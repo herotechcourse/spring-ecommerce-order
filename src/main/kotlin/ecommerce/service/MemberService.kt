@@ -4,12 +4,12 @@ import ecommerce.auth.JwtTokenProvider
 import ecommerce.dto.MemberRequest
 import ecommerce.dto.TokenMemberResponse
 import ecommerce.model.Member
-import ecommerce.repository.MemberRepository
+import ecommerce.repository.MemberJpaRepository
 import org.springframework.stereotype.Service
 
 @Service
 class MemberService(
-    private val memberRepository: MemberRepository,
+    private val memberRepository: MemberJpaRepository,
     private val jwtTokenProvider: JwtTokenProvider,
 ) {
     fun register(request: MemberRequest): TokenMemberResponse {
@@ -36,11 +36,11 @@ class MemberService(
         return TokenMemberResponse(token)
     }
 
-    fun findByToken(token: String): Member {
+    fun findByToken(token: String): Member? {
         val memberId =
             jwtTokenProvider.getSubject(token).toLongOrNull()
                 ?: throw IllegalArgumentException("Invalid token")
-        return memberRepository.findById(memberId)
-            ?: throw IllegalArgumentException("Member not found")
+
+        return memberRepository.findById(memberId).orElse(null)
     }
 }

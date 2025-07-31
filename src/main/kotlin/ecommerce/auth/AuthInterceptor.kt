@@ -24,7 +24,7 @@ class AuthInterceptor(
                 return unauthorized(response)
             }
 
-        if (request.requestURI.startsWith("/admin") && member.role != "ADMIN") {
+        if (request.requestURI.startsWith("/admin") && member?.role != "ADMIN") {
             return unauthorized(response)
         }
 
