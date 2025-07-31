@@ -2,7 +2,7 @@ package ecommerce.service
 
 import ecommerce.dto.ProductRequest
 import ecommerce.exception.DuplicateProductNameException
-import ecommerce.model.Product
+import ecommerce.entity.Product
 import ecommerce.repository.ProductJpaRepository
 import jakarta.transaction.Transactional
 import org.springframework.stereotype.Service

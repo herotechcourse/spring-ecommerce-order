@@ -1,6 +1,6 @@
 package ecommerce.controller
 
-import ecommerce.model.Product
+import ecommerce.entity.Product
 import ecommerce.repository.ProductJpaRepository
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller

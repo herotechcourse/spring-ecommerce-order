@@ -2,7 +2,7 @@ package ecommerce.auth.resolver
 
 import ecommerce.auth.annotation.LoginMember
 import ecommerce.exception.UnauthorizedException
-import ecommerce.model.Member
+import ecommerce.entity.Member
 import ecommerce.service.MemberService
 import org.springframework.core.MethodParameter
 import org.springframework.stereotype.Component

@@ -3,7 +3,7 @@ package ecommerce.service
 import ecommerce.auth.JwtTokenProvider
 import ecommerce.dto.MemberRequest
 import ecommerce.dto.TokenMemberResponse
-import ecommerce.model.Member
+import ecommerce.entity.Member
 import ecommerce.repository.MemberJpaRepository
 import org.springframework.stereotype.Service
 
