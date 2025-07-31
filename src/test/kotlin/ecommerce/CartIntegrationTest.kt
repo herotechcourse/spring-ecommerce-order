@@ -3,7 +3,7 @@ package ecommerce
 import ecommerce.dto.CartRequest
 import ecommerce.dto.MemberRequest
 import ecommerce.model.Product
-import ecommerce.repository.ProductRepository
+import ecommerce.repository.ProductJpaRepository
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
 import org.assertj.core.api.Assertions.assertThat
@@ -23,7 +23,7 @@ class CartIntegrationTest {
     var port: Int = 0
 
     @Autowired
-    private lateinit var productRepository: ProductRepository
+    private lateinit var productRepository: ProductJpaRepository
     private lateinit var token: String
     private lateinit var product: Product
 
@@ -98,8 +98,8 @@ class CartIntegrationTest {
                 price = 10.0,
                 imageUrl = "https://example.com/image.jpg",
             )
-        productRepository.createProduct(productObj)
-        product = productRepository.getAll().first()
+        productRepository.save(productObj)
+        product = productRepository.findAll().first()
     }
 
     @Test
