@@ -13,7 +13,6 @@ import org.springframework.data.domain.Sort
 
 @DataJpaTest
 class CartPaginationTest {
-
     @Autowired
     lateinit var cartJpaRepository: CartJpaRepository
 
@@ -29,15 +28,16 @@ class CartPaginationTest {
     fun setUp() {
         member = memberJpaRepository.save(Member(name = "TestUser", email = "user@test.com", password = "secret"))
 
-        val products = (1..12).map {
-            productJpaRepository.save(
-                Product(
-                    name = "Product $it",
-                    price = 10.0 + it,
-                    imageUrl = "http://test.com/product$it.png"
+        val products =
+            (1..12).map {
+                productJpaRepository.save(
+                    Product(
+                        name = "Product $it",
+                        price = 10.0 + it,
+                        imageUrl = "http://test.com/product$it.png",
+                    ),
                 )
-            )
-        }
+            }
 
         products.forEach {
             cartJpaRepository.save(Cart(member = member, product = it))
@@ -53,5 +53,4 @@ class CartPaginationTest {
         assertThat(page.totalElements).isEqualTo(12)
         assertThat(page.totalPages).isEqualTo(3)
     }
-
 }

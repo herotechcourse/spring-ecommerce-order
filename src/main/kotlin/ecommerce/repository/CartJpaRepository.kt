@@ -8,10 +8,15 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface CartJpaRepository : JpaRepository<Cart, Long> {
-
     fun findByMemberId(memberId: Long): List<Cart>
 
-    fun findByMemberId(memberId: Long, pageable: Pageable): Page <Cart>
+    fun findByMemberId(
+        memberId: Long,
+        pageable: Pageable,
+    ): Page<Cart>
 
-    fun deleteByMemberIdAndProductId(memberId: Long, productId: Long)
+    fun deleteByMemberIdAndProductId(
+        memberId: Long,
+        productId: Long,
+    )
 }

@@ -13,41 +13,43 @@ import java.time.LocalDateTime
 
 @DataJpaTest
 class CartJpaRepositoryTest
+    @Autowired
+    constructor(
+        val cartRepository: CartJpaRepository,
+        val productRepository: ProductJpaRepository,
+        val memberRepository: MemberJpaRepository,
+        val entityManager: EntityManager,
+    ) {
+        private lateinit var member: Member
+        private lateinit var product: Product
 
-@Autowired constructor(
-    val cartRepository: CartJpaRepository,
-    val productRepository: ProductJpaRepository,
-    val memberRepository: MemberJpaRepository,
-    val entityManager: EntityManager,
-) {
-    private lateinit var member: Member
-    private lateinit var product: Product
+        @BeforeEach
+        fun setup() {
+            member =
+                memberRepository.save(
+                    Member(name = "Alice", email = "alice@example.com", password = "pw"),
+                )
 
-    @BeforeEach
-    fun setup() {
-        member = memberRepository.save(
-            Member(name = "Alice", email = "alice@example.com", password = "pw")
-        )
+            product =
+                productRepository.save(
+                    Product(name = "Widget", price = 9.99, imageUrl = "http://image.com/widget.png"),
+                )
 
-        product = productRepository.save(
-            Product(name = "Widget", price = 9.99, imageUrl = "http://image.com/widget.png")
-        )
+            val now = LocalDateTime.now()
+            cartRepository.save(Cart(member = member, product = product, createdAt = now))
+        }
 
-        val now = LocalDateTime.now()
-        cartRepository.save(Cart(member = member, product = product, createdAt = now))
+        @Test
+        fun `findByMemberId should return items for given member`() {
+            val items = cartRepository.findByMemberId(member.id)
+            assertThat(items).hasSize(1)
+            assertThat(items[0].member.id).isEqualTo(member.id)
+        }
+
+        @Test
+        fun `deleteByMemberIdAndProductId should remove item`() {
+            cartRepository.deleteByMemberIdAndProductId(member.id, product.id)
+            val items = cartRepository.findByMemberId(member.id)
+            assertThat(items).isEmpty()
+        }
     }
-
-    @Test
-    fun `findByMemberId should return items for given member`() {
-        val items = cartRepository.findByMemberId(member.id)
-        assertThat(items).hasSize(1)
-        assertThat(items[0].member.id).isEqualTo(member.id)
-    }
-
-    @Test
-    fun `deleteByMemberIdAndProductId should remove item`() {
-        cartRepository.deleteByMemberIdAndProductId(member.id, product.id)
-        val items = cartRepository.findByMemberId(member.id)
-        assertThat(items).isEmpty()
-    }
-}

@@ -9,7 +9,6 @@ import kotlin.test.Test
 
 @DataJpaTest
 class ProductJpaRepositoryTest {
-
     @Autowired
     lateinit var productJpaRepository: ProductJpaRepository
 
@@ -17,11 +16,12 @@ class ProductJpaRepositoryTest {
 
     @BeforeEach
     fun setUp() {
-        val product = Product(
-            name = "TestProduct",
-            price = 19.99,
-            imageUrl = "http://test.com/image.png"
-        )
+        val product =
+            Product(
+                name = "TestProduct",
+                price = 19.99,
+                imageUrl = "http://test.com/image.png",
+            )
         savedProduct = productJpaRepository.save(product)
     }
 

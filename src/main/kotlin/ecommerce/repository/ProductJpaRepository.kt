@@ -8,10 +8,12 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface ProductJpaRepository : JpaRepository<Product, Long> {
-
     fun existsByName(name: String): Boolean
 
-    fun existsByNameAndIdNot(name: String, id: Long): Boolean
+    fun existsByNameAndIdNot(
+        name: String,
+        id: Long,
+    ): Boolean
 
     override fun findAll(pageable: Pageable): Page<Product>
 }

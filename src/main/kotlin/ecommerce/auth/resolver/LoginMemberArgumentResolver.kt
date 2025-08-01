@@ -1,8 +1,8 @@
 package ecommerce.auth.resolver
 
 import ecommerce.auth.annotation.LoginMember
-import ecommerce.exception.UnauthorizedException
 import ecommerce.entity.Member
+import ecommerce.exception.UnauthorizedException
 import ecommerce.service.MemberService
 import org.springframework.core.MethodParameter
 import org.springframework.stereotype.Component
@@ -24,7 +24,7 @@ class LoginMemberArgumentResolver(
         mavContainer: ModelAndViewContainer?,
         webRequest: NativeWebRequest,
         binderFactory: WebDataBinderFactory?,
-    ): Member?{
+    ): Member?  {
         val token =
             webRequest.getHeader("Authorization")
                 ?.removePrefix("Bearer ")

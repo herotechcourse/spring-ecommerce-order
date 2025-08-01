@@ -1,12 +1,12 @@
 package ecommerce.service
 
 import ecommerce.dto.ProductRequest
-import ecommerce.exception.DuplicateProductNameException
 import ecommerce.entity.Product
-import org.springframework.data.domain.Page
-import org.springframework.data.domain.Pageable
+import ecommerce.exception.DuplicateProductNameException
 import ecommerce.repository.ProductJpaRepository
 import jakarta.transaction.Transactional
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 
 @Service
@@ -54,11 +54,12 @@ class ProductService(
             throw DuplicateProductNameException()
         }
 
-        val updatedProduct = Product(
-            name = request.name,
-            price = request.price,
-            imageUrl = request.imageUrl
-        )
+        val updatedProduct =
+            Product(
+                name = request.name,
+                price = request.price,
+                imageUrl = request.imageUrl,
+            )
 
         productRepository.save(updatedProduct)
         return updatedProduct
