@@ -2,6 +2,7 @@ package ecommerce.repository
 
 import ecommerce.entity.Cart
 import ecommerce.entity.Member
+import ecommerce.entity.Option
 import ecommerce.entity.Product
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -35,6 +36,12 @@ class CartPaginationTest {
                         name = "Product $it",
                         price = 10.0 + it,
                         imageUrl = "http://test.com/product$it.png",
+                        listOf(
+                            Option(
+                                "name",
+                                1,
+                            ),
+                        ),
                     ),
                 )
             }

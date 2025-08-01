@@ -2,6 +2,7 @@ package ecommerce.repository
 
 import ecommerce.entity.Cart
 import ecommerce.entity.Member
+import ecommerce.entity.Option
 import ecommerce.entity.Product
 import jakarta.persistence.EntityManager
 import org.assertj.core.api.Assertions.assertThat
@@ -32,7 +33,15 @@ class CartJpaRepositoryTest
 
             product =
                 productRepository.save(
-                    Product(name = "Widget", price = 9.99, imageUrl = "http://image.com/widget.png"),
+                    Product(
+                        name = "Widget", price = 9.99, imageUrl = "http://image.com/widget.png",
+                        listOf(
+                            Option(
+                                "name",
+                                1,
+                            ),
+                        ),
+                    ),
                 )
 
             val now = LocalDateTime.now()

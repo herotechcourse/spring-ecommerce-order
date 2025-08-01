@@ -24,7 +24,7 @@ class LoginMemberArgumentResolver(
         mavContainer: ModelAndViewContainer?,
         webRequest: NativeWebRequest,
         binderFactory: WebDataBinderFactory?,
-    ): Member?  {
+    ): Member? {
         val token =
             webRequest.getHeader("Authorization")
                 ?.removePrefix("Bearer ")
