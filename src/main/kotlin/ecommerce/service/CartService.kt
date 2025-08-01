@@ -1,38 +1,49 @@
 package ecommerce.service
 
+import ecommerce.dto.CartRequest
 import ecommerce.dto.MemberStatsResponse
 import ecommerce.dto.ProductStatResponse
-import ecommerce.model.CartItem
-import ecommerce.repository.CartRepository
+import ecommerce.entity.Cart
+import ecommerce.entity.Member
+import ecommerce.entity.Product
+import ecommerce.repository.CartJpaRepository
+import ecommerce.repository.CartStaticsRepository
+import ecommerce.repository.ProductJpaRepository
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
+@Transactional
 @Service
 class CartService(
-    private val cartRepository: CartRepository,
+    private val cartRepository: CartJpaRepository,
+    private val productRepository: ProductJpaRepository,
+    private val cartStaticsRepository: CartStaticsRepository,
 ) {
     fun addToCart(
-        memberId: Long,
-        productId: Long,
+        member: Member,
+        request: CartRequest,
     ) {
-        cartRepository.addToCart(memberId, productId)
+        val product = productRepository.findByIdOrNull(request.productId) ?: throw NoSuchElementException()
+        cartRepository.save(Cart(member, product))
     }
 
-    fun getCartItems(memberId: Long): List<CartItem> {
-        return cartRepository.getCartItems(memberId)
+    fun getCartItems(memberId: Long): List<Cart> {
+        return cartRepository.findByMemberId(memberId)
     }
 
     fun removeFromCart(
         memberId: Long,
         productId: Long,
     ) {
-        cartRepository.removeFromCart(memberId, productId)
+        cartRepository.deleteByMemberIdAndProductId(memberId, productId)
     }
 
     fun getTop5MostAddedProducts(): List<ProductStatResponse> {
-        return cartRepository.getTop5MostAddedProducts()
+        return cartStaticsRepository.getTop5MostAddedProducts()
     }
 
     fun getRecentlyActiveMembers(): List<MemberStatsResponse> {
-        return cartRepository.getRecentlyActiveMembers()
+        return cartStaticsRepository.getRecentlyActiveMembers()
     }
 }
