@@ -26,8 +26,8 @@ class ProductJpaRepositoryTest {
                     Option(
                         "name",
                         1,
-                    )
-                )
+                    ),
+                ),
             )
         savedProduct = productJpaRepository.save(product)
     }

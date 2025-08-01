@@ -14,15 +14,11 @@ import jakarta.persistence.Table
 class Product(
     @Column(name = "name", nullable = false)
     val name: String,
-
     @Column(name = "price", nullable = false)
     val price: Double,
-
     @Column(name = "image_url")
     val imageUrl: String,
-
     options: List<Option>,
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0L,

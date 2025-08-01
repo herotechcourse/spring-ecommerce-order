@@ -27,8 +27,8 @@ class ProductPaginationTest {
                         Option(
                             "name",
                             1,
-                        )
-                    )
+                        ),
+                    ),
                 )
             }
         productJpaRepository.saveAll(products)

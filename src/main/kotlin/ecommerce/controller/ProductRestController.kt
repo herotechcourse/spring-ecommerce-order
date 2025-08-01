@@ -37,7 +37,7 @@ class ProductRestController(
 
     @GetMapping("/{id}/options")
     fun getOptions(
-        @PathVariable id: Long
+        @PathVariable id: Long,
     ): ResponseEntity<List<OptionResponse>> {
         val options = productService.getOptions(id)
         return ResponseEntity.ok(options)

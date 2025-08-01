@@ -10,7 +10,7 @@ class ProductTest {
             createProduct(
                 listOf<Option>(
                     option,
-                )
+                ),
             ).addOption(option)
         }
     }
@@ -29,7 +29,7 @@ class ProductTest {
                 listOf<Option>(
                     option,
                     option,
-                )
+                ),
             )
         }
     }
@@ -39,14 +39,15 @@ class ProductTest {
             "pizza",
             1.2,
             "https://pizza.png",
-            options
+            options,
         )
     }
 
     companion object {
-        val option =  Option(
-            "salami",
-            1,
-        )
+        val option =
+            Option(
+                "salami",
+                1,
+            )
     }
 }

@@ -14,18 +14,15 @@ data class ProductRequest(
         message = "Name contains invalid characters",
     )
     val name: String,
-
     @field:Min(value = 1, message = "Price must be greater than 0")
     val price: Double,
-
     @field:NotBlank(message = "Image URL must not be blank")
     @field:Pattern(
         regexp = """^https?://.*""",
         message = "Image URL must start with http:// or https://",
     )
     val imageUrl: String,
-
     @field:Size(min = 1, message = "At least one option is required")
     @field:Valid
-    val options: List<OptionRequest>
+    val options: List<OptionRequest>,
 )
