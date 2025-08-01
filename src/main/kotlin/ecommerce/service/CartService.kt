@@ -11,6 +11,8 @@ import ecommerce.repository.ProductJpaRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 
 @Transactional
 @Service
@@ -29,6 +31,10 @@ class CartService(
 
     fun getCartItems(memberId: Long): List<Cart> {
         return cartRepository.findByMemberId(memberId)
+    }
+
+    fun getCartItemsPaginated(memberId:Long, pageable: Pageable): Page<Cart> {
+        return cartRepository.findByMemberId(memberId, pageable)
     }
 
     fun removeFromCart(
