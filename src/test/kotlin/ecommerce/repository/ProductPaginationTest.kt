@@ -1,5 +1,6 @@
 package ecommerce.repository
 
+import ecommerce.entity.Option
 import ecommerce.entity.Product
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -22,6 +23,12 @@ class ProductPaginationTest {
                     name = "Product $it",
                     price = 10.0 + it,
                     imageUrl = "http://test.com/product$it.png",
+                    listOf(
+                        Option(
+                            "name",
+                            1,
+                        )
+                    )
                 )
             }
         productJpaRepository.saveAll(products)

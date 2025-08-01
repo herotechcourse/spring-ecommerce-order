@@ -1,5 +1,6 @@
 package ecommerce.controller
 
+import ecommerce.dto.OptionResponse
 import ecommerce.dto.ProductRequest
 import ecommerce.entity.Product
 import ecommerce.service.ProductService
@@ -32,6 +33,14 @@ class ProductRestController(
             productService.getById(id)
                 ?: return ResponseEntity.notFound().build()
         return ResponseEntity.ok(product)
+    }
+
+    @GetMapping("/{id}/options")
+    fun getOptions(
+        @PathVariable id: Long
+    ): ResponseEntity<List<OptionResponse>> {
+        val options = productService.getOptions(id)
+        return ResponseEntity.ok(options)
     }
 
     @PostMapping
