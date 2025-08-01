@@ -25,7 +25,12 @@ class CartItemService(
         val member =
             memberRepository.findByIdOrNull(memberId)
                 ?: throw NotFoundException(MESSAGE_PRODUCT_NOT_FOUND)
-        val pages = cartItemRepository.findAllByMemberOrderByProductNameAsc(member, PageRequest.of(pageNumber, pageSize))
+        val pages =
+            when (sortBy) {
+                "name" -> cartItemRepository.findAllByMemberOrderByProductNameAsc(member, PageRequest.of(pageNumber, pageSize))
+                "price" -> cartItemRepository.findAllByMemberOrderByProductPriceAsc(member, PageRequest.of(pageNumber, pageSize))
+                else -> throw NotFoundException(MESSAGE_UNKNOWN_SORT_BY)
+            }
         return pages
     }
 
@@ -95,5 +100,6 @@ class CartItemService(
         const val MESSAGE_PRODUCT_NOT_FOUND_IN_CART = "Product not found in Cart"
         const val MESSAGE_REMOVE_SUCCESS = "Item removed from cart"
         const val MESSAGE_UPDATE_SUCCESS = "Item updated in cart"
+        const val MESSAGE_UNKNOWN_SORT_BY = "Unknown sort by method"
     }
 }
