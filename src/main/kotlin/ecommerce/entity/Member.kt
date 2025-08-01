@@ -25,4 +25,10 @@ class Member(
 
     @Column(name = "role")
     val role: String = "USER",
-)
+) {
+    companion object {
+        fun toEntity(id: Long): Member {
+            return Member(id, "", "", "")
+        }
+    }
+}
