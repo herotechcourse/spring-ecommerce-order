@@ -3,6 +3,8 @@ package ecommerce.service
 import ecommerce.dto.ProductRequest
 import ecommerce.exception.DuplicateProductNameException
 import ecommerce.entity.Product
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import ecommerce.repository.ProductJpaRepository
 import jakarta.transaction.Transactional
 import org.springframework.stereotype.Service
@@ -34,6 +36,10 @@ class ProductService(
 
         productRepository.save(product)
         return product
+    }
+
+    fun getAllPaginated(pageable: Pageable): Page<Product> {
+        return productRepository.findAll(pageable)
     }
 
     @Transactional

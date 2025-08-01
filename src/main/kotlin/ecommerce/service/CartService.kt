@@ -5,7 +5,6 @@ import ecommerce.dto.MemberStatsResponse
 import ecommerce.dto.ProductStatResponse
 import ecommerce.entity.Cart
 import ecommerce.entity.Member
-import ecommerce.entity.Product
 import ecommerce.repository.CartJpaRepository
 import ecommerce.repository.CartStaticsRepository
 import ecommerce.repository.ProductJpaRepository
