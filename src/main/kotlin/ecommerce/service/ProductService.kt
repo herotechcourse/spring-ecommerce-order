@@ -2,6 +2,7 @@ package ecommerce.service
 
 import ecommerce.dto.OptionResponse
 import ecommerce.dto.ProductRequest
+import ecommerce.dto.ProductResponse
 import ecommerce.entity.Option
 import ecommerce.entity.Product
 import ecommerce.exception.DuplicateProductNameException
@@ -17,16 +18,16 @@ class ProductService(
     private val productRepository: ProductJpaRepository,
     private val optionRepository: OptionJpaRepository,
 ) {
-    fun getAll(): List<Product> {
-        return productRepository.findAll()
+    fun getAll(): List<ProductResponse> {
+        return productRepository.findAll().map { it.toResponse() }
     }
 
-    fun getById(id: Long): Product? {
-        return productRepository.findById(id).orElse(null)
+    fun getById(id: Long): ProductResponse? {
+        return productRepository.findById(id).orElse(null)?.toResponse()
     }
 
-    fun getAllPaginated(pageable: Pageable): Page<Product> {
-        return productRepository.findAll(pageable)
+    fun getAllPaginated(pageable: Pageable): Page<ProductResponse> {
+        return productRepository.findAll(pageable).map { it.toResponse() }
     }
 
     fun getOptions(productId: Long): List<OptionResponse> {
@@ -41,63 +42,93 @@ class ProductService(
         }
     }
 
-    fun create(request: ProductRequest): Product {
+    fun create(request: ProductRequest): ProductResponse {
         if (productRepository.existsByName(request.name)) {
             throw DuplicateProductNameException()
         }
 
-        val options =
-            request.options.map {
-                Option(
-                    name = it.name,
-                    quantity = it.quantity,
-                )
-            }
+        val product = Product(
+            name = request.name,
+            price = request.price,
+            imageUrl = request.imageUrl,
+            options = emptyList()
+        )
 
-        val product =
-            Product(
-                name = request.name,
-                price = request.price,
-                imageUrl = request.imageUrl,
-                options = options,
+        val options = request.options.map {
+            Option(
+                name = it.name,
+                quantity = it.quantity,
+                product = product
             )
+        }
 
-        productRepository.save(product)
-        return product
+        val productWithOptions = Product(
+            name = request.name,
+            price = request.price,
+            imageUrl = request.imageUrl,
+            options = options
+        )
+
+        productRepository.save(productWithOptions)
+        return productWithOptions.toResponse()
     }
 
     @Transactional
     fun update(
         id: Long,
         request: ProductRequest,
-    ): Product {
-        val existingProduct =
-            productRepository.findById(id)
+    ): ProductResponse {
+        val existingProduct = productRepository.findById(id).orElseThrow {
+            NoSuchElementException("Product with ID $id not found.")
+        }
 
         if (productRepository.existsByNameAndIdNot(request.name, id)) {
             throw DuplicateProductNameException()
         }
 
-        val options =
-            request.options.map {
-                Option(
-                    name = it.name,
-                    quantity = it.quantity,
-                )
-            }
+        val updatedProduct = Product(
+            id = existingProduct.id,
+            name = request.name,
+            price = request.price,
+            imageUrl = request.imageUrl,
+            options = emptyList()
+        )
 
-        val updatedProduct =
-            Product(
-                name = request.name,
-                price = request.price,
-                imageUrl = request.imageUrl,
-                options = options,
+        val updatedOptions = request.options.map {
+            Option(
+                name = it.name,
+                quantity = it.quantity,
+                product = updatedProduct
             )
+        }
 
-        productRepository.save(updatedProduct)
-        return updatedProduct
+        val productWithOptions = Product(
+            id = existingProduct.id,
+            name = request.name,
+            price = request.price,
+            imageUrl = request.imageUrl,
+            options = updatedOptions
+        )
+
+        productRepository.save(productWithOptions)
+        return productWithOptions.toResponse()
     }
 
+    private fun Product.toResponse(): ProductResponse {
+        return ProductResponse(
+            id = this.id,
+            name = this.name,
+            price = this.price,
+            imageUrl = this.imageUrl,
+            options = this.options.map {
+                OptionResponse(
+                    id = it.id,
+                    name = it.name,
+                    quantity = it.quantity
+                )
+            }
+        )
+    }
     fun delete(id: Long) {
         productRepository.deleteById(id)
     }

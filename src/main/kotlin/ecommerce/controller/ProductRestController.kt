@@ -2,9 +2,11 @@ package ecommerce.controller
 
 import ecommerce.dto.OptionResponse
 import ecommerce.dto.ProductRequest
-import ecommerce.entity.Product
+import ecommerce.dto.ProductResponse
 import ecommerce.service.ProductService
 import jakarta.validation.Valid
+import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Page
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
@@ -20,18 +22,19 @@ import org.springframework.web.bind.annotation.RestController
 class ProductRestController(
     private val productService: ProductService,
 ) {
+
     @GetMapping
-    fun getAll(): ResponseEntity<List<Product>> {
-        return ResponseEntity.ok(productService.getAll())
+    fun getAll(pageable: Pageable): ResponseEntity<Page<ProductResponse>> {
+        val page = productService.getAllPaginated(pageable)
+        return ResponseEntity.ok(page)
     }
 
     @GetMapping("/{id}")
     fun getById(
         @PathVariable id: Long,
-    ): ResponseEntity<Product> {
-        val product =
-            productService.getById(id)
-                ?: return ResponseEntity.notFound().build()
+    ): ResponseEntity<ProductResponse> {
+        val product = productService.getById(id)
+            ?: return ResponseEntity.notFound().build()
         return ResponseEntity.ok(product)
     }
 
@@ -46,7 +49,7 @@ class ProductRestController(
     @PostMapping
     fun create(
         @RequestBody @Valid request: ProductRequest,
-    ): ResponseEntity<Product> {
+    ): ResponseEntity<ProductResponse> {
         val createdProduct = productService.create(request)
         return ResponseEntity.ok(createdProduct)
     }
@@ -55,7 +58,7 @@ class ProductRestController(
     fun update(
         @PathVariable id: Long,
         @RequestBody @Valid request: ProductRequest,
-    ): ResponseEntity<Product> {
+    ): ResponseEntity<ProductResponse> {
         val updatedProduct = productService.update(id, request)
         return ResponseEntity.ok(updatedProduct)
     }
