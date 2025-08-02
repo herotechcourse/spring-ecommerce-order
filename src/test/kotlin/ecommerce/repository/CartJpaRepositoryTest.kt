@@ -24,30 +24,37 @@ class CartJpaRepositoryTest
         private lateinit var member: Member
         private lateinit var product: Product
 
-        @BeforeEach
-        fun setup() {
-            member =
-                memberRepository.save(
-                    Member(name = "Alice", email = "alice@example.com", password = "pw"),
-                )
+    @BeforeEach
+    fun setup() {
+        member = memberRepository.save(
+            Member(name = "Alice", email = "alice@example.com", password = "pw"),
+        )
 
-            product =
-                productRepository.save(
-                    Product(
-                        name = "Widget", price = 9.99, imageUrl = "http://image.com/widget.png",
-                        listOf(
-                            Option(
-                                "name",
-                                1,
-                            ),
-                        ),
-                    ),
-                )
+        val baseProduct = Product(
+            name = "Widget",
+            price = 9.99,
+            imageUrl = "http://image.com/widget.png",
+            options = emptyList()
+        )
 
-            val now = LocalDateTime.now()
-            cartRepository.save(Cart(member = member, product = product, createdAt = now))
-        }
+        val option = Option(
+            name = "Standard",
+            quantity = 1,
+            product = baseProduct
+        )
 
+        val productWithOptions = Product(
+            name = "Widget",
+            price = 9.99,
+            imageUrl = "http://image.com/widget.png",
+            options = listOf(option)
+        )
+
+        product = productRepository.save(productWithOptions)
+
+        val now = LocalDateTime.now()
+        cartRepository.save(Cart(member = member, product = product, createdAt = now))
+    }
         @Test
         fun `findByMemberId should return items for given member`() {
             val items = cartRepository.findByMemberId(member.id)

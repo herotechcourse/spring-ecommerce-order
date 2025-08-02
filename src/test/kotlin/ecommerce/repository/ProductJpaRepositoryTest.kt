@@ -1,5 +1,6 @@
 package ecommerce.repository
 
+import ecommerce.entity.Member
 import ecommerce.entity.Option
 import ecommerce.entity.Product
 import org.assertj.core.api.Assertions.assertThat
@@ -16,20 +17,28 @@ class ProductJpaRepositoryTest {
     private lateinit var savedProduct: Product
 
     @BeforeEach
-    fun setUp() {
-        val product =
-            Product(
-                name = "TestProduct",
-                price = 19.99,
-                imageUrl = "http://test.com/image.png",
-                listOf(
-                    Option(
-                        "name",
-                        1,
-                    ),
-                ),
-            )
-        savedProduct = productJpaRepository.save(product)
+    fun setup() {
+        val baseProduct = Product(
+            name = "Widget",
+            price = 9.99,
+            imageUrl = "http://image.com/widget.png",
+            options = emptyList()
+        )
+
+        val option = Option(
+            name = "Standard",
+            quantity = 1,
+            product = baseProduct
+        )
+
+        val productWithOptions = Product(
+            name = "Widget",
+            price = 9.99,
+            imageUrl = "http://image.com/widget.png",
+            options = listOf(option)
+        )
+
+        savedProduct = productJpaRepository.save(productWithOptions)
     }
 
     @Test

@@ -14,21 +14,26 @@ class OptionJpaRepositoryTest {
 
     @BeforeEach
     fun setUp() {
-        val mockProduct =
-            Product(
-                "product",
-                0.2,
-                "https://image.png",
-                listOf(
-                    Option(
-                        "name",
-                        1,
-                    ),
-                ),
-            )
-    }
+        val product = Product(
+            name = "product",
+            price = 0.2,
+            imageUrl = "https://image.png",
+            options = emptyList()
+        )
 
-    @org.junit.jupiter.api.Test
-    fun `findByProductId should return a list of options`() {
+        val option = Option(
+            name = "name",
+            quantity = 1,
+            product = product
+        )
+
+        val productWithOption = Product(
+            name = "product",
+            price = 0.2,
+            imageUrl = "https://image.png",
+            options = listOf(option)
+        )
+
+        optionJpaRepository.save(option)
     }
-}
+    }

@@ -25,9 +25,15 @@ class ProductPaginationTest {
                     imageUrl = "http://test.com/product$it.png",
                     listOf(
                         Option(
-                            "name",
-                            1,
-                        ),
+                            name = "Option $it",
+                            quantity = 1,
+                            product = Product(
+                                name = "Product $it",
+                                price = 10.0 + it,
+                                imageUrl = "http://test.com/product$it.png",
+                                options = emptyList()
+                            )
+                        )
                     ),
                 )
             }
