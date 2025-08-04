@@ -27,28 +27,33 @@ class ProductRestControllerJpaTest {
 
     @Test
     fun `create and fetch product`() {
+
         val request = ProductRequest(
             name = "chair",
             price = 22.0,
             imageUrl = "https://test.com/chair.jpg",
-            options = listOf(OptionRequest(name = "default", quantity = 1))
+            options = listOf(
+                OptionRequest(name = "default", quantity = 1)
+            )
         )
 
-        val postResponse: ResponseEntity<Map<String, Any>> = restTemplate.postForEntity(
+
+        val postResponse = restTemplate.postForEntity<Map<String, Any>>(
             "/api/products",
             request,
             object : ParameterizedTypeReference<Map<String, Any>>() {}
         )
 
         assertThat(postResponse.statusCode).isEqualTo(HttpStatus.OK)
-        val productId = postResponse.body?.get("id") as Int
+        val productId = (postResponse.body?.get("id") as Number).toLong()
 
-        val getResponse: ResponseEntity<Map<String, Any>> = restTemplate.getForEntity(
+        val getResponse = restTemplate.getForEntity<Map<String, Any>>(
             "/api/products/$productId",
             object : ParameterizedTypeReference<Map<String, Any>>() {}
         )
 
         assertThat(getResponse.statusCode).isEqualTo(HttpStatus.OK)
         assertThat(getResponse.body?.get("name")).isEqualTo("chair")
+        assertThat((getResponse.body?.get("options") as List<*>).size).isEqualTo(1)
     }
 }

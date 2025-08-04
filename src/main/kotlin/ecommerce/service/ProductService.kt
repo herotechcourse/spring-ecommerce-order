@@ -42,16 +42,19 @@ class ProductService(
         }
     }
 
+    @Transactional
     fun create(request: ProductRequest): ProductResponse {
         if (productRepository.existsByName(request.name)) {
             throw DuplicateProductNameException()
         }
 
-        val product = Product(
-            name = request.name,
-            price = request.price,
-            imageUrl = request.imageUrl,
-            options = emptyList()
+        val product = productRepository.save(
+            Product(
+                name = request.name,
+                price = request.price,
+                imageUrl = request.imageUrl,
+                options = emptyList()
+            )
         )
 
         val options = request.options.map {
@@ -62,15 +65,21 @@ class ProductService(
             )
         }
 
-        val productWithOptions = Product(
-            name = request.name,
-            price = request.price,
-            imageUrl = request.imageUrl,
-            options = options
-        )
+        val savedOptions = optionRepository.saveAll(options)
 
-        productRepository.save(productWithOptions)
-        return productWithOptions.toResponse()
+        return ProductResponse(
+            id = product.id,
+            name = product.name,
+            price = product.price,
+            imageUrl = product.imageUrl,
+            options = savedOptions.map {
+                OptionResponse(
+                    id = it.id,
+                    name = it.name,
+                    quantity = it.quantity
+                )
+            }
+        )
     }
 
     @Transactional
