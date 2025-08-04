@@ -26,11 +26,9 @@ class Product(
     @OneToMany(mappedBy = "product", cascade = [CascadeType.PERSIST, CascadeType.ALL])
     val options: MutableList<Option> = options.toMutableList()
 
-//    init {
-//        require(options.isNotEmpty())
-//        require(options.size == options.distinctBy { it.name }.size)
-//        options.forEach { it.product = this }
-//    }
+    init {
+        options.forEach { it.product = this }
+    }
 
     fun addOption(option: Option) {
         require(options.none { it.name == option.name })
