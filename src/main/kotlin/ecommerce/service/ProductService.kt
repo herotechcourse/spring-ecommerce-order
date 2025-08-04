@@ -48,22 +48,24 @@ class ProductService(
             throw DuplicateProductNameException()
         }
 
-        val product = productRepository.save(
-            Product(
-                name = request.name,
-                price = request.price,
-                imageUrl = request.imageUrl,
-                options = emptyList()
+        val product =
+            productRepository.save(
+                Product(
+                    name = request.name,
+                    price = request.price,
+                    imageUrl = request.imageUrl,
+                    options = emptyList(),
+                ),
             )
-        )
 
-        val options = request.options.map {
-            Option(
-                name = it.name,
-                quantity = it.quantity,
-                product = product
-            )
-        }
+        val options =
+            request.options.map {
+                Option(
+                    name = it.name,
+                    quantity = it.quantity,
+                    product = product,
+                )
+            }
 
         val savedOptions = optionRepository.saveAll(options)
 
@@ -72,13 +74,14 @@ class ProductService(
             name = product.name,
             price = product.price,
             imageUrl = product.imageUrl,
-            options = savedOptions.map {
-                OptionResponse(
-                    id = it.id,
-                    name = it.name,
-                    quantity = it.quantity
-                )
-            }
+            options =
+                savedOptions.map {
+                    OptionResponse(
+                        id = it.id,
+                        name = it.name,
+                        quantity = it.quantity,
+                    )
+                },
         )
     }
 
@@ -87,37 +90,41 @@ class ProductService(
         id: Long,
         request: ProductRequest,
     ): ProductResponse {
-        val existingProduct = productRepository.findById(id).orElseThrow {
-            NoSuchElementException("Product with ID $id not found.")
-        }
+        val existingProduct =
+            productRepository.findById(id).orElseThrow {
+                NoSuchElementException("Product with ID $id not found.")
+            }
 
         if (productRepository.existsByNameAndIdNot(request.name, id)) {
             throw DuplicateProductNameException()
         }
 
-        val updatedProduct = Product(
-            id = existingProduct.id,
-            name = request.name,
-            price = request.price,
-            imageUrl = request.imageUrl,
-            options = emptyList()
-        )
-
-        val updatedOptions = request.options.map {
-            Option(
-                name = it.name,
-                quantity = it.quantity,
-                product = updatedProduct
+        val updatedProduct =
+            Product(
+                id = existingProduct.id,
+                name = request.name,
+                price = request.price,
+                imageUrl = request.imageUrl,
+                options = emptyList(),
             )
-        }
 
-        val productWithOptions = Product(
-            id = existingProduct.id,
-            name = request.name,
-            price = request.price,
-            imageUrl = request.imageUrl,
-            options = updatedOptions
-        )
+        val updatedOptions =
+            request.options.map {
+                Option(
+                    name = it.name,
+                    quantity = it.quantity,
+                    product = updatedProduct,
+                )
+            }
+
+        val productWithOptions =
+            Product(
+                id = existingProduct.id,
+                name = request.name,
+                price = request.price,
+                imageUrl = request.imageUrl,
+                options = updatedOptions,
+            )
 
         productRepository.save(productWithOptions)
         return productWithOptions.toResponse()
@@ -129,15 +136,17 @@ class ProductService(
             name = this.name,
             price = this.price,
             imageUrl = this.imageUrl,
-            options = this.options.map {
-                OptionResponse(
-                    id = it.id,
-                    name = it.name,
-                    quantity = it.quantity
-                )
-            }
+            options =
+                this.options.map {
+                    OptionResponse(
+                        id = it.id,
+                        name = it.name,
+                        quantity = it.quantity,
+                    )
+                },
         )
     }
+
     fun delete(id: Long) {
         productRepository.deleteById(id)
     }

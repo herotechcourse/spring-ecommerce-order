@@ -10,7 +10,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 
 @DataJpaTest
 class ProductJpaRepositoryTest {
-
     @Autowired
     lateinit var productJpaRepository: ProductJpaRepository
 
@@ -18,27 +17,30 @@ class ProductJpaRepositoryTest {
 
     @BeforeEach
     fun setUp() {
-        val baseProduct = Product(
-            name = "TestProduct",
-            price = 19.99,
-            imageUrl = "http://test.com/image.png",
-            options = emptyList()
-        )
+        val baseProduct =
+            Product(
+                name = "TestProduct",
+                price = 19.99,
+                imageUrl = "http://test.com/image.png",
+                options = emptyList(),
+            )
         val persistedProduct = productJpaRepository.save(baseProduct)
 
-        val option = Option(
-            name = "name",
-            quantity = 1,
-            product = persistedProduct
-        )
+        val option =
+            Option(
+                name = "name",
+                quantity = 1,
+                product = persistedProduct,
+            )
 
-        val productWithOption = Product(
-            name = persistedProduct.name,
-            price = persistedProduct.price,
-            imageUrl = persistedProduct.imageUrl,
-            options = listOf(option),
-            id = persistedProduct.id
-        )
+        val productWithOption =
+            Product(
+                name = persistedProduct.name,
+                price = persistedProduct.price,
+                imageUrl = persistedProduct.imageUrl,
+                options = listOf(option),
+                id = persistedProduct.id,
+            )
         savedProduct = productJpaRepository.save(productWithOption)
     }
 

@@ -5,8 +5,8 @@ import ecommerce.dto.ProductRequest
 import ecommerce.dto.ProductResponse
 import ecommerce.service.ProductService
 import jakarta.validation.Valid
-import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.RestController
 class ProductRestController(
     private val productService: ProductService,
 ) {
-
     @GetMapping
     fun getAll(pageable: Pageable): ResponseEntity<Page<ProductResponse>> {
         val page = productService.getAllPaginated(pageable)
@@ -33,8 +32,9 @@ class ProductRestController(
     fun getById(
         @PathVariable id: Long,
     ): ResponseEntity<ProductResponse> {
-        val product = productService.getById(id)
-            ?: return ResponseEntity.notFound().build()
+        val product =
+            productService.getById(id)
+                ?: return ResponseEntity.notFound().build()
         return ResponseEntity.ok(product)
     }
 

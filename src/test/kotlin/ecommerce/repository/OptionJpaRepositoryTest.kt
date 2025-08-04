@@ -5,7 +5,6 @@ import ecommerce.entity.Product
 import org.junit.jupiter.api.BeforeEach
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
-import kotlin.test.Test
 
 @DataJpaTest
 class OptionJpaRepositoryTest {
@@ -14,26 +13,29 @@ class OptionJpaRepositoryTest {
 
     @BeforeEach
     fun setUp() {
-        val product = Product(
-            name = "product",
-            price = 0.2,
-            imageUrl = "https://image.png",
-            options = emptyList()
-        )
+        val product =
+            Product(
+                name = "product",
+                price = 0.2,
+                imageUrl = "https://image.png",
+                options = emptyList(),
+            )
 
-        val option = Option(
-            name = "name",
-            quantity = 1,
-            product = product
-        )
+        val option =
+            Option(
+                name = "name",
+                quantity = 1,
+                product = product,
+            )
 
-        val productWithOption = Product(
-            name = "product",
-            price = 0.2,
-            imageUrl = "https://image.png",
-            options = listOf(option)
-        )
+        val productWithOption =
+            Product(
+                name = "product",
+                price = 0.2,
+                imageUrl = "https://image.png",
+                options = listOf(option),
+            )
 
         optionJpaRepository.save(option)
     }
-    }
+}

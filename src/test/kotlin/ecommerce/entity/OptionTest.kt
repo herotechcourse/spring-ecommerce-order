@@ -4,13 +4,13 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
 class OptionTest {
-
-    private val dummyProduct = Product(
-        name = "Test Product",
-        price = 1.0,
-        imageUrl = "http://test.com",
-        options = emptyList()
-    )
+    private val dummyProduct =
+        Product(
+            name = "Test Product",
+            price = 1.0,
+            imageUrl = "http://test.com",
+            options = emptyList(),
+        )
 
     @Test
     fun `throw error if name length is longer than 50 letters`() {

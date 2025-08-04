@@ -15,26 +15,27 @@ class ProductPaginationTest(
     @Autowired val productRepository: ProductJpaRepository,
     @Autowired val optionRepository: OptionJpaRepository,
 ) {
-
     @BeforeEach
     fun setUp() {
         (1..10).forEach {
-            val baseProduct = Product(
-                name = "Product $it",
-                price = 10.0 + it,
-                imageUrl = "http://test.com/product$it.png",
-                options = emptyList(),
-            )
+            val baseProduct =
+                Product(
+                    name = "Product $it",
+                    price = 10.0 + it,
+                    imageUrl = "http://test.com/product$it.png",
+                    options = emptyList(),
+                )
             val savedProduct = productRepository.save(baseProduct)
 
             val option = Option("Option $it", 1, savedProduct)
-            val productWithOption = Product(
-                name = savedProduct.name,
-                price = savedProduct.price,
-                imageUrl = savedProduct.imageUrl,
-                options = listOf(option),
-                id = savedProduct.id,
-            )
+            val productWithOption =
+                Product(
+                    name = savedProduct.name,
+                    price = savedProduct.price,
+                    imageUrl = savedProduct.imageUrl,
+                    options = listOf(option),
+                    id = savedProduct.id,
+                )
 
             productRepository.save(productWithOption)
         }
