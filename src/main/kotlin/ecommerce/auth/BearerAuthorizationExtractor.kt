@@ -1,12 +1,13 @@
 package ecommerce.auth
 
 import jakarta.servlet.http.HttpServletRequest
+import org.springframework.http.HttpHeaders.AUTHORIZATION
 import org.springframework.stereotype.Component
 
 @Component
 class BearerAuthorizationExtractor : AuthorizationExtractor<String> {
     override fun extract(request: HttpServletRequest): String {
-        val headers = request.getHeaders(AuthorizationExtractor.AUTHORIZATION)
+        val headers = request.getHeaders(AUTHORIZATION)
         while (headers.hasMoreElements()) {
             val value = headers.nextElement()
             if (value.lowercase().startsWith(BEARER_TYPE.lowercase())) {
