@@ -20,7 +20,7 @@ class CheckAdminInterceptor(
         val token = authorizationExtractor.extract(request)
         val member = authService.findMemberByToken(token)
         if (member.role != "admin") {
-            response.status = 401
+            response.status = 403
             return false
         }
 

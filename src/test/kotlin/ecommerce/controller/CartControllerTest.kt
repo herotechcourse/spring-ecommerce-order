@@ -265,7 +265,7 @@ class CartControllerTest(
             .`when`().get("/api/admin/cart-stats/top5-products")
             .then().log().all()
             .assertThat()
-            .statusCode(HttpStatus.UNAUTHORIZED.value())
+            .statusCode(HttpStatus.FORBIDDEN.value())
     }
 
     companion object {

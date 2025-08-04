@@ -36,11 +36,6 @@ class AuthService(
         return AuthResponse(accessToken)
     }
 
-    fun findMemberById(id: Long): Member? = memberRepository.findByIdOrNull(id)
-
-    fun findMemberByEmail(email: String): Member? =
-        memberRepository.findByEmail(email) ?: throw AuthorizationException(MESSAGE_INVALID_EMAIL)
-
     fun findMemberByToken(token: String): Member {
         if (!jwtTokenProvider.validateToken(token)) {
             throw AuthorizationException(MESSAGE_INVALID_TOKEN)
