@@ -4,7 +4,6 @@ import ecommerce.entity.Cart
 import ecommerce.entity.Member
 import ecommerce.entity.Option
 import ecommerce.entity.Product
-import jakarta.persistence.EntityManager
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -13,16 +12,13 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import java.time.LocalDateTime
 
 @DataJpaTest
-class CartJpaRepositoryTest
-    @Autowired
-    constructor(
-        val cartRepository: CartJpaRepository,
-        val productRepository: ProductJpaRepository,
-        val memberRepository: MemberJpaRepository,
-        val entityManager: EntityManager,
-    ) {
-        private lateinit var member: Member
-        private lateinit var product: Product
+class CartJpaRepositoryTest @Autowired constructor(
+    val cartRepository: CartJpaRepository,
+    val productRepository: ProductJpaRepository,
+    val memberRepository: MemberJpaRepository,
+) {
+    private lateinit var member: Member
+    private lateinit var product: Product
 
     @BeforeEach
     fun setup() {
@@ -34,38 +30,40 @@ class CartJpaRepositoryTest
             name = "Widget",
             price = 9.99,
             imageUrl = "http://image.com/widget.png",
-            options = emptyList()
+            options = emptyList(),
         )
+        val savedProduct = productRepository.save(baseProduct)
 
         val option = Option(
             name = "Standard",
             quantity = 1,
-            product = baseProduct
+            product = savedProduct,
+        )
+        val productWithOption = Product(
+            name = savedProduct.name,
+            price = savedProduct.price,
+            imageUrl = savedProduct.imageUrl,
+            options = listOf(option),
+            id = savedProduct.id,
         )
 
-        val productWithOptions = Product(
-            name = "Widget",
-            price = 9.99,
-            imageUrl = "http://image.com/widget.png",
-            options = listOf(option)
-        )
-
-        product = productRepository.save(productWithOptions)
+        product = productRepository.save(productWithOption)
 
         val now = LocalDateTime.now()
         cartRepository.save(Cart(member = member, product = product, createdAt = now))
     }
-        @Test
-        fun `findByMemberId should return items for given member`() {
-            val items = cartRepository.findByMemberId(member.id)
-            assertThat(items).hasSize(1)
-            assertThat(items[0].member.id).isEqualTo(member.id)
-        }
 
-        @Test
-        fun `deleteByMemberIdAndProductId should remove item`() {
-            cartRepository.deleteByMemberIdAndProductId(member.id, product.id)
-            val items = cartRepository.findByMemberId(member.id)
-            assertThat(items).isEmpty()
-        }
+    @Test
+    fun `findByMemberId should return items for given member`() {
+        val items = cartRepository.findByMemberId(member.id)
+        assertThat(items).hasSize(1)
+        assertThat(items[0].member.id).isEqualTo(member.id)
     }
+
+    @Test
+    fun `deleteByMemberIdAndProductId should remove item`() {
+        cartRepository.deleteByMemberIdAndProductId(member.id, product.id)
+        val items = cartRepository.findByMemberId(member.id)
+        assertThat(items).isEmpty()
+    }
+}

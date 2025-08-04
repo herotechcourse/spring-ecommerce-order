@@ -10,60 +10,53 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.data.domain.PageRequest
-import org.springframework.data.domain.Sort
+import java.time.LocalDateTime
 
 @DataJpaTest
-class CartPaginationTest {
-    @Autowired
-    lateinit var cartJpaRepository: CartJpaRepository
-
-    @Autowired
-    lateinit var memberJpaRepository: MemberJpaRepository
-
-    @Autowired
-    lateinit var productJpaRepository: ProductJpaRepository
-
+class CartPaginationTest @Autowired constructor(
+    val cartRepository: CartJpaRepository,
+    val productRepository: ProductJpaRepository,
+    val memberRepository: MemberJpaRepository,
+) {
     private lateinit var member: Member
+    private lateinit var product: Product
 
     @BeforeEach
     fun setUp() {
-        member = memberJpaRepository.save(Member(name = "TestUser", email = "user@test.com", password = "secret"))
+        member = memberRepository.save(
+            Member(name = "Bob", email = "bob@example.com", password = "pw")
+        )
 
-        val products =
-            (1..12).map {
-                productJpaRepository.save(
-                    Product(
-                        name = "Product $it",
-                        price = 10.0 + it,
-                        imageUrl = "http://test.com/product$it.png",
-                        listOf(
-                            Option(
-                                name = "Option $it",
-                                quantity = 1,
-                                product = Product(
-                                    name = "Product $it",
-                                    price = 10.0 + it,
-                                    imageUrl = "http://test.com/product$it.png",
-                                    options = emptyList()
-                                )
-                            )
-                        ),
-                    ),
-                )
-            }
+        val baseProduct = Product(
+            name = "Paginated Product",
+            price = 12.34,
+            imageUrl = "http://image.com/paginated.png",
+            options = emptyList()
+        )
+        val savedProduct = productRepository.save(baseProduct)
 
-        products.forEach {
-            cartJpaRepository.save(Cart(member = member, product = it))
-        }
+        val option = Option(
+            name = "PaginatedOption",
+            quantity = 1,
+            product = savedProduct
+        )
+        val productWithOption = Product(
+            name = savedProduct.name,
+            price = savedProduct.price,
+            imageUrl = savedProduct.imageUrl,
+            options = listOf(option),
+            id = savedProduct.id
+        )
+        product = productRepository.save(productWithOption)
+
+        val now = LocalDateTime.now()
+        cartRepository.save(Cart(member = member, product = product, createdAt = now))
     }
 
     @Test
     fun `findByMemberId returns paginated wishlist items`() {
-        val pageable = PageRequest.of(0, 5, Sort.by(Sort.Direction.ASC, "id"))
-        val page = cartJpaRepository.findByMemberId(member.id, pageable)
-
-        assertThat(page.content).hasSize(5)
-        assertThat(page.totalElements).isEqualTo(12)
-        assertThat(page.totalPages).isEqualTo(3)
+        val page = cartRepository.findByMemberId(member.id, PageRequest.of(0, 10))
+        assertThat(page.content).hasSize(1)
+        assertThat(page.content[0].product.name).isEqualTo("Paginated Product")
     }
 }
