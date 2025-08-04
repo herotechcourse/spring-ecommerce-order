@@ -32,11 +32,10 @@ class CartController(
         @RequestParam(defaultValue = "10") pageSize: Int,
         @RequestParam(defaultValue = "name") sortBy: String,
     ): ResponseEntity<Page<CartItemResponse>> {
-        val memberId = member.id
         val cartItemPage =
             when (sortBy.isEmpty()) {
-                true -> cartItemService.getCartItemsByMemberId(memberId, pageNumber, pageSize)
-                false -> cartItemService.getCartItemsByMemberId(memberId, pageNumber, pageSize, sortBy)
+                true -> cartItemService.getCartItemsByMemberId(member.id, pageNumber, pageSize)
+                false -> cartItemService.getCartItemsByMemberId(member.id, pageNumber, pageSize, sortBy)
             }
         val alteredPages = cartItemPage.map { CartItem.to(it) }
         return ResponseEntity.ok(alteredPages)
@@ -47,8 +46,7 @@ class CartController(
         @RequestBody @Valid cartForm: CartAddItemForm,
         @LoginMember member: Member,
     ): ResponseEntity<String> {
-        val memberId = member.id
-        val cartItem = cartItemService.addCartItem(memberId, cartForm.productId, cartForm.quantity)
+        cartItemService.addCartItem(member.id, cartForm.productId, cartForm.quantity)
         return ResponseEntity.ok(MESSAGE_ADD_SUCCESS)
     }
 
@@ -58,8 +56,7 @@ class CartController(
         @RequestBody @Valid cartForm: CartUpdateQuantityForm,
         @LoginMember member: Member,
     ): ResponseEntity<String> {
-        val memberId = member.id
-        val message = cartItemService.updateQuantity(memberId, productId, cartForm.quantity)
+        val message = cartItemService.updateQuantity(member.id, productId, cartForm.quantity)
         return ResponseEntity.ok(message)
     }
 
@@ -68,8 +65,7 @@ class CartController(
         @PathVariable productId: Long,
         @LoginMember member: Member,
     ): ResponseEntity<String> {
-        val memberId = member.id
-        val message = cartItemService.removeCartItem(memberId, productId)
+        val message = cartItemService.removeCartItem(member.id, productId)
         return ResponseEntity.ok(message)
     }
 
