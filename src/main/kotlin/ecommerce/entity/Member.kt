@@ -27,6 +27,6 @@ class Member(
         name = "",
         email = "jpa@constructor.fake",
         password = "hidden",
-        role = "USER"
+        role = "USER",
     )
 }
