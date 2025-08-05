@@ -5,8 +5,10 @@ import ecommerce.dto.TopProductStats
 import ecommerce.model.Product
 import ecommerce.repository.CartItemRepository
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 
+@Transactional
 @Service
 class CartStatisticsService(
     private val cartItemRepository: CartItemRepository,

@@ -13,7 +13,9 @@ import ecommerce.repository.CartRepository
 import ecommerce.repository.MemberRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
+@Transactional
 @Service
 class AuthService(
     private val memberRepository: MemberRepository,
