@@ -13,6 +13,22 @@ import org.springframework.web.bind.annotation.ExceptionHandler
 
 @ControllerAdvice
 class GlobalExceptionHandler {
+    @ExceptionHandler(Exception::class)
+    fun handleGeneric(e: Exception): ResponseEntity<Void> {
+        val error = mapOf("error" to e.message)
+        val errorBody = mapOf("errors" to error)
+        println("Unexpected Exception occurred: $errorBody")
+        return ResponseEntity.internalServerError().build()
+    }
+
+    @ExceptionHandler(RuntimeException::class)
+    fun handleRuntimeException(e: RuntimeException): ResponseEntity<Map<String, Any>> {
+        val error = mapOf("error" to e.message)
+        val errorBody = mapOf("errors" to error)
+        println("RuntimeException occurred: $errorBody")
+        return ResponseEntity.internalServerError().body(errorBody)
+    }
+
     @ExceptionHandler(NotFoundException::class)
     fun handleNotFoundException(e: NotFoundException): ResponseEntity<Void> {
         println("NotFoundException occurred: " + e.message)
