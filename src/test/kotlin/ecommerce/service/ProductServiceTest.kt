@@ -12,7 +12,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.mockito.ArgumentMatchers.any
-import org.mockito.ArgumentMatchers.anyList
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
@@ -90,7 +89,7 @@ class ProductServiceTest {
     }
 
     @Test
-    fun `create should save product and options`() {
+    fun `create should save product with options`() {
         val request =
             ProductRequest(
                 name = "New",
@@ -98,12 +97,18 @@ class ProductServiceTest {
                 imageUrl = "url",
                 options = listOf(OptionRequest("S", 1)),
             )
-        val product = Product("New", 2.0, "url", emptyList(), 1L)
-        val savedOption = Option("S", 1, product, 1L)
+
+        val savedProduct =
+            Product(
+                name = "New",
+                price = 2.0,
+                imageUrl = "url",
+                options = listOf(Option("S", 1)),
+                id = 1L,
+            )
 
         `when`(productRepository.existsByName("New")).thenReturn(false)
-        `when`(productRepository.save(any(Product::class.java))).thenReturn(product)
-        `when`(optionRepository.saveAll(anyList())).thenReturn(listOf(savedOption))
+        `when`(productRepository.save(any(Product::class.java))).thenReturn(savedProduct)
 
         val result = service.create(request)
 

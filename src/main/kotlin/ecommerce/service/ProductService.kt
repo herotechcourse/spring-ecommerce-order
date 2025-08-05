@@ -48,14 +48,16 @@ class ProductService(
             throw DuplicateProductNameException()
         }
 
+        if (request.options.isEmpty()) {
+            throw IllegalArgumentException("A product must have at least one option.")
+        }
+
         val product =
-            productRepository.save(
-                Product(
-                    name = request.name,
-                    price = request.price,
-                    imageUrl = request.imageUrl,
-                    options = emptyList(),
-                ),
+            Product(
+                name = request.name,
+                price = request.price,
+                imageUrl = request.imageUrl,
+                options = emptyList(),
             )
 
         val options =
@@ -67,22 +69,17 @@ class ProductService(
                 )
             }
 
-        val savedOptions = optionRepository.saveAll(options)
+        val productWithOptions =
+            Product(
+                name = request.name,
+                price = request.price,
+                imageUrl = request.imageUrl,
+                options = options,
+            )
 
-        return ProductResponse(
-            id = product.id,
-            name = product.name,
-            price = product.price,
-            imageUrl = product.imageUrl,
-            options =
-                savedOptions.map {
-                    OptionResponse(
-                        id = it.id,
-                        name = it.name,
-                        quantity = it.quantity,
-                    )
-                },
-        )
+        val savedProduct = productRepository.save(productWithOptions)
+
+        return savedProduct.toResponse()
     }
 
     @Transactional
