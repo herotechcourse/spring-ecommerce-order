@@ -36,8 +36,8 @@ class Option(
     }
 
     fun subtract(amount: Int) {
-        if (amount <= 0) throw IllegalArgumentException("Amount must be positive.")
-        if (quantity - amount < 0) throw IllegalStateException("Not enough quantity.")
+        require(amount > 0) { "Amount must be positive." }
+        check(quantity - amount >= 0) { "Not enough quantity." }
         quantity -= amount
     }
 }
