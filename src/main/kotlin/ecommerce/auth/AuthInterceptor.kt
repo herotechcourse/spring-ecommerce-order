@@ -21,11 +21,13 @@ class AuthInterceptor(
             try {
                 memberService.findByToken(token)
             } catch (e: Exception) {
-                return unauthorized(response)
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED)
+                return false
             }
 
         if (request.requestURI.startsWith("/admin") && member?.role != "ADMIN") {
-            return unauthorized(response)
+            response.sendError(HttpServletResponse.SC_FORBIDDEN)
+            return false
         }
 
         return true
