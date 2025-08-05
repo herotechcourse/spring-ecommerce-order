@@ -1,5 +1,6 @@
 package ecommerce.auth
 
+import ecommerce.entity.Role
 import ecommerce.service.MemberService
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
@@ -25,7 +26,7 @@ class AuthInterceptor(
                 return false
             }
 
-        if (request.requestURI.startsWith("/admin") && member?.role != "ADMIN") {
+        if (request.requestURI.startsWith("/admin") && member?.role != Role.ADMIN) {
             response.sendError(HttpServletResponse.SC_FORBIDDEN)
             return false
         }
