@@ -105,6 +105,17 @@ class ProductService(
                 options = emptyList(),
             )
 
+        val duplicateOptionNames =
+            request.options
+                .groupingBy { it.name }
+                .eachCount()
+                .filter { it.value > 1 }
+                .keys
+
+        if (duplicateOptionNames.isNotEmpty()) {
+            throw IllegalArgumentException("Duplicate option names are not allowed: ${duplicateOptionNames.joinToString()}")
+        }
+
         val updatedOptions =
             request.options.map {
                 Option(
