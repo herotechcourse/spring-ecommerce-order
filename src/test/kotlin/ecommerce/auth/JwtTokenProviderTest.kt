@@ -1,17 +1,15 @@
 package ecommerce.auth
 
+import io.jsonwebtoken.JwtException
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.web.server.LocalServerPort
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class JwtTokenProviderTest {
     @Autowired private lateinit var jwtTokenProvider: JwtTokenProvider
-
-    @LocalServerPort
-    private var port: Int = 0
 
     @Test
     fun `create and validate token successfully`() {
@@ -25,7 +23,12 @@ class JwtTokenProviderTest {
     }
 
     @Test
-    fun `validateToken() - return false when validate invalid token`() {
-        assertThat(jwtTokenProvider.validateToken("some.invalid.token")).isFalse()
+    fun `validateToken() - throws exception when validate invalid token`() {
+        assertThrows<JwtException> { jwtTokenProvider.validateToken("some.invalid.token") }
+    }
+
+    @Test
+    fun `validateToken() - throws exception when validate empty token`() {
+        assertThrows<IllegalArgumentException> { jwtTokenProvider.validateToken(" ") }
     }
 }

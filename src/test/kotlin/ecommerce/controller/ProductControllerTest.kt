@@ -216,7 +216,7 @@ class ProductControllerTest(
             .`when`().get("/api/products?pageNumber=$pageNumber&pageSize=$pageSize&sortBy=$sortBy")
             .then().log().all()
             .assertThat()
-            .statusCode(HttpStatus.BAD_REQUEST.value())
+            .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
     }
 
     @Test

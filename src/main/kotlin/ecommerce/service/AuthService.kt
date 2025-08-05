@@ -37,9 +37,7 @@ class AuthService(
     }
 
     fun findMemberByToken(token: String): Member {
-        if (!jwtTokenProvider.validateToken(token)) {
-            throw AuthorizationException(MESSAGE_INVALID_TOKEN)
-        }
+        jwtTokenProvider.validateToken(token)
         val email = jwtTokenProvider.getPayload(token)
         val member = memberRepository.findByEmail(email) ?: throw AuthorizationException(MESSAGE_INVALID_EMAIL)
         return member
@@ -60,7 +58,6 @@ class AuthService(
         const val MESSAGE_MEMBER_NOT_FOUND = "Member not found"
         const val MESSAGE_INVALID_EMAIL = "Invalid email"
         const val MESSAGE_INVALID_PASSWORD = "Invalid password"
-        const val MESSAGE_INVALID_TOKEN = "Invalid token"
         const val MESSAGE_EMAIL_ALREADY_EXISTS = "Email already exists"
     }
 }

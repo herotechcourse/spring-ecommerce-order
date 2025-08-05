@@ -3,6 +3,7 @@ package ecommerce
 import ecommerce.exception.AuthorizationException
 import ecommerce.exception.InternalServerErrorException
 import ecommerce.exception.NotFoundException
+import io.jsonwebtoken.JwtException
 import org.springframework.dao.DataAccessException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -16,6 +17,17 @@ class GlobalExceptionHandler {
     fun handleNotFoundException(e: NotFoundException): ResponseEntity<Void> {
         println("NotFoundException occurred: " + e.message)
         return ResponseEntity.notFound().build()
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException::class)
+    fun handleValidationException(e: MethodArgumentNotValidException): ResponseEntity<Map<String, Any>> {
+        val errors =
+            e.bindingResult.fieldErrors.associate { error ->
+                error.field to (error.defaultMessage ?: "Invalid value")
+            }
+        val errorBody = mapOf("errors" to errors)
+        println("MethodArgumentNotValidException occurred: $errorBody")
+        return ResponseEntity.badRequest().body(errorBody)
     }
 
     @ExceptionHandler(InternalServerErrorException::class)
@@ -37,22 +49,9 @@ class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(IllegalArgumentException::class)
-    fun handlerIllegalArgumentException(e: Exception): ResponseEntity<Map<String, Any>> {
+    fun handlerIllegalArgumentException(e: Exception): ResponseEntity<Void> {
         println("IllegalArgumentException occurred: " + e.message)
-        val error = mapOf("page" to e.message)
-        val errorBody = mapOf("errors" to error)
-        return ResponseEntity.badRequest().body(errorBody)
-    }
-
-    @ExceptionHandler(MethodArgumentNotValidException::class)
-    fun handleValidationException(e: MethodArgumentNotValidException): ResponseEntity<Map<String, Any>> {
-        val errors =
-            e.bindingResult.fieldErrors.associate { error ->
-                error.field to (error.defaultMessage ?: "Invalid value")
-            }
-        val errorBody = mapOf("errors" to errors)
-        println("MethodArgumentNotValidException occurred: $errorBody")
-        return ResponseEntity.badRequest().body(errorBody)
+        return ResponseEntity.internalServerError().build()
     }
 
     @ExceptionHandler(AuthorizationException::class)
@@ -60,6 +59,12 @@ class GlobalExceptionHandler {
         val error = mapOf("authorization" to e.message)
         val errorBody = mapOf("errors" to error)
         println("AuthorizationException occurred: $errorBody")
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
+    }
+
+    @ExceptionHandler(JwtException::class)
+    fun handleJwtException(e: JwtException): ResponseEntity<Void> {
+        println("JwtException occurred: " + e.message)
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
     }
 }
