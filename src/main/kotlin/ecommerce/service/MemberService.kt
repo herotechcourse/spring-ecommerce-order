@@ -6,12 +6,14 @@ import ecommerce.dto.TokenMemberResponse
 import ecommerce.entity.Member
 import ecommerce.repository.MemberJpaRepository
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class MemberService(
     private val memberRepository: MemberJpaRepository,
     private val jwtTokenProvider: JwtTokenProvider,
 ) {
+    @Transactional
     fun register(request: MemberRequest): TokenMemberResponse {
         val existing = memberRepository.findByEmail(request.email)
         if (existing != null) {
@@ -23,6 +25,7 @@ class MemberService(
         return TokenMemberResponse(token)
     }
 
+    @Transactional(readOnly = true)
     fun login(request: MemberRequest): TokenMemberResponse {
         val member =
             memberRepository.findByEmail(request.email)
@@ -36,6 +39,7 @@ class MemberService(
         return TokenMemberResponse(token)
     }
 
+    @Transactional(readOnly = true)
     fun findByToken(token: String): Member? {
         val memberId =
             jwtTokenProvider.getSubject(token).toLongOrNull()

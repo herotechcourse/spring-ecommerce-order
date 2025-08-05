@@ -14,13 +14,13 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
-@Transactional
 @Service
 class CartService(
     private val cartRepository: CartJpaRepository,
     private val productRepository: ProductJpaRepository,
     private val cartStaticsRepository: CartStaticsRepository,
 ) {
+    @Transactional
     fun addToCart(
         member: Member,
         request: CartRequest,
@@ -29,10 +29,12 @@ class CartService(
         cartRepository.save(Cart(member, product))
     }
 
+    @Transactional(readOnly = true)
     fun getCartItems(memberId: Long): List<Cart> {
         return cartRepository.findByMemberId(memberId)
     }
 
+    @Transactional(readOnly = true)
     fun getCartItemsPaginated(
         memberId: Long,
         pageable: Pageable,
@@ -40,6 +42,7 @@ class CartService(
         return cartRepository.findByMemberId(memberId, pageable)
     }
 
+    @Transactional
     fun removeFromCart(
         memberId: Long,
         productId: Long,
@@ -47,10 +50,13 @@ class CartService(
         cartRepository.deleteByMemberIdAndProductId(memberId, productId)
     }
 
+    @Transactional(readOnly = true)
     fun getTop5MostAddedProducts(): List<ProductStatResponse> {
         return cartStaticsRepository.getTop5MostAddedProducts()
     }
 
+
+    @Transactional(readOnly = true)
     fun getRecentlyActiveMembers(): List<MemberStatsResponse> {
         return cartStaticsRepository.getRecentlyActiveMembers()
     }

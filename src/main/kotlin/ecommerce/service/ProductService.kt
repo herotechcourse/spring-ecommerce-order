@@ -8,28 +8,32 @@ import ecommerce.entity.Product
 import ecommerce.exception.DuplicateProductNameException
 import ecommerce.repository.OptionJpaRepository
 import ecommerce.repository.ProductJpaRepository
-import jakarta.transaction.Transactional
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class ProductService(
     private val productRepository: ProductJpaRepository,
     private val optionRepository: OptionJpaRepository,
 ) {
+    @Transactional(readOnly = true)
     fun getAll(): List<ProductResponse> {
         return productRepository.findAll().map { it.toResponse() }
     }
 
+    @Transactional(readOnly = true)
     fun getById(id: Long): ProductResponse? {
         return productRepository.findById(id).orElse(null)?.toResponse()
     }
 
+    @Transactional(readOnly = true)
     fun getAllPaginated(pageable: Pageable): Page<ProductResponse> {
         return productRepository.findAll(pageable).map { it.toResponse() }
     }
 
+    @Transactional(readOnly = true)
     fun getOptions(productId: Long): List<OptionResponse> {
         val option = optionRepository.findByProductId(productId)
         if (option.isEmpty()) throw NoSuchElementException("Not Found")
@@ -147,6 +151,7 @@ class ProductService(
         )
     }
 
+    @Transactional
     fun delete(id: Long) {
         productRepository.deleteById(id)
     }
