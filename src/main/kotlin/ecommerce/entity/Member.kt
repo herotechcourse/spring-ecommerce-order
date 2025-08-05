@@ -21,4 +21,12 @@ class Member(
     val password: String,
     @Column(name = "role")
     val role: String = "USER",
-)
+) {
+    private constructor() : this(
+        id = 0L,
+        name = "",
+        email = "jpa@constructor.fake",
+        password = "hidden",
+        role = "USER"
+    )
+}
