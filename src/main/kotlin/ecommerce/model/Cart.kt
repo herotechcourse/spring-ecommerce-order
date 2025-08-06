@@ -26,7 +26,7 @@ class Cart(
     val member: Member,
     @OneToMany(
         mappedBy = "cart",
-        cascade = [CascadeType.ALL],
+        cascade = [CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REMOVE],
         orphanRemoval = true,
         fetch = FetchType.LAZY,
     )
