@@ -20,7 +20,6 @@ class Option(
     var quantity: Int,
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
-    @JsonIgnore
     var product: Product? = null,
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
