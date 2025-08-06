@@ -7,6 +7,7 @@ import ecommerce.dto.RegisteredMember
 import ecommerce.dto.Role
 import ecommerce.infrastructure.AuthorizationExtractor
 import ecommerce.infrastructure.JwtTokenProvider
+import ecommerce.model.mapper.ProductMapper
 import ecommerce.service.ProductService
 import org.assertj.core.api.Assertions.assertThat
 import org.json.JSONObject
@@ -78,7 +79,7 @@ class ProductControllerMockTest
         fun `test getPages`() {
             setMockMemberTo(Role.USER)
 
-            val testProduct = DatabaseFixture.createPaintingSadHuman()
+            val testProduct = ProductMapper.toProductDto(DatabaseFixture.createPaintingSadHuman())
             whenever(productService.getPages(any(), any()))
                 .thenReturn(PageImpl(listOf(testProduct), PageRequest.of(0, 10), 20))
 

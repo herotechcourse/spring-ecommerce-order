@@ -3,8 +3,8 @@ package ecommerce.controller
 import ecommerce.annotation.Admin
 import ecommerce.dto.OptionResponse
 import ecommerce.dto.ProductRequest
+import ecommerce.dto.ProductResponse
 import ecommerce.dto.RegisteredMember
-import ecommerce.model.Product
 import ecommerce.service.ProductService
 import jakarta.validation.Valid
 import org.springframework.data.domain.Page
@@ -32,7 +32,7 @@ class ProductController(private val productService: ProductService) {
     }
 
     @GetMapping("/api/products")
-    fun read(): ResponseEntity<List<Product>> {
+    fun read(): ResponseEntity<List<ProductResponse>> {
         val products = productService.read()
         return ResponseEntity.ok().body(products)
     }
@@ -41,7 +41,7 @@ class ProductController(private val productService: ProductService) {
     fun asPages(
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "10") size: Int,
-    ): ResponseEntity<Page<Product>> {
+    ): ResponseEntity<Page<ProductResponse>> {
         val productPage = productService.getPages(page, size)
         val headers =
             HttpHeaders().apply {

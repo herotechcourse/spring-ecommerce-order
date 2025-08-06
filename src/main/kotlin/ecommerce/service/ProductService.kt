@@ -2,11 +2,12 @@ package ecommerce.service
 
 import ecommerce.dto.OptionResponse
 import ecommerce.dto.ProductRequest
+import ecommerce.dto.ProductResponse
 import ecommerce.exception.ConflictException
 import ecommerce.exception.NotFoundException
 import ecommerce.model.Option
-import ecommerce.model.Product
 import ecommerce.model.mapper.OptionMapper
+import ecommerce.model.mapper.ProductMapper
 import ecommerce.repository.OptionRepository
 import ecommerce.repository.ProductRepository
 import org.springframework.data.domain.PageImpl
@@ -30,9 +31,8 @@ class ProductService(private val productRepository: ProductRepository, private v
             ?: throw NotFoundException("Product with name ${productRequest.name} not found")
     }
 
-    fun read(): List<Product> {
-        val products = productRepository.findAll()
-        products.forEach { it.options.size }
+    fun read(): List<ProductResponse> {
+        val products = (productRepository.findAll()).map { ProductMapper.toProductDto(it) }
         return products
     }
 
@@ -55,14 +55,14 @@ class ProductService(private val productRepository: ProductRepository, private v
     fun getPages(
         page: Int,
         size: Int,
-    ): PageImpl<Product> {
-        val products = productRepository.findAll()
+    ): PageImpl<ProductResponse> {
+        val products = productRepository.findAll().map { ProductMapper.toProductDto(it) }
         val pageRequest = PageRequest.of(page, size)
         val start = pageRequest.offset.toInt()
         val end = min(start + pageRequest.pageSize, products.size)
 
         val pageContent = products.subList(start, end)
-        return PageImpl<Product>(pageContent, pageRequest, products.size.toLong())
+        return PageImpl<ProductResponse>(pageContent, pageRequest, products.size.toLong())
     }
 
     fun findOptions(id: Long): List<OptionResponse> {
