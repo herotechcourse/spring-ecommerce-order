@@ -100,25 +100,15 @@ class ProductService(
             throw DuplicateProductNameException()
         }
 
-        val updatedProduct =
-            Product(
-                id = existingProduct.id,
-                name = request.name,
-                price = request.price,
-                imageUrl = request.imageUrl,
-                options = emptyList(),
-            )
-
         val updatedOptions =
             request.options.map {
                 Option(
                     name = it.name,
                     quantity = it.quantity,
-                    product = updatedProduct,
                 )
             }
 
-        val productWithOptions =
+        val updatedProduct =
             Product(
                 id = existingProduct.id,
                 name = request.name,
@@ -127,8 +117,8 @@ class ProductService(
                 options = updatedOptions,
             )
 
-        productRepository.save(productWithOptions)
-        return productWithOptions.toResponse()
+        productRepository.save(updatedProduct)
+        return updatedProduct.toResponse()
     }
 
     private fun Product.toResponse(): ProductResponse {

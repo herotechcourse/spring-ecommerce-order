@@ -27,6 +27,7 @@ class Product(
     val options: MutableList<Option> = options.toMutableList()
 
     init {
+        require(options.isNotEmpty()) { "At least one option must be provided" }
         options.forEach { it.product = this }
     }
 

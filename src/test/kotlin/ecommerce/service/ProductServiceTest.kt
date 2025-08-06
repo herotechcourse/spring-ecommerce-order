@@ -8,34 +8,35 @@ import ecommerce.exception.DuplicateProductNameException
 import ecommerce.repository.OptionJpaRepository
 import ecommerce.repository.ProductJpaRepository
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.mock
+import org.mockito.InjectMocks
+import org.mockito.Mock
 import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
+import org.mockito.junit.jupiter.MockitoExtension
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import java.util.Optional
 
+@ExtendWith(MockitoExtension::class)
 class ProductServiceTest {
+    @Mock
     private lateinit var productRepository: ProductJpaRepository
-    private lateinit var optionRepository: OptionJpaRepository
-    private lateinit var service: ProductService
 
-    @BeforeEach
-    fun setUp() {
-        productRepository = mock(ProductJpaRepository::class.java)
-        optionRepository = mock(OptionJpaRepository::class.java)
-        service = ProductService(productRepository, optionRepository)
-    }
+    @Mock
+    private lateinit var optionRepository: OptionJpaRepository
+
+    @InjectMocks
+    private lateinit var service: ProductService
 
     @Test
     fun `getAll should return all products mapped to ProductResponse`() {
-        val product = Product("Bar", 1.0, "url", emptyList(), 1L)
+        val product = Product("Bar", 1.0, "url", listOf(Option("Opt", 1)), 1L)
         `when`(productRepository.findAll()).thenReturn(listOf(product))
 
         val result = service.getAll()
@@ -46,7 +47,7 @@ class ProductServiceTest {
 
     @Test
     fun `getById should return mapped ProductResponse when product exists`() {
-        val product = Product("Bar", 1.0, "url", emptyList(), 1L)
+        val product = Product("Bar", 1.0, "url", listOf(Option("m", 1)), 1L)
         `when`(productRepository.findById(1L)).thenReturn(
             Optional.of(product),
         )
@@ -68,7 +69,7 @@ class ProductServiceTest {
     @Test
     fun `getAllPaginated should return paginated ProductResponse`() {
         val pageable = PageRequest.of(0, 2)
-        val product = Product("Bar", 1.0, "url", emptyList(), 1L)
+        val product = Product("Bar", 1.0, "url", listOf(Option("m", 1)), 1L)
         val page: Page<Product> = PageImpl(listOf(product), pageable, 1)
 
         `when`(productRepository.findAll(pageable)).thenReturn(page)
@@ -126,9 +127,9 @@ class ProductServiceTest {
     @Test
     fun `update should replace product and return response`() {
         val id = 10L
-        val oldProduct = Product("Old", 1.0, "url", emptyList(), id)
+        val oldProduct = Product("Old", 1.0, "url", listOf(Option("Opt", 1)), id)
         val request = ProductRequest("Updated", 2.0, "img", listOf(OptionRequest("Opt", 1)))
-        val updated = Product("Updated", 2.0, "img", emptyList(), id)
+        val updated = Product("Updated", 2.0, "img", listOf(Option("Opt", 1)), id)
 
         `when`(productRepository.findById(id)).thenReturn(Optional.of(oldProduct))
         `when`(productRepository.existsByNameAndIdNot("Updated", id)).thenReturn(false)

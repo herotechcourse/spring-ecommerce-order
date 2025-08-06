@@ -29,31 +29,21 @@ class CartJpaRepositoryTest
                     Member(name = "Alice", email = "alice@example.com", password = "pw"),
                 )
 
+            val option =
+                Option(
+                    name = "Standard",
+                    quantity = 1,
+                )
+
             val baseProduct =
                 Product(
                     name = "Widget",
                     price = 9.99,
                     imageUrl = "http://image.com/widget.png",
-                    options = emptyList(),
-                )
-            val savedProduct = productRepository.save(baseProduct)
-
-            val option =
-                Option(
-                    name = "Standard",
-                    quantity = 1,
-                    product = savedProduct,
-                )
-            val productWithOption =
-                Product(
-                    name = savedProduct.name,
-                    price = savedProduct.price,
-                    imageUrl = savedProduct.imageUrl,
                     options = listOf(option),
-                    id = savedProduct.id,
                 )
 
-            product = productRepository.save(productWithOption)
+            product = productRepository.save(baseProduct)
 
             val now = LocalDateTime.now()
             cartRepository.save(Cart(member = member, product = product, createdAt = now))

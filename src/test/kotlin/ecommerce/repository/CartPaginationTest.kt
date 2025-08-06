@@ -30,30 +30,21 @@ class CartPaginationTest
                     Member(name = "Bob", email = "bob@example.com", password = "pw"),
                 )
 
+            val option =
+                Option(
+                    name = "PaginatedOption",
+                    quantity = 1,
+                )
+
             val baseProduct =
                 Product(
                     name = "Paginated Product",
                     price = 12.34,
                     imageUrl = "http://image.com/paginated.png",
-                    options = emptyList(),
-                )
-            val savedProduct = productRepository.save(baseProduct)
-
-            val option =
-                Option(
-                    name = "PaginatedOption",
-                    quantity = 1,
-                    product = savedProduct,
-                )
-            val productWithOption =
-                Product(
-                    name = savedProduct.name,
-                    price = savedProduct.price,
-                    imageUrl = savedProduct.imageUrl,
                     options = listOf(option),
-                    id = savedProduct.id,
                 )
-            product = productRepository.save(productWithOption)
+
+            product = productRepository.save(baseProduct)
 
             val now = LocalDateTime.now()
             cartRepository.save(Cart(member = member, product = product, createdAt = now))
