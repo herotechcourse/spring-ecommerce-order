@@ -37,6 +37,7 @@ class ProductController(
         @RequestBody productRequest: ProductRequest,
     ): ResponseEntity<Void> {
         val product = productService.createProduct(productRequest)
+
         return ResponseEntity.created(URI.create("/products/${product.id}")).build()
     }
 
@@ -54,6 +55,7 @@ class ProductController(
     ): ResponseEntity<Void> {
         val newProduct = productRequest.toProduct()
         productRepositoryJpa.save(newProduct)
+
         return ResponseEntity.ok().build()
     }
 
@@ -63,6 +65,7 @@ class ProductController(
         @PathVariable("id") id: Long,
     ): ResponseEntity<Void> {
         productRepositoryJpa.deleteById(id)
+
         return ResponseEntity.noContent().build()
     }
 

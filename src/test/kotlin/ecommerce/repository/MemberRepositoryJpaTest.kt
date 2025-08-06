@@ -57,6 +57,7 @@ class MemberRepositoryJpaTest(
             )
         repo.save(sampleMemberEntity1)
         repo.save(sampleMemberEntity2)
+
         val found = repo.findAll()
         assertThat(found)
             .isNotEmpty

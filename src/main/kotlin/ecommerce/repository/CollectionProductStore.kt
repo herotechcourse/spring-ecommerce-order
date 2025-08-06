@@ -29,6 +29,7 @@ class CollectionProductStore(val products: MutableList<Product>) : ProductStore 
     override fun save(product: Product): Product {
         val newProduct = Product(product.id, product.name, price = product.price, imageUrl = product.imageUrl)
         products.add(newProduct)
+
         return newProduct
     }
 
@@ -40,12 +41,14 @@ class CollectionProductStore(val products: MutableList<Product>) : ProductStore 
         updatedProduct?.name = product.name
         updatedProduct?.price = product.price
         updatedProduct?.imageUrl = product.imageUrl
+
         return true
     }
 
     override fun delete(id: Long): Boolean {
         val deletedProduct = findById(id)
         products.remove(deletedProduct)
+
         return true
     }
 }

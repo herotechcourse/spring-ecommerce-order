@@ -81,6 +81,7 @@ class ProductControllerTest {
                 .log().all()
                 .extract()
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value())
+
         val products: List<ProductEntity> =
             response.body().jsonPath().getList("", ProductEntity::class.java)
         assertThat(products).anyMatch { it.name == "Mini Laptop" }
@@ -321,8 +322,6 @@ class ProductControllerTest {
         Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value())
         Assertions.assertThat(response.asString()).contains("Image URL must start with http:// or https://", "imageUrl")
     }
-
-// validation for update products
 
     @Test
     fun `update fails when product name is blank`() {

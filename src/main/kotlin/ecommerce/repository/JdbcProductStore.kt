@@ -21,28 +21,33 @@ class JdbcProductStore(private val jdbcTemplate: JdbcTemplate) : ProductStore {
 
     override fun countProducts(): Int {
         val sql = "SELECT COUNT(*) FROM products"
+
         return jdbcTemplate.queryForObject(sql, Int::class.java) ?: 0
     }
 
     override fun findAll(): List<Product> {
         val sql = "Select * from products"
+
         return jdbcTemplate.query(sql, productRowMapper)
     }
 
     override fun findById(id: Long): Product {
         val sql = "SELECT * FROM products WHERE id = ?"
+
         return jdbcTemplate.queryForObject(sql, productRowMapper, id)
             ?: throw NoSuchElementException("Product with id $id not found")
     }
 
     override fun findByName(name: String): Product? {
         val sql = "SELECT * FROM products WHERE product_name = ?"
+
         return jdbcTemplate.query(sql, productRowMapper, name).firstOrNull()
     }
 
     override fun existsByName(name: String): Boolean {
         val sql = "SELECT COUNT(*) FROM PRODUCTS WHERE product_name = ?"
         val count = jdbcTemplate.queryForObject(sql, Long::class.java, name)
+
         return count != null && count > 0
     }
 
@@ -75,11 +80,13 @@ class JdbcProductStore(private val jdbcTemplate: JdbcTemplate) : ProductStore {
         product: Product,
     ): Boolean {
         val sql = "update products set product_name = ?, price = ?, image_url = ? where id = ?"
+
         return jdbcTemplate.update(sql, product.name, product.price, product.imageUrl, id) == NUMBER_OF_AFFECTED_ROWS
     }
 
     override fun delete(id: Long): Boolean {
         val sql = "delete from products where id = ?"
+
         return jdbcTemplate.update(sql, id) == NUMBER_OF_AFFECTED_ROWS
     }
 

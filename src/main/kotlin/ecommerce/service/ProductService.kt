@@ -29,6 +29,7 @@ class ProductService(
                 imageUrl = productRequest.imageUrl,
                 options = options,
             )
+
         return productRepositoryJpa.save(product)
     }
 
@@ -39,6 +40,7 @@ class ProductService(
         direction: Sort.Direction = Sort.Direction.ASC,
     ): Page<ProductEntity> {
         val pageable = PageRequest.of(page, size, Sort.by(direction, sortBy))
+
         return productRepositoryJpa.findAll(pageable)
     }
 
@@ -48,6 +50,7 @@ class ProductService(
         size: Int,
     ): Page<ProductEntity> {
         val pageable = PageRequest.of(page, size)
+
         return productRepositoryJpa.findAllByPrice(price, pageable)
     }
 }

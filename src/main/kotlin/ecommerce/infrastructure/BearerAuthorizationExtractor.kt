@@ -9,6 +9,7 @@ class BearerAuthorizationExtractor : AuthorizationExtractor<String> {
 
         while (headers.hasMoreElements()) {
             val value = headers.nextElement()
+
             if (value.startsWith(BEARER_TYPE, ignoreCase = true)) {
                 var authHeaderValue = value.substring(BEARER_TYPE.length).trim()
 

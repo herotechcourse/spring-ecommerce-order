@@ -18,7 +18,6 @@ import java.time.LocalDateTime
 open class CartItemEntity(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
-    // --- owner side: cart-item → product (many cart items can refer to the same product)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cart_id", nullable = false)
     val cart: CartEntity,

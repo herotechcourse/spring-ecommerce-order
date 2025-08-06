@@ -23,6 +23,7 @@ class OptionService(
     ): ProductEntity {
         val options = options.map { OptionEntity(name = it.name, quantity = it.quantity) }
         val product = ProductEntity(name = name, price = price, imageUrl = imageUrl, options = options.toMutableList())
+
         return productRepositoryJpa.save(product)
     }
 

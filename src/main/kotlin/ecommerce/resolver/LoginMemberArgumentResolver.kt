@@ -29,6 +29,7 @@ class LoginMemberArgumentResolver(
                 ?: throw AuthorizationException("Missing Authorization token")
 
         val memberResponse = authService.findMemberByToken(token)
+
         return memberResponse
     }
 }

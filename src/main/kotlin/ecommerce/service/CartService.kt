@@ -62,6 +62,7 @@ class CartService(
         size: Int,
     ): Page<CartItemEntity> {
         val pageable = PageRequest.of(page, size)
+
         return cartItemRepositoryJpa.findAllByQuantity(quantity, pageable)
     }
 }

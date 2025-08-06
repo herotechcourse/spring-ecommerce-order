@@ -31,6 +31,7 @@ class CartController(
         @LoginMember member: MemberResponse,
     ): ResponseEntity<Void> {
         cartService.addToCart(member.id, request.productId)
+
         return ResponseEntity.created(
             URI.create("/api/cart"),
         ).build()
@@ -42,6 +43,7 @@ class CartController(
         @LoginMember member: MemberResponse,
     ): ResponseEntity<Void> {
         cartService.removeFromCart(member.id, request.productId)
+
         return ResponseEntity.noContent().build()
     }
 

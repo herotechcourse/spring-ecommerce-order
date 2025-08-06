@@ -22,6 +22,7 @@ class AuthController(
         @RequestBody request: TokenRequest,
     ): ResponseEntity<TokenResponse> {
         val tokenResponse = authService.register(request)
+
         return ResponseEntity.ok(tokenResponse)
     }
 
@@ -39,6 +40,7 @@ class AuthController(
     ): ResponseEntity<MemberResponse> {
         val token = authHeader.removePrefix("Bearer ").trim()
         val memberResponse = authService.findMemberByToken(token)
+
         return ResponseEntity.ok(memberResponse)
     }
 }

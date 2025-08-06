@@ -19,6 +19,7 @@ class JwtAuthenticationInterceptor(
         val accessToken =
             request.getHeader("Authorization") ?: throw AuthorizationException("Authorization header missing")
         jwtProvider.validateToken(accessToken)
+
         return true
     }
 }

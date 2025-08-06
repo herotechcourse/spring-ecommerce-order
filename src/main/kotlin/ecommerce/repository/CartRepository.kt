@@ -20,6 +20,7 @@ class CartRepository(private val jdbcTemplate: JdbcTemplate) {
             ON DUPLICATE KEY UPDATE quantity = quantity + 1
             """.trimIndent()
         val now = Timestamp(System.currentTimeMillis())
+
         jdbcTemplate.update(sql, memberId, productId, now)
     }
 
@@ -28,6 +29,7 @@ class CartRepository(private val jdbcTemplate: JdbcTemplate) {
         productId: Long,
     ) {
         val sql = "DELETE FROM CART WHERE member_id = ? AND product_id = ?"
+
         jdbcTemplate.update(sql, memberId, productId)
     }
 
