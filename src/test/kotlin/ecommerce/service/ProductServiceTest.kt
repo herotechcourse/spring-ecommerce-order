@@ -98,12 +98,12 @@ class ProductServiceTest {
                 imageUrl = "url",
                 options = listOf(OptionRequest("S", 1)),
             )
-        val product = Product("New", 2.0, "url", emptyList(), 1L)
-        val savedOption = Option("S", 1, product, 1L)
+        val savedOption = listOf(Option("S", 1))
+        val product = Product("New", 2.0, "url", savedOption, 1L)
+
 
         `when`(productRepository.existsByName("New")).thenReturn(false)
         `when`(productRepository.save(any(Product::class.java))).thenReturn(product)
-        `when`(optionRepository.saveAll(anyList())).thenReturn(listOf(savedOption))
 
         val result = service.create(request)
 
