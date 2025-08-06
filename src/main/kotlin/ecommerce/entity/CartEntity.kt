@@ -10,7 +10,7 @@ import java.time.LocalDateTime
 
 @Entity
 @Table(name = "cart")
-open class CartEntity(
+class CartEntity(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
     @Column(name = "member_id", nullable = false)

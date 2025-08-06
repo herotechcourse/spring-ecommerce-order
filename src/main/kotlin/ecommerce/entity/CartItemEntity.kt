@@ -15,7 +15,7 @@ import java.time.LocalDateTime
 
 @Entity
 @Table(name = "cart_item")
-open class CartItemEntity(
+class CartItemEntity(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
     @ManyToOne(fetch = FetchType.LAZY)

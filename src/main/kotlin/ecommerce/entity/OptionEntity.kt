@@ -11,7 +11,7 @@ import jakarta.persistence.Table
 @Table(
     name = "option",
 )
-open class OptionEntity(
+class OptionEntity(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
     @Column(nullable = false)

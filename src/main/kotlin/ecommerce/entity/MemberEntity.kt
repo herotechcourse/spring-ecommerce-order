@@ -12,7 +12,7 @@ import jakarta.persistence.Table
 
 @Entity
 @Table(name = "member")
-open class MemberEntity(
+class MemberEntity(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
     @Column(nullable = false, unique = true)
@@ -23,7 +23,6 @@ open class MemberEntity(
     val role: String,
     @Column(nullable = false)
     var name: String,
-
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(
         name = "id",
