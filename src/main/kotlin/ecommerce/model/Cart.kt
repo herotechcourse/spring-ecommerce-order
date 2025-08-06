@@ -21,7 +21,7 @@ import java.time.LocalDateTime
 @Entity
 @Table(name = "carts")
 class Cart(
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "member_id", unique = true)
     val member: Member,
     @OneToMany(
