@@ -12,7 +12,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.mockito.ArgumentMatchers.any
-import org.mockito.ArgumentMatchers.anyList
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
@@ -100,7 +99,6 @@ class ProductServiceTest {
             )
         val savedOption = listOf(Option("S", 1))
         val product = Product("New", 2.0, "url", savedOption, 1L)
-
 
         `when`(productRepository.existsByName("New")).thenReturn(false)
         `when`(productRepository.save(any(Product::class.java))).thenReturn(product)
