@@ -26,10 +26,6 @@ class Product(
     @OneToMany(mappedBy = "product", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
     var options: MutableList<Option> = mutableListOf()
 
-//    init {
-//        require(options.isNotEmpty()) { "Product name must not be blank" }
-//    }
-
     override fun equals(other: Any?): Boolean {
         if (this == other) return true
         if (other == null || javaClass != other.javaClass) return false

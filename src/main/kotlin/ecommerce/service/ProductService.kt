@@ -4,8 +4,10 @@ import ecommerce.dto.OptionResponse
 import ecommerce.dto.ProductRequest
 import ecommerce.exception.ConflictException
 import ecommerce.exception.NotFoundException
+import ecommerce.model.Option
 import ecommerce.model.Product
 import ecommerce.model.mapper.OptionMapper
+import ecommerce.repository.OptionRepository
 import ecommerce.repository.ProductRepository
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
@@ -15,7 +17,7 @@ import kotlin.math.min
 
 @Transactional
 @Service
-class ProductService(private val productRepository: ProductRepository) {
+class ProductService(private val productRepository: ProductRepository, private val optionRepository: OptionRepository) {
     fun create(productRequest: ProductRequest): Long {
         require(!productRequest.options.isNullOrEmpty()) { "options must not be empty" }
 
@@ -23,6 +25,7 @@ class ProductService(private val productRepository: ProductRepository) {
             throw ConflictException("Product with name ${productRequest.name} already exists")
         }
         val product = productRepository.save(productRequest.toProduct())
+        optionRepository.saveAll(productRequest.options.map { Option(it.name, it.quantity, product) })
         return product.id
             ?: throw NotFoundException("Product with name ${productRequest.name} not found")
     }

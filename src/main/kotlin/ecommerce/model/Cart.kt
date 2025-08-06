@@ -48,7 +48,7 @@ class Cart(
                         product = product,
                         cart = this,
                         quantity = quantity,
-                        )
+                    )
                 items.add(newItem)
 
                 newItem
