@@ -41,7 +41,8 @@ class CartService(
                 ?: cartRepository.save(Cart(member))
 
         val item = cart.addItem(product, request.quantity)
-        cartRepository.save(cart)
+        // no need to save `cart` here because of Cascade
+        // cartRepository.save(cart)
         return item
     }
 
@@ -58,7 +59,8 @@ class CartService(
                 ?: cartRepository.save(Cart(member))
 
         cart.removeItem(product, request.quantity)
-        cartRepository.save(cart)
+        // no need to save `cart` here because of Cascade
+        // cartRepository.save(cart)
     }
 
     fun getPages(
