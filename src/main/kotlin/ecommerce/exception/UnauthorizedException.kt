@@ -1,3 +1,7 @@
 package ecommerce.exception
 
-class UnauthorizedException(message: String = "Unauthorized") : RuntimeException(message)
+import org.springframework.http.HttpStatus
+
+class UnauthorizedException(
+    override val message: String = "Unauthorized"
+) : ApplicationException(field = "auth", message = message, status = HttpStatus.UNAUTHORIZED)

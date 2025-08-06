@@ -28,7 +28,7 @@ class LoginMemberArgumentResolver(
         val token =
             webRequest.getHeader("Authorization")
                 ?.removePrefix("Bearer ")
-                ?: throw UnauthorizedException("Missing token")
+                ?: throw UnauthorizedException()
 
         return memberService.findByToken(token)
     }
