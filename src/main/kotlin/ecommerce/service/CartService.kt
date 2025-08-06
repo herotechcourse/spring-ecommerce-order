@@ -55,7 +55,6 @@ class CartService(
         return cartStaticsRepository.getTop5MostAddedProducts()
     }
 
-
     @Transactional(readOnly = true)
     fun getRecentlyActiveMembers(): List<MemberStatsResponse> {
         return cartStaticsRepository.getRecentlyActiveMembers()
