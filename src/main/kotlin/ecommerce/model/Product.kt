@@ -22,7 +22,7 @@ class Product(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0L,
 ) {
-    @OneToMany(mappedBy = "product", cascade = [CascadeType.PERSIST])
+    @OneToMany(mappedBy = "product", cascade = [CascadeType.PERSIST], orphanRemoval = true)
     val options: MutableList<Option> = options.toMutableList()
 
     init {
