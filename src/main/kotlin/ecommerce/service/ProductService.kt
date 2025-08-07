@@ -13,6 +13,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 
+@Transactional
 @Service
 class ProductService(
     private val productRepository: ProductJpaRepository,
@@ -42,7 +43,6 @@ class ProductService(
         }
     }
 
-    @Transactional
     fun create(request: ProductRequest): ProductResponse {
         if (productRepository.existsByName(request.name)) {
             throw DuplicateProductNameException()
@@ -82,7 +82,6 @@ class ProductService(
         return savedProduct.toResponse()
     }
 
-    @Transactional
     fun update(
         id: Long,
         request: ProductRequest,
