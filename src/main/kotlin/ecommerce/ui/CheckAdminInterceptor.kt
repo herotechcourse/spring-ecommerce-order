@@ -5,6 +5,7 @@ import ecommerce.auth.BearerAuthorizationExtractor
 import ecommerce.service.AuthService
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
+import org.springframework.http.HttpStatus
 import org.springframework.web.servlet.HandlerInterceptor
 
 class CheckAdminInterceptor(
@@ -20,7 +21,7 @@ class CheckAdminInterceptor(
         val token = authorizationExtractor.extract(request)
         val member = authService.findMemberByToken(token)
         if (member.role != "admin") {
-            response.status = 403
+            response.status = HttpStatus.FORBIDDEN.value()
             return false
         }
 
