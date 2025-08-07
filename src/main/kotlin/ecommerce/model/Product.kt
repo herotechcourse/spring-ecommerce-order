@@ -27,7 +27,7 @@ class Product(
     var options: MutableList<Option> = mutableListOf()
 
     fun addOption(option: Option) {
-        require(options.none { it.name == this.name }) { "duplicate name ${name} found" }
+        require(options.none { it.name == this.name }) { "duplicate name $name found" }
         option.product = this
         options.add(option)
     }

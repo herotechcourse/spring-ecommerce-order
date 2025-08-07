@@ -48,7 +48,17 @@ class ProductService(private val productRepository: ProductRepository, private v
             create(updateRequest)
             return true
         }
-        productRepository.save(updateRequest.toProduct(id))
+        val product = productRepository.findById(id).orElseThrow { NotFoundException("Product with id $id not found") }
+        product.name = updateRequest.name
+        product.price = updateRequest.price
+        product.imageUrl = updateRequest.imageUrl
+        if (updateRequest.options != null) product.options.clear()
+        updateRequest.options?.forEach {
+            val option = Option(name = it.name, quantity = it.quantity)
+            option.product = product
+            product.options.add(option)
+        }
+        // study note: no save needed! Hibernate flushes changes at the end of a transaction!!
         return false
     }
 
