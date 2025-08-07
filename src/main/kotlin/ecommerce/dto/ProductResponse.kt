@@ -5,4 +5,4 @@ class ProductResponse(
     val name: String,
     val price: Double,
     val imageUrl: String,
-)
+) : PageItem

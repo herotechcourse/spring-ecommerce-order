@@ -2,13 +2,12 @@ package ecommerce.controller
 
 import ecommerce.annotation.Admin
 import ecommerce.dto.OptionResponse
+import ecommerce.dto.PagedResponse
 import ecommerce.dto.ProductRequest
 import ecommerce.dto.ProductResponse
 import ecommerce.dto.RegisteredMember
 import ecommerce.service.ProductService
 import jakarta.validation.Valid
-import org.springframework.data.domain.Page
-import org.springframework.http.HttpHeaders
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
@@ -41,17 +40,20 @@ class ProductController(private val productService: ProductService) {
     fun asPages(
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "10") size: Int,
-    ): ResponseEntity<Page<ProductResponse>> {
+    ): ResponseEntity<PagedResponse<ProductResponse>> {
         val productPage = productService.getPages(page, size)
-        val headers =
-            HttpHeaders().apply {
-                add("X-Page-Number", productPage.number.toString())
-                add("X-Page-Size", productPage.size.toString())
-            }
+
+        val body =
+            PagedResponse(
+                productPage.content,
+                productPage.number,
+                productPage.size,
+                productPage.totalPages,
+                productPage.totalElements,
+            )
 
         return ResponseEntity.ok()
-            .headers(headers)
-            .body(productPage)
+            .body(body)
     }
 
     @PutMapping("/api/products/{id}")

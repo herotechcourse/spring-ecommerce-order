@@ -6,4 +6,4 @@ class CartItemResponse(
     val productName: String,
     val productPrice: Double,
     val productImageUrl: String,
-)
+) : PageItem
