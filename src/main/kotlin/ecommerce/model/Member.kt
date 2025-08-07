@@ -6,6 +6,7 @@ import ecommerce.dto.RegisterForm
 import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
+import jakarta.persistence.FetchType
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
@@ -21,7 +22,7 @@ class Member(
     @Column(nullable = false)
     val password: String,
     val role: String? = null,
-    @OneToOne(cascade = [CascadeType.PERSIST])
+    @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST])
     @JoinColumn
     var cart: Cart = Cart(),
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
