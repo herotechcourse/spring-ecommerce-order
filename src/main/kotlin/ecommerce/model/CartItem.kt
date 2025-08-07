@@ -3,7 +3,6 @@ package ecommerce.model
 import ecommerce.dto.CartItemResponse
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
-import jakarta.persistence.FetchType
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
@@ -15,10 +14,10 @@ import java.time.LocalDateTime
 @Entity
 @Table(name = "cart_items")
 class CartItem(
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "member_id", nullable = false)
     var member: Member,
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)
     var product: Product,
     @Column(nullable = false)
