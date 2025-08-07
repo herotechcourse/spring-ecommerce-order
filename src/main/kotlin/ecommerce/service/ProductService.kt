@@ -17,11 +17,11 @@ class ProductService(
         if (productRepositoryJpa.existsByName(productRequest.name)) {
             throw IllegalArgumentException("Product with name '${productRequest.name}' already exists.")
         }
-        val options: MutableList<OptionEntity> =
-            mutableListOf(
-                OptionEntity(name = "Blue XL", quantity = 99),
-                OptionEntity(name = "Red Large", quantity = 42),
-            )
+        val options =
+            productRequest.options.map {
+                OptionEntity(name = it.name, quantity = it.quantity)
+            }.toMutableList()
+
         val product =
             ProductEntity(
                 name = productRequest.name,

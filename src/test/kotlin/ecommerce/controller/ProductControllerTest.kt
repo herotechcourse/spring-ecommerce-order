@@ -1,7 +1,7 @@
 package ecommerce.controller
 
+import ecommerce.dto.OptionCreateDto
 import ecommerce.dto.ProductRequest
-import ecommerce.entity.OptionEntity
 import ecommerce.entity.ProductEntity
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
@@ -26,6 +26,13 @@ class ProductControllerTest {
         RestAssured.port = port
     }
 
+    fun defaultOptions(): MutableList<OptionCreateDto> {
+        return mutableListOf(
+            OptionCreateDto(name = "Silver", quantity = 99),
+            OptionCreateDto(name = "Black", quantity = 42),
+        )
+    }
+
     @Test
     fun `create a product`() {
         val productRequest =
@@ -33,11 +40,7 @@ class ProductControllerTest {
                 name = "Product 1",
                 price = 10.0,
                 imageUrl = "http://localhost:8080/image/upload/product1.jpg",
-                options =
-                    mutableListOf(
-                        OptionEntity(name = "Silver", quantity = 99),
-                        OptionEntity(name = "Black", quantity = 42),
-                    ),
+                options = defaultOptions(),
             )
 
         val response =
@@ -58,11 +61,7 @@ class ProductControllerTest {
                 name = "Mini Laptop",
                 price = 299.99,
                 imageUrl = "http://localhost:$port/image/upload/tablet.jpg",
-                options =
-                    mutableListOf(
-                        OptionEntity(name = "Silver", quantity = 99),
-                        OptionEntity(name = "Black", quantity = 42),
-                    ),
+                options = defaultOptions(),
             )
         RestAssured.given()
             .log().all()
@@ -94,11 +93,7 @@ class ProductControllerTest {
                 name = "Product",
                 price = 10.0,
                 imageUrl = "http://localhost:$port/image/upload/product1.jpg",
-                options =
-                    mutableListOf(
-                        OptionEntity(name = "Silver", quantity = 99),
-                        OptionEntity(name = "Black", quantity = 42),
-                    ),
+                options = defaultOptions(),
             )
 
         // Create product first
@@ -116,11 +111,7 @@ class ProductControllerTest {
                 name = "Updated Product",
                 price = 20.0,
                 imageUrl = "http://localhost:$port/image/upload/product2.jpg",
-                options =
-                    mutableListOf(
-                        OptionEntity(name = "Silver", quantity = 99),
-                        OptionEntity(name = "Black", quantity = 42),
-                    ),
+                options = defaultOptions(),
             )
 
         val response =
@@ -141,11 +132,7 @@ class ProductControllerTest {
                 name = "Product 10",
                 price = 10.0,
                 imageUrl = "http://localhost:$port/image/upload/product1.jpg",
-                options =
-                    mutableListOf(
-                        OptionEntity(name = "Silver", quantity = 99),
-                        OptionEntity(name = "Black", quantity = 42),
-                    ),
+                options = defaultOptions(),
             )
 
         // Create the product
@@ -174,11 +161,7 @@ class ProductControllerTest {
                 name = "",
                 price = 10.0,
                 imageUrl = "http://valid-url.com/image.jpg",
-                options =
-                    mutableListOf(
-                        OptionEntity(name = "Silver", quantity = 99),
-                        OptionEntity(name = "Black", quantity = 42),
-                    ),
+                options = defaultOptions(),
             )
 
         val response =
@@ -201,11 +184,7 @@ class ProductControllerTest {
                 name = "This name is definitely way too long",
                 price = 10.0,
                 imageUrl = "http://valid-url.com/image.jpg",
-                options =
-                    mutableListOf(
-                        OptionEntity(name = "Silver", quantity = 99),
-                        OptionEntity(name = "Black", quantity = 42),
-                    ),
+                options = defaultOptions(),
             )
 
         val response =
@@ -227,11 +206,7 @@ class ProductControllerTest {
                 name = "Invalid@Name!",
                 price = 10.0,
                 imageUrl = "http://valid-url.com/image.jpg",
-                options =
-                    mutableListOf(
-                        OptionEntity(name = "Silver", quantity = 99),
-                        OptionEntity(name = "Black", quantity = 42),
-                    ),
+                options = defaultOptions(),
             )
 
         val response =
@@ -252,11 +227,7 @@ class ProductControllerTest {
                 name = "ValidName",
                 price = 0.0,
                 imageUrl = "http://valid-url.com/image.jpg",
-                options =
-                    mutableListOf(
-                        OptionEntity(name = "Silver", quantity = 99),
-                        OptionEntity(name = "Black", quantity = 42),
-                    ),
+                options = defaultOptions(),
             )
 
         val response =
@@ -278,11 +249,7 @@ class ProductControllerTest {
                 name = "ValidName",
                 price = -5.0,
                 imageUrl = "http://valid-url.com/image.jpg",
-                options =
-                    mutableListOf(
-                        OptionEntity(name = "Silver", quantity = 99),
-                        OptionEntity(name = "Black", quantity = 42),
-                    ),
+                options = defaultOptions(),
             )
 
         val response =
@@ -304,11 +271,7 @@ class ProductControllerTest {
                 name = "ValidName",
                 price = 10.0,
                 imageUrl = "ftp://invalid-url.com/image.jpg",
-                options =
-                    mutableListOf(
-                        OptionEntity(name = "Silver", quantity = 99),
-                        OptionEntity(name = "Black", quantity = 42),
-                    ),
+                options = defaultOptions(),
             )
 
         val response =
@@ -331,11 +294,7 @@ class ProductControllerTest {
                 name = "",
                 price = 10.0,
                 imageUrl = "http://valid-url.com/image.jpg",
-                options =
-                    mutableListOf(
-                        OptionEntity(name = "Silver", quantity = 99),
-                        OptionEntity(name = "Black", quantity = 42),
-                    ),
+                options = defaultOptions(),
             )
 
         val response =
@@ -358,11 +317,7 @@ class ProductControllerTest {
                 name = "ValidName",
                 price = 0.0,
                 imageUrl = "http://valid-url.com/image.jpg",
-                options =
-                    mutableListOf(
-                        OptionEntity(name = "Silver", quantity = 99),
-                        OptionEntity(name = "Black", quantity = 42),
-                    ),
+                options = defaultOptions(),
             )
 
         val response =
@@ -385,11 +340,7 @@ class ProductControllerTest {
                 name = "ValidName",
                 price = 10.0,
                 imageUrl = "invalid-url",
-                options =
-                    mutableListOf(
-                        OptionEntity(name = "Silver", quantity = 99),
-                        OptionEntity(name = "Black", quantity = 42),
-                    ),
+                options = defaultOptions(),
             )
 
         val response =

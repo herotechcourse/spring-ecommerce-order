@@ -25,7 +25,7 @@ class ProductEntity(
         orphanRemoval = true,
     )
     @Column(nullable = false, name = "option")
-    val options: MutableList<OptionEntity> = mutableListOf(),
+    val options: List<OptionEntity> = emptyList(),
 ) {
     init {
         require(name.isNotBlank()) { "Product name must not be blank" }
