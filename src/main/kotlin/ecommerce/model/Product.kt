@@ -23,7 +23,7 @@ class Product(
     @Column(name = "image_url", nullable = false)
     var imageUrl: String,
 ) {
-    @OneToMany(mappedBy = "product", cascade = [CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE], fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "product", cascade = [CascadeType.PERSIST, CascadeType.REMOVE], fetch = FetchType.LAZY)
     var options: MutableList<Option> = mutableListOf()
 
     fun addOption(option: Option) {
