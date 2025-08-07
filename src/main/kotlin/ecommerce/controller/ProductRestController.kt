@@ -6,7 +6,9 @@ import ecommerce.dto.ProductResponse
 import ecommerce.service.ProductService
 import jakarta.validation.Valid
 import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Sort
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
@@ -23,9 +26,22 @@ class ProductRestController(
     private val productService: ProductService,
 ) {
     @GetMapping
-    fun getAll(pageable: Pageable): ResponseEntity<Page<ProductResponse>> {
-        val page = productService.getAllPaginated(pageable)
-        return ResponseEntity.ok(page)
+    fun getAll(
+
+        @RequestParam(defaultValue = "0") page: Int,
+        @RequestParam(defaultValue = "10") size: Int,
+        @RequestParam(defaultValue = "id") sortBy: String,
+        @RequestParam(defaultValue = "asc") direction: String,
+    ): ResponseEntity<Page<ProductResponse>> {
+        val sort = if (direction.equals("desc", ignoreCase = true)) {
+            Sort.by(sortBy).descending()
+        } else {
+            Sort.by(sortBy).ascending()
+        }
+
+        val pageable = PageRequest.of(page, size, sort)
+        val result = productService.getAllPaginated(pageable)
+        return ResponseEntity.ok(result)
     }
 
     @GetMapping("/{id}")

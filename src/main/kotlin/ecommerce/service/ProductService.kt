@@ -86,8 +86,9 @@ class ProductService(
         id: Long,
         request: ProductRequest,
     ): ProductResponse {
-        val existingProduct = productRepository.findById(id)
-            .orElseThrow { NoSuchElementException("Product with ID $id not found.") }
+        val existingProduct =
+            productRepository.findById(id)
+                .orElseThrow { NoSuchElementException("Product with ID $id not found.") }
 
         if (productRepository.existsByNameAndIdNot(request.name, id)) {
             throw DuplicateProductNameException()
@@ -98,31 +99,34 @@ class ProductService(
 
         val combinedOptionNames = existingOptionNames + newOptionNames
 
-        val duplicateOptionNames = combinedOptionNames
-            .groupingBy { it }
-            .eachCount()
-            .filter { it.value > 1 }
-            .keys
+        val duplicateOptionNames =
+            combinedOptionNames
+                .groupingBy { it }
+                .eachCount()
+                .filter { it.value > 1 }
+                .keys
 
         if (duplicateOptionNames.isNotEmpty()) {
             throw IllegalArgumentException("Duplicate option names are not allowed: ${duplicateOptionNames.joinToString()}")
         }
 
-        val updatedOptions = request.options.map {
-            Option(
-                name = it.name,
-                quantity = it.quantity,
-                product = existingProduct
-            )
-        }
+        val updatedOptions =
+            request.options.map {
+                Option(
+                    name = it.name,
+                    quantity = it.quantity,
+                    product = existingProduct,
+                )
+            }
 
-        val updatedProduct = Product(
-            id = existingProduct.id,
-            name = request.name,
-            price = request.price,
-            imageUrl = request.imageUrl,
-            options = updatedOptions
-        )
+        val updatedProduct =
+            Product(
+                id = existingProduct.id,
+                name = request.name,
+                price = request.price,
+                imageUrl = request.imageUrl,
+                options = updatedOptions,
+            )
 
         val savedProduct = productRepository.save(updatedProduct)
         return savedProduct.toResponse()
