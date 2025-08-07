@@ -1,7 +1,7 @@
 package ecommerce.auth.resolver
 
 import ecommerce.auth.annotation.LoginMember
-import ecommerce.entity.Member
+import ecommerce.dto.AuthenticatedUser
 import ecommerce.exception.UnauthorizedException
 import ecommerce.service.MemberService
 import org.springframework.core.MethodParameter
@@ -24,12 +24,12 @@ class LoginMemberArgumentResolver(
         mavContainer: ModelAndViewContainer?,
         webRequest: NativeWebRequest,
         binderFactory: WebDataBinderFactory?,
-    ): Member? {
+    ): AuthenticatedUser {
         val token =
             webRequest.getHeader("Authorization")
                 ?.removePrefix("Bearer ")
                 ?: throw UnauthorizedException()
 
-        return memberService.findByToken(token)
+        return AuthenticatedUser(memberService.findByToken(token)?.role ?: throw UnauthorizedException())
     }
 }
