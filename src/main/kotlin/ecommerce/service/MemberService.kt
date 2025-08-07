@@ -31,9 +31,7 @@ class MemberService(
             memberRepository.findByEmail(request.email)
                 ?: throw IllegalArgumentException("Invalid email or password")
 
-        if (member.password != request.password) {
-            throw IllegalArgumentException("Invalid email or password")
-        }
+        member.validatePassword(request.password)
 
         val token = jwtTokenProvider.createToken(member.id)
         return TokenMemberResponse(token)
