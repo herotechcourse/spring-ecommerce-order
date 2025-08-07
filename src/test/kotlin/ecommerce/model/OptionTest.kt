@@ -1,6 +1,5 @@
 package ecommerce.model
 
-import groovy.cli.Option
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
