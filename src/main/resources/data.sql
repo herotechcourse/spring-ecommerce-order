@@ -49,5 +49,5 @@ INSERT INTO cart_items (member_id, product_id, quantity, created_at, cart_id) VA
 INSERT INTO cart_items (member_id, product_id, quantity, created_at, cart_id) VALUES (1, 6, 1, CURRENT_TIMESTAMP - INTERVAL '6' DAY, 1);
 INSERT INTO cart_items (member_id, product_id, quantity, created_at, cart_id) VALUES (2, 6, 1, CURRENT_TIMESTAMP - INTERVAL '7' DAY, 2);
 INSERT INTO cart_items (member_id, product_id, quantity, created_at, cart_id) VALUES (3, 3, 1, CURRENT_TIMESTAMP - INTERVAL '8' DAY, 3);
-INSERT INTO cart_items (member_id, product_id, quantity, created_at, cart_id) VALUES (1, 1, 1, CURRENT_TIMESTAMP - INTERVAL '9' DAY, 1);
+INSERT INTO cart_items (member_id, product_id, quantity, created_at, cart_id) VALUES (1, 7, 1, CURRENT_TIMESTAMP - INTERVAL '9' DAY, 1);
 ;
