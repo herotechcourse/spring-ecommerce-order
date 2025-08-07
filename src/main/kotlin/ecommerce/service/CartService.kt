@@ -34,14 +34,6 @@ class CartService(
         return cartRepository.findByMemberId(memberId)
     }
 
-    @Transactional(readOnly = true)
-    fun getCartItemsPaginated(
-        memberId: Long,
-        pageable: Pageable,
-    ): Page<Cart> {
-        return cartRepository.findByMemberId(memberId, pageable)
-    }
-
     @Transactional
     fun removeFromCart(
         memberId: Long,
