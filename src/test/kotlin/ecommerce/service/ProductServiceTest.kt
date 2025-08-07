@@ -36,7 +36,7 @@ class ProductServiceTest {
 
     @Test
     fun `getAll should return all products mapped to ProductResponse`() {
-        val product = Product("Bar", 1.0, "url", listOf(Option("Opt", 1)), 1L)
+        val product = Product("Bar", 1.0, "https://test.jpg", listOf(Option("Opt", 1)), 1L)
         `when`(productRepository.findAll()).thenReturn(listOf(product))
 
         val result = service.getAll()
@@ -47,7 +47,7 @@ class ProductServiceTest {
 
     @Test
     fun `getById should return mapped ProductResponse when product exists`() {
-        val product = Product("Bar", 1.0, "url", listOf(Option("m", 1)), 1L)
+        val product = Product("Bar", 1.0, "https://test.jpg", listOf(Option("m", 1)), 1L)
         `when`(productRepository.findById(1L)).thenReturn(
             Optional.of(product),
         )
@@ -69,7 +69,7 @@ class ProductServiceTest {
     @Test
     fun `getAllPaginated should return paginated ProductResponse`() {
         val pageable = PageRequest.of(0, 2)
-        val product = Product("Bar", 1.0, "url", listOf(Option("m", 1)), 1L)
+        val product = Product("Bar", 1.0, "https://test.jpg", listOf(Option("m", 1)), 1L)
         val page: Page<Product> = PageImpl(listOf(product), pageable, 1)
 
         `when`(productRepository.findAll(pageable)).thenReturn(page)
@@ -95,11 +95,11 @@ class ProductServiceTest {
             ProductRequest(
                 name = "New",
                 price = 2.0,
-                imageUrl = "url",
+                imageUrl = "https://test.jpg",
                 options = listOf(OptionRequest("S", 1)),
             )
         val savedOption = listOf(Option("S", 1))
-        val product = Product("New", 2.0, "url", savedOption, 1L)
+        val product = Product("New", 2.0, "https://test.jpg", savedOption, 1L)
 
         `when`(productRepository.existsByName("New")).thenReturn(false)
         `when`(productRepository.save(any(Product::class.java))).thenReturn(product)
@@ -115,7 +115,7 @@ class ProductServiceTest {
     fun `create should throw when name exists`() {
         `when`(productRepository.existsByName("Dup")).thenReturn(true)
 
-        val request = ProductRequest("Dup", 1.0, "url", listOf())
+        val request = ProductRequest("Dup", 1.0, "https://test.jpg", listOf())
 
         assertThrows<DuplicateProductNameException> {
             service.create(request)
@@ -127,9 +127,9 @@ class ProductServiceTest {
     @Test
     fun `update should replace product and return response`() {
         val id = 10L
-        val oldProduct = Product("Old", 1.0, "url", listOf(Option("Opt", 1)), id)
-        val request = ProductRequest("Updated", 2.0, "img", listOf(OptionRequest("Opt", 1)))
-        val updated = Product("Updated", 2.0, "img", listOf(Option("Opt", 1)), id)
+        val oldProduct = Product("Old", 1.0, "https://test.jpg", listOf(Option("Opt", 1)), id)
+        val request = ProductRequest("Updated", 2.0, "https://test.jpg", listOf(OptionRequest("Opt", 1)))
+        val updated = Product("Updated", 2.0, "https://test.jpg", listOf(Option("Opt", 1)), id)
 
         `when`(productRepository.findById(id)).thenReturn(Optional.of(oldProduct))
         `when`(productRepository.existsByNameAndIdNot("Updated", id)).thenReturn(false)
@@ -144,7 +144,7 @@ class ProductServiceTest {
     fun `update should throw if product not found`() {
         `when`(productRepository.findById(999L)).thenReturn(Optional.empty())
 
-        val request = ProductRequest("Updated", 1.0, "url", listOf())
+        val request = ProductRequest("Updated", 1.0, "https://test.jpg", listOf())
 
         assertThrows<NoSuchElementException> {
             service.update(999L, request)

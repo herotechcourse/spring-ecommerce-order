@@ -36,7 +36,7 @@ class ProductJpaRepositoryTest {
 
     @Test
     fun `existsByName should return true when product exists`() {
-        val exists = productJpaRepository.existsByName(savedProduct.name)
+        val exists = productJpaRepository.existsByName(savedProduct.name.value)
         assertThat(exists).isTrue()
     }
 
@@ -48,7 +48,7 @@ class ProductJpaRepositoryTest {
 
     @Test
     fun `existsByNameAndIdNot should return false for same id`() {
-        val result = productJpaRepository.existsByNameAndIdNot(savedProduct.name, savedProduct.id)
+        val result = productJpaRepository.existsByNameAndIdNot(savedProduct.name.value, savedProduct.id)
         assertThat(result).isFalse()
     }
 }

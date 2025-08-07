@@ -12,8 +12,7 @@ import jakarta.persistence.Table
 @Entity
 @Table(name = "products")
 class Product(
-    @Column(name = "name", nullable = false)
-    val name: String,
+    name: String,
     @Column(name = "price", nullable = false)
     val price: Double,
     @Column(name = "image_url")
@@ -23,10 +22,15 @@ class Product(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0L,
 ) {
+    @Column(name = "name", nullable = false)
+    val name = ProductName(name)
+
     @OneToMany(mappedBy = "product", cascade = [CascadeType.ALL], orphanRemoval = true)
     val options: MutableList<Option> = options.toMutableList()
 
     init {
+        require(price > 0)
+        require(Regex("""^(http://|https://).+""").matches(imageUrl))
         require(options.isNotEmpty()) { "At least one option must be provided" }
         options.forEach { it.product = this }
     }

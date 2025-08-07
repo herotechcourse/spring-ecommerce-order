@@ -21,4 +21,32 @@ class ProductTest {
             dummyProduct.addOption(Option("salami", 2))
         }
     }
+
+    @Test
+    fun `price zero should fail validation`() {
+        assertThrows<IllegalArgumentException> {
+            Product(
+                "a",
+                0.0,
+                "http://example.jpg",
+                listOf(
+                    Option("salami", 2),
+                ),
+            )
+        }
+    }
+
+    @Test
+    fun `link to image without http prefix should fail validation`() {
+        assertThrows<IllegalArgumentException> {
+            Product(
+                "a",
+                3.0,
+                "example.jpg",
+                listOf(
+                    Option("salami", 2),
+                ),
+            )
+        }
+    }
 }

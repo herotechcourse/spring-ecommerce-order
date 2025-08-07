@@ -40,7 +40,7 @@ class ProductService(
         return option.map {
             OptionResponse(
                 it.id,
-                it.name,
+                it.name.toString(),
                 it.quantity,
             )
         }
@@ -72,14 +72,14 @@ class ProductService(
 
         return ProductResponse(
             id = product.id,
-            name = product.name,
+            name = product.name.toString(),
             price = product.price,
             imageUrl = product.imageUrl,
             options =
                 product.options.map {
                     OptionResponse(
                         id = it.id,
-                        name = it.name,
+                        name = it.name.toString(),
                         quantity = it.quantity,
                     )
                 },
@@ -124,14 +124,14 @@ class ProductService(
     private fun Product.toResponse(): ProductResponse {
         return ProductResponse(
             id = this.id,
-            name = this.name,
+            name = this.name.value,
             price = this.price,
             imageUrl = this.imageUrl,
             options =
                 this.options.map {
                     OptionResponse(
                         id = it.id,
-                        name = it.name,
+                        name = it.name.value,
                         quantity = it.quantity,
                     )
                 },

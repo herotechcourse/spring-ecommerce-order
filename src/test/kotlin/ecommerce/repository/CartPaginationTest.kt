@@ -38,7 +38,7 @@ class CartPaginationTest
 
             val baseProduct =
                 Product(
-                    name = "Paginated Product",
+                    name = "Product",
                     price = 12.34,
                     imageUrl = "http://image.com/paginated.png",
                     options = listOf(option),
@@ -54,6 +54,6 @@ class CartPaginationTest
         fun `findByMemberId returns paginated wishlist items`() {
             val page = cartRepository.findByMemberId(member.id, PageRequest.of(0, 10))
             assertThat(page.content).hasSize(1)
-            assertThat(page.content[0].product.name).isEqualTo("Paginated Product")
+            assertThat(page.content[0].product.name).isEqualTo(product.name)
         }
     }
