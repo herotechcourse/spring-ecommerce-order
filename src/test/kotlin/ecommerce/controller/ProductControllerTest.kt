@@ -5,8 +5,8 @@ import ecommerce.config.DatabaseFixture.BRUSH
 import ecommerce.config.DatabaseFixture.createAcrylics
 import ecommerce.config.DatabaseFixture.createAdmin
 import ecommerce.config.DatabaseFixture.createBrush
-import ecommerce.config.DatabaseFixture.createBrushWithOptions
 import ecommerce.config.DatabaseFixture.createCanvas
+import ecommerce.config.DatabaseFixture.createOptions
 import ecommerce.config.DatabaseFixture.createPalette
 import ecommerce.dto.OptionRequest
 import ecommerce.dto.ProductRequest
@@ -115,7 +115,10 @@ class ProductControllerTest {
 
     @Test
     fun getOptions() {
-        val product = createBrushWithOptions()
+        val product = createBrush()
+        createOptions().forEach {
+            product.addOption(it)
+        }
         val productId = productRepository.save(product).id
         val response =
             RestAssured

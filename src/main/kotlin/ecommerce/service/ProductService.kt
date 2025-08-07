@@ -25,9 +25,13 @@ class ProductService(private val productRepository: ProductRepository, private v
         if (productRepository.existsByName(productRequest.name)) {
             throw ConflictException("Product with name ${productRequest.name} already exists")
         }
-        val product = productRepository.save(productRequest.toProduct())
-        optionRepository.saveAll(productRequest.options.map { Option(it.name, it.quantity, product) })
-        return product.id
+        val product = productRequest.toProduct()
+        productRequest.options.forEach {
+            val option = Option(it.name, it.quantity)
+            product.addOption(option)
+        }
+        val savedProduct = productRepository.save(product)
+        return savedProduct.id
             ?: throw NotFoundException("Product with name ${productRequest.name} not found")
     }
 

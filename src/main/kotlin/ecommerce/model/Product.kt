@@ -26,6 +26,12 @@ class Product(
     @OneToMany(mappedBy = "product", cascade = [CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE], fetch = FetchType.LAZY)
     var options: MutableList<Option> = mutableListOf()
 
+    fun addOption(option: Option) {
+        require(options.none { it.name == this.name }) { "duplicate name ${name} found" }
+        option.product = this
+        options.add(option)
+    }
+
     override fun equals(other: Any?): Boolean {
         if (this == other) return true
         if (other == null || javaClass != other.javaClass) return false

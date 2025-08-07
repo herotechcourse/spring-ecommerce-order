@@ -84,20 +84,14 @@ object DatabaseFixture {
             imageUrl = "https://example.com/images/brush.jpg",
         )
 
-    fun createBrushWithOptions(): Product {
-        val product =
-            Product(
-                name = "Brush",
-                price = 5.99,
-                imageUrl = "https://example.com/images/brush.jpg",
-            )
-        product.options =
+    fun createOptions(): List<Option> {
+        val options =
             mutableListOf(
-                Option("small", 3, product),
-                Option("medium", 1, product),
-                Option("large", 2, product),
+                Option("small", 3),
+                Option("medium", 1),
+                Option("large", 2),
             )
-        return product
+        return options
     }
 
     fun createCanvas(): Product =
