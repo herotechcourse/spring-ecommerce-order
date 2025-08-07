@@ -1,5 +1,7 @@
 package ecommerce.exception
 
+import org.slf4j.LoggerFactory
+
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.MethodArgumentNotValidException
@@ -8,13 +10,16 @@ import org.springframework.web.bind.annotation.RestControllerAdvice
 
 @RestControllerAdvice
 class GlobalExceptionHandler {
+    private val logger = LoggerFactory.getLogger(GlobalExceptionHandler::class.java)
     @ExceptionHandler(MethodArgumentNotValidException::class)
     fun handleValidationException(ex: MethodArgumentNotValidException): ResponseEntity<ErrorResponse> {
+        logger.warn("Validation exception occurred", ex)
+        logger.warn("Validation failed: ${ex.bindingResult.fieldErrors}")
         val errors =
             ex.bindingResult.fieldErrors.map {
                 FieldError(
                     field = it.field,
-                    reason = it.defaultMessage ?: "Invalid value",
+                    reason = "Invalid value",
                 )
             }
         val response =
@@ -26,7 +31,8 @@ class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ApplicationException::class)
-    fun handleApiException(ex: ApplicationException): ResponseEntity<ErrorResponse> {
+    fun handleApplicationException(ex: ApplicationException): ResponseEntity<ErrorResponse> {
+        logger.warn("Handled application exception", ex)
         val error =
             ErrorResponse(
                 message = ex.message,
@@ -37,10 +43,11 @@ class GlobalExceptionHandler {
 
     @ExceptionHandler(RuntimeException::class)
     fun handleUnexpectedException(ex: RuntimeException): ResponseEntity<ErrorResponse> {
+        logger.error("Unexpected error occurred", ex)
         val error =
             ErrorResponse(
                 message = "Internal server error",
-                errors = listOf(FieldError("unknown", ex.message ?: "Something went wrong")),
+                errors = listOf(FieldError("unknown","Something went wrong")),
             )
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error)
     }
