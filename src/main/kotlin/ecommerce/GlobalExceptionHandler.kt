@@ -26,7 +26,7 @@ class GlobalExceptionHandler {
         val error = mapOf("error" to e.message)
         val errorBody = mapOf("errors" to error)
         println("RuntimeException occurred: $errorBody")
-        return ResponseEntity.internalServerError().body(errorBody)
+        return ResponseEntity.internalServerError().build()
     }
 
     @ExceptionHandler(NotFoundException::class)
