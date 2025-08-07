@@ -14,22 +14,22 @@ import jakarta.persistence.Table
 @Table(name = "product_option")
 class Option(
     @Column(name = "name", nullable = false, length = 50)
-    var name: String,
+    val name: String,
     @Column(nullable = false)
     var quantity: Int,
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "product_id", nullable = false)
-    var product: Product? = null,
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0L,
 ) {
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @JoinColumn(name = "product_id", nullable = false)
+    lateinit var product: Product
+
     init {
         require(name.length <= 50) { "Option name must be 50 characters or fewer." }
         require(name.matches(Regex("^[a-zA-Z0-9 ()\\[\\]+\\-&/_]*$"))) {
             "Option name contains invalid characters."
         }
-
         require(quantity in 1 until 100_000_000) {
             "Quantity must be between 1 and 99,999,999."
         }

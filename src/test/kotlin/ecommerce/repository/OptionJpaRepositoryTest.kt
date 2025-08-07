@@ -25,7 +25,6 @@ class OptionJpaRepositoryTest {
             Option(
                 name = "name",
                 quantity = 1,
-                product = product,
             )
 
         val productWithOption =

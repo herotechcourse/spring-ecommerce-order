@@ -18,7 +18,7 @@ class ProductTest {
     @Test
     fun `addOption should throw error if option name is not unique`() {
         assertThrows<IllegalArgumentException> {
-            dummyProduct.addOption(Option("salami", 2, dummyProduct))
+            dummyProduct.addOption(Option("salami", 2))
         }
     }
 }
