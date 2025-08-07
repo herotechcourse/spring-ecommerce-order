@@ -1,7 +1,6 @@
-package ecommerce
+package ecommerce.model
 
-import ecommerce.config.DatabaseFixture.PETRA
-import ecommerce.model.Cart
+import ecommerce.DatabaseFixture
 import ecommerce.repository.CartRepository
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -14,7 +13,7 @@ class CartEntityTest {
 
     @Test
     fun initCart() {
-        val user = PETRA
+        val user = DatabaseFixture.PETRA
         val cart = Cart(member = user)
         repository.save(cart)
     }

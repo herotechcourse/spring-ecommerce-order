@@ -1,7 +1,7 @@
 package ecommerce.controller
 
+import ecommerce.DatabaseFixture
 import ecommerce.annotation.LoginMemberArgumentResolver
-import ecommerce.config.DatabaseFixture
 import ecommerce.config.WebMvcConfiguration
 import ecommerce.dto.RegisteredMember
 import ecommerce.dto.Role

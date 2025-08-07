@@ -1,4 +1,4 @@
-package ecommerce.config
+package ecommerce
 
 import ecommerce.dto.Role
 import ecommerce.model.Member

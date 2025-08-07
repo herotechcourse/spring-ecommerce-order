@@ -1,6 +1,6 @@
 package ecommerce.controller
 
-import ecommerce.config.DatabaseFixture
+import ecommerce.DatabaseFixture
 import ecommerce.dto.TokenRequest
 import ecommerce.repository.MemberRepository
 import io.restassured.RestAssured

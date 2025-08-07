@@ -1,16 +1,6 @@
-package ecommerce
+package ecommerce.controller
 
-import ecommerce.config.DatabaseFixture.ADMIN
-import ecommerce.config.DatabaseFixture.MINA
-import ecommerce.config.DatabaseFixture.createAcrylics
-import ecommerce.config.DatabaseFixture.createAdmin
-import ecommerce.config.DatabaseFixture.createBrush
-import ecommerce.config.DatabaseFixture.createCanvas
-import ecommerce.config.DatabaseFixture.createMina
-import ecommerce.config.DatabaseFixture.createPalette
-import ecommerce.config.DatabaseFixture.createPen
-import ecommerce.config.DatabaseFixture.createPencil
-import ecommerce.config.DatabaseFixture.createPetra
+import ecommerce.DatabaseFixture
 import ecommerce.dto.CartItemRequest
 import ecommerce.dto.TokenRequest
 import ecommerce.model.Cart
@@ -23,7 +13,7 @@ import io.restassured.RestAssured
 import io.restassured.http.ContentType
 import io.restassured.response.ExtractableResponse
 import io.restassured.response.Response
-import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -60,29 +50,77 @@ class StatisticsE2ETest {
     fun setUp() {
         val fortyDaysAgo = LocalDateTime.now().minusDays(40)
 
-        val mina = memberRepository.save(createMina())
-        val petra = memberRepository.save(createPetra())
-        memberRepository.save(createAdmin())
+        val mina = memberRepository.save(DatabaseFixture.createMina())
+        val petra = memberRepository.save(DatabaseFixture.createPetra())
+        memberRepository.save(DatabaseFixture.createAdmin())
 
         val minasCart = cartRepository.save(Cart(mina))
         val petrasCart = cartRepository.save(Cart(petra))
-        val brush = productRepository.save(createBrush())
-        val palette = productRepository.save(createPalette())
-        val canvas = productRepository.save(createCanvas())
-        val acrylics = productRepository.save(createAcrylics())
-        val pen = productRepository.save(createPen())
-        val pencil = productRepository.save(createPencil())
+        val brush = productRepository.save(DatabaseFixture.createBrush())
+        val palette = productRepository.save(DatabaseFixture.createPalette())
+        val canvas = productRepository.save(DatabaseFixture.createCanvas())
+        val acrylics = productRepository.save(DatabaseFixture.createAcrylics())
+        val pen = productRepository.save(DatabaseFixture.createPen())
+        val pencil = productRepository.save(DatabaseFixture.createPencil())
 
-        val cartItem1 = cartItemRepository.save(CartItem(product = brush, cart = minasCart, quantity = 7, createdAt = LocalDateTime.now()))
+        val cartItem1 =
+            cartItemRepository.save(
+                CartItem(
+                    product = brush,
+                    cart = minasCart,
+                    quantity = 7,
+                    createdAt = LocalDateTime.now(),
+                ),
+            )
         val cartItem2 =
             cartItemRepository.save(
                 CartItem(product = palette, cart = minasCart, quantity = 6, createdAt = LocalDateTime.now()),
             )
-        val cartItem3 = cartItemRepository.save(CartItem(product = canvas, cart = minasCart, quantity = 5, createdAt = LocalDateTime.now()))
-        val cartItem4 = cartItemRepository.save(CartItem(product = pen, cart = minasCart, quantity = 4, createdAt = fortyDaysAgo))
-        val cartItem5 = cartItemRepository.save(CartItem(product = acrylics, cart = minasCart, quantity = 3, createdAt = fortyDaysAgo))
-        val cartItem6 = cartItemRepository.save(CartItem(product = pencil, cart = minasCart, quantity = 2, createdAt = fortyDaysAgo))
-        val cartItem7 = cartItemRepository.save(CartItem(product = pencil, cart = petrasCart, quantity = 2, createdAt = fortyDaysAgo))
+        val cartItem3 =
+            cartItemRepository.save(
+                CartItem(
+                    product = canvas,
+                    cart = minasCart,
+                    quantity = 5,
+                    createdAt = LocalDateTime.now(),
+                ),
+            )
+        val cartItem4 =
+            cartItemRepository.save(
+                CartItem(
+                    product = pen,
+                    cart = minasCart,
+                    quantity = 4,
+                    createdAt = fortyDaysAgo,
+                ),
+            )
+        val cartItem5 =
+            cartItemRepository.save(
+                CartItem(
+                    product = acrylics,
+                    cart = minasCart,
+                    quantity = 3,
+                    createdAt = fortyDaysAgo,
+                ),
+            )
+        val cartItem6 =
+            cartItemRepository.save(
+                CartItem(
+                    product = pencil,
+                    cart = minasCart,
+                    quantity = 2,
+                    createdAt = fortyDaysAgo,
+                ),
+            )
+        val cartItem7 =
+            cartItemRepository.save(
+                CartItem(
+                    product = pencil,
+                    cart = petrasCart,
+                    quantity = 2,
+                    createdAt = fortyDaysAgo,
+                ),
+            )
 
         cartItem1.updatedAt = LocalDateTime.now()
         cartItem2.updatedAt = LocalDateTime.now()
@@ -160,37 +198,37 @@ class StatisticsE2ETest {
 
     @Test
     fun `should return top 5 most added products in the past 30 days for admin`() {
-        val token = loginAS(ADMIN.email, ADMIN.password)
+        val token = loginAS(DatabaseFixture.ADMIN.email, DatabaseFixture.ADMIN.password)
 
         val stats = getStatistics(token, "/admin/statistics/top-products")
 
-        assertThat(stats.statusCode()).isEqualTo(HttpStatus.OK.value())
+        Assertions.assertThat(stats.statusCode()).isEqualTo(HttpStatus.OK.value())
         val json = stats.body().jsonPath()
         val productNames = json.getList<String>("productName")
         val topProducts =
             listOf(mostRecentCartItems[0].product.name, mostRecentCartItems[1].product.name, mostRecentCartItems[2].product.name)
-        assertThat(productNames).containsExactlyInAnyOrderElementsOf(topProducts)
+        Assertions.assertThat(productNames).containsExactlyInAnyOrderElementsOf(topProducts)
     }
 
     @Test
     fun `should return active members in the past 7 days for admin`() {
-        val token = loginAS(ADMIN.email, ADMIN.password)
+        val token = loginAS(DatabaseFixture.ADMIN.email, DatabaseFixture.ADMIN.password)
 
         val stats = getStatistics(token, "/admin/statistics/active-members")
 
-        assertThat(stats.statusCode()).isEqualTo(HttpStatus.OK.value())
+        Assertions.assertThat(stats.statusCode()).isEqualTo(HttpStatus.OK.value())
         val json = stats.body().jsonPath()
         val emails = json.getList<String>("email")
-        assertThat(emails).containsExactly(MINA.email)
+        Assertions.assertThat(emails).containsExactly(DatabaseFixture.MINA.email)
     }
 
     @ParameterizedTest
     @ValueSource(strings = ["/admin/statistics/top-products", "/admin/statistics/active-members"])
     fun `should not return statistics for user`(path: String) {
-        val token = loginAS(MINA.email, MINA.password)
+        val token = loginAS(DatabaseFixture.MINA.email, DatabaseFixture.MINA.password)
 
         val stats = getStatistics(token, path)
 
-        assertThat(stats.statusCode()).isEqualTo(HttpStatus.FORBIDDEN.value())
+        Assertions.assertThat(stats.statusCode()).isEqualTo(HttpStatus.FORBIDDEN.value())
     }
 }
