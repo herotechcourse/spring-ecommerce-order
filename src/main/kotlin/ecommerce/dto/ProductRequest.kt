@@ -1,5 +1,6 @@
 package ecommerce.dto
 
+import ecommerce.entity.OptionEntity
 import ecommerce.entity.ProductEntity
 import ecommerce.validation.UniqueProductName
 import ecommerce.validation.ValidProductName
@@ -26,7 +27,15 @@ data class ProductRequest(
     val options: MutableList<OptionCreateDto> = mutableListOf(),
 ) {
     fun toProduct(): ProductEntity {
-        val optionConverted = options.map { option -> option.toOptionEntity() }
-        return ProductEntity(name = name, price = price, imageUrl = imageUrl, options = optionConverted)
+        val options =
+            options.map {
+                OptionEntity(name = it.name, quantity = it.quantity)
+            }
+
+        val product = ProductEntity(name = name, price = price, imageUrl = imageUrl, options = options.toMutableList())
+
+        options.forEach { it.product = product }
+
+        return product
     }
 }
