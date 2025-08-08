@@ -17,15 +17,15 @@ class ProductEntity(
     @Column(nullable = false, unique = true)
     var name: String,
     @Column(nullable = false)
-    val price: Double,
+    var price: Double,
     @Column(nullable = false, name = "image_url")
-    val imageUrl: String,
+    var imageUrl: String,
     @OneToMany(
-        cascade = [CascadeType.MERGE, CascadeType.PERSIST],
+        cascade = [CascadeType.ALL],
         orphanRemoval = true,
     )
     @Column(nullable = false, name = "option")
-    val options: List<OptionEntity> = emptyList(),
+    val options: MutableList<OptionEntity> = mutableListOf(),
 ) {
     init {
         require(name.isNotBlank()) { "Product name must not be blank" }
