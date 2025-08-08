@@ -1,0 +1,18 @@
+TRUNCATE TABLE cart_items;
+;
+INSERT INTO cart_items (member_id, product_id, quantity, created_at, cart_id) VALUES (1, 1, 1, CURRENT_TIMESTAMP - INTERVAL '5' DAY, 1);
+INSERT INTO cart_items (member_id, product_id, quantity, created_at, cart_id) VALUES (1, 2, 1, CURRENT_TIMESTAMP - INTERVAL '3' DAY, 1);
+INSERT INTO cart_items (member_id, product_id, quantity, created_at, cart_id) VALUES (2, 2, 1, CURRENT_TIMESTAMP - INTERVAL '2' DAY, 2);
+INSERT INTO cart_items (member_id, product_id, quantity, created_at, cart_id) VALUES (3, 2, 1, CURRENT_TIMESTAMP - INTERVAL '1' DAY, 3);
+INSERT INTO cart_items (member_id, product_id, quantity, created_at, cart_id) VALUES (1, 3, 1, CURRENT_TIMESTAMP - INTERVAL '10' DAY, 1);
+INSERT INTO cart_items (member_id, product_id, quantity, created_at, cart_id) VALUES (2, 3, 1, CURRENT_TIMESTAMP - INTERVAL '20' DAY, 2);
+INSERT INTO cart_items (member_id, product_id, quantity, created_at, cart_id) VALUES (3, 3, 1, CURRENT_TIMESTAMP - INTERVAL '25' DAY, 3);
+INSERT INTO cart_items (member_id, product_id, quantity, created_at, cart_id) VALUES (1, 4, 1, CURRENT_TIMESTAMP - INTERVAL '6' DAY, 1);
+INSERT INTO cart_items (member_id, product_id, quantity, created_at, cart_id) VALUES (2, 5, 1, CURRENT_TIMESTAMP - INTERVAL '7' DAY, 2);
+INSERT INTO cart_items (member_id, product_id, quantity, created_at, cart_id) VALUES (3, 5, 1, CURRENT_TIMESTAMP - INTERVAL '8' DAY, 3);
+INSERT INTO cart_items (member_id, product_id, quantity, created_at, cart_id) VALUES (1, 5, 1, CURRENT_TIMESTAMP - INTERVAL '9' DAY, 1);
+INSERT INTO cart_items (member_id, product_id, quantity, created_at, cart_id) VALUES (1, 6, 1, CURRENT_TIMESTAMP - INTERVAL '6' DAY, 1);
+INSERT INTO cart_items (member_id, product_id, quantity, created_at, cart_id) VALUES (2, 6, 1, CURRENT_TIMESTAMP - INTERVAL '7' DAY, 2);
+INSERT INTO cart_items (member_id, product_id, quantity, created_at, cart_id) VALUES (3, 3, 1, CURRENT_TIMESTAMP - INTERVAL '8' DAY, 3);
+INSERT INTO cart_items (member_id, product_id, quantity, created_at, cart_id) VALUES (1, 1, 1, CURRENT_TIMESTAMP - INTERVAL '9' DAY, 1);
+;

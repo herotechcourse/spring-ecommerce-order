@@ -1,0 +1,13 @@
+TRUNCATE TABLE members;
+TRUNCATE TABLE carts;
+;
+INSERT INTO carts () VALUES ();
+INSERT INTO carts () VALUES ();
+INSERT INTO carts () VALUES ();
+INSERT INTO carts () VALUES ();
+;
+INSERT INTO members (email, password, role, cart_id) VALUES ( 'san@htc.com', 'san1234', 'admin', 1);
+INSERT INTO members (email, password, role, cart_id) VALUES ( 'dan@htc.com', 'dan1234', 'admin', 2);
+INSERT INTO members (email, password, cart_id) VALUES ( 'ann@htc.com', 'ann1234', 3);
+INSERT INTO members (email, password, cart_id) VALUES ( 'min@htc.com', 'min1234', 4);
+;

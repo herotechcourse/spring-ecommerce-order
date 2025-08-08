@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Spring E-commerce</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css"
+    >
+</head>
+<body>
+<header class="container">
+    <nav>
+        <ul>
+            <li><strong><a href="/">Home</a></strong></li>
+        </ul>
+        <ul>
+            <li><a href="/add/product">add product</a></li>
+        </ul>
+    </nav>
+</header>
+<main class="container">
+    <h1>Form</h1>
+    <form id="product-form" action="#" method="post">
+        <fieldset>
+            <label>
+                Name
+                <input
+                        id="name"
+                        name="name"
+                        placeholder="name"
+                        autocomplete="name"
+                />
+            </label>
+            <label>
+                Price
+                <input
+                        type="number"
+                        id="price"
+                        step="0.1"
+                        name="price"
+                        placeholder="0"
+                        autocomplete="price"
+                />
+            </label>
+            <label>
+                ImageUrl
+                <input
+                        type="url"
+                        id="imageUrl"
+                        name="imageUrl"
+                        placeholder="Url"
+                        autocomplete="url"
+                />
+            </label>
+        </fieldset>
+        <input
+                type="submit"
+                value="Create"
+        />
+    </form>
+</main>
+</body>
+<script>
+    document.getElementById("product-form").addEventListener("submit", async function (event) {
+        event.preventDefault();
+        const name = document.getElementById("name").value;
+        const price = parseFloat(document.getElementById("price").value);
+        const imageUrl = document.getElementById("imageUrl").value;
+        const product = { name, price, imageUrl };
+        try {
+            const response = await fetch(`/api/products`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(product)
+            });
+            if (response.ok) {
+                // alert("Product created successfully!");
+                window.location.href = "/"; // Redirect to home or product list
+            } else {
+                alert("Failed to create product. Status: " + response.status);
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            alert("An error occurred while creating the product.");
+        }
+    });
+</script>
+</html>

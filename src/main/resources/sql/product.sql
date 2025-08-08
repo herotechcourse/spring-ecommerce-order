@@ -1,0 +1,10 @@
+TRUNCATE TABLE products;
+;
+INSERT INTO products (name, price, image_url) VALUES ('Iron Man', 1000, 'https://alexnsan.comics/imageurl/1');
+INSERT INTO products (name, price, image_url) VALUES ('X-men', 1000, 'https://alexnsan.comics/imageurl/2');
+INSERT INTO products (name, price, image_url) VALUES ('Superman', 1000, 'https://alexnsan.comics/imageurl/3');
+INSERT INTO products (name, price, image_url) VALUES ('Naruto', 1000, 'https://alexnsan.comics/imageurl/4');
+INSERT INTO products (name, price, image_url) VALUES ('Full Metal Alchemist', 1000, 'https://alexnsan.comics/imageurl/5');
+INSERT INTO products (name, price, image_url) VALUES ('Batman', 1000, 'https://alexnsan.comics/imageurl/6');
+INSERT INTO products (name, price, image_url) VALUES ('Man', 1000, 'https://alexnsan.comics/imageurl/7');
+;

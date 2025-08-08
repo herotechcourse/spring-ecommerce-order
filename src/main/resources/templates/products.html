@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Spring E-commerce</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css"
+    >
+</head>
+<body>
+<header class="container">
+    <nav>
+        <ul>
+            <li><strong><a href="/">Home</a></strong></li>
+        </ul>
+        <ul>
+            <li><a href="/add/product">add product</a></li>
+        </ul>
+    </nav>
+</header>
+<main class="container">
+    <table>
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Price</th>
+            <th>ImageURL</th>
+            <th>actions</th>
+        </tr>
+        </thead>
+        <tbody id="product-table-body">
+        <!-- Rows will be populated via JavaScript -->
+        </tbody>
+    </table>
+</main>
+</body>
+<script>
+    async function fetchProducts() {
+        try {
+            const response = await fetch('/api/products');
+            if (!response.ok) throw new Error('Network response was not ok');
+
+            const products = await response.json();
+            const tableBody = document.getElementById('product-table-body');
+            tableBody.innerHTML = ''; // Clear any existing rows
+
+            products.forEach(product => {
+                const row = document.createElement('tr');
+
+                row.innerHTML = `
+                    <td>${product.id}</td>
+                    <td>${product.name}</td>
+                    <td>${product.price}</td>
+                    <td>${product.imageUrl}</td>
+                    <td>
+                        <a href="/update/product/${product.id}">edit</a>
+                        <button type="button" class="delete-button" style="background-color: red" data-id="${product.id}">
+                            Delete
+                        </button>
+                    </td>
+                `;
+
+                tableBody.appendChild(row);
+            });
+
+            attachDeleteHandlers(); // Set up delete buttons after table is populated
+        } catch (error) {
+            console.error('Error fetching products:', error);
+        }
+    }
+
+    function attachDeleteHandlers() {
+        document.querySelectorAll(".delete-button").forEach(button => {
+            button.addEventListener("click", async (event) => {
+                const id = event.target.getAttribute("data-id");
+                if (!confirm(`Are you sure you want to delete product ${id}?`)) return;
+                try {
+                    const response = await fetch(`/api/products/${id}`, {
+                        method: "DELETE"
+                    });
+                    if (response.ok) {
+                        window.location.reload();
+                    } else {
+                        alert("Failed to delete product. Status: " + response.status);
+                    }
+                } catch (error) {
+                    console.error("Error:", error);
+                    alert("An error occurred while deleting the product.");
+                }
+            });
+        });
+    }
+
+    // Load products when the page is ready
+    document.addEventListener("DOMContentLoaded", fetchProducts);
+</script>
+</html>
