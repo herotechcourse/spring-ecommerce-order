@@ -1,0 +1,155 @@
+package ecommerce.service
+
+import ecommerce.dto.OptionResponse
+import ecommerce.dto.ProductRequest
+import ecommerce.dto.ProductResponse
+import ecommerce.entity.Option
+import ecommerce.entity.Product
+import ecommerce.exception.DuplicateProductNameException
+import ecommerce.repository.OptionJpaRepository
+import ecommerce.repository.ProductJpaRepository
+import jakarta.transaction.Transactional
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
+import org.springframework.stereotype.Service
+
+@Transactional
+@Service
+class ProductService(
+    private val productRepository: ProductJpaRepository,
+    private val optionRepository: OptionJpaRepository,
+) {
+    fun getAll(): List<ProductResponse> {
+        return productRepository.findAll().map { it.toResponse() }
+    }
+
+    fun getById(id: Long): ProductResponse? {
+        return productRepository.findById(id).orElse(null)?.toResponse()
+    }
+
+    fun getAllPaginated(pageable: Pageable): Page<ProductResponse> {
+        return productRepository.findAll(pageable).map { it.toResponse() }
+    }
+
+    fun getOptions(productId: Long): List<OptionResponse> {
+        val option = optionRepository.findByProductId(productId)
+        if (option.isEmpty()) throw NoSuchElementException("Not Found")
+        return option.map {
+            OptionResponse(
+                it.id,
+                it.name,
+                it.quantity,
+            )
+        }
+    }
+
+    fun create(request: ProductRequest): ProductResponse {
+        if (productRepository.existsByName(request.name)) {
+            throw DuplicateProductNameException()
+        }
+
+        if (request.options.isEmpty()) {
+            throw IllegalArgumentException("A product must have at least one option.")
+        }
+
+        val product =
+            Product(
+                name = request.name,
+                price = request.price,
+                imageUrl = request.imageUrl,
+                options = emptyList(),
+            )
+
+        val options =
+            request.options.map {
+                Option(
+                    name = it.name,
+                    quantity = it.quantity,
+                    product = product,
+                )
+            }
+
+        val productWithOptions =
+            Product(
+                name = request.name,
+                price = request.price,
+                imageUrl = request.imageUrl,
+                options = options,
+            )
+
+        val savedProduct = productRepository.save(productWithOptions)
+
+        return savedProduct.toResponse()
+    }
+
+    fun update(
+        id: Long,
+        request: ProductRequest,
+    ): ProductResponse {
+        val existingProduct =
+            productRepository.findById(id)
+                .orElseThrow { NoSuchElementException("Product with ID $id not found.") }
+
+        if (productRepository.existsByNameAndIdNot(request.name, id)) {
+            throw DuplicateProductNameException()
+        }
+
+        val existingOptionNames = optionRepository.findByProductId(id).map { it.name }
+        val newOptionNames = request.options.map { it.name }
+
+        val combinedOptionNames = existingOptionNames + newOptionNames
+
+        val duplicateOptionNames =
+            combinedOptionNames
+                .groupingBy { it }
+                .eachCount()
+                .filter { it.value > 1 }
+                .keys
+
+        if (duplicateOptionNames.isNotEmpty()) {
+            throw IllegalArgumentException("Duplicate option names are not allowed: ${duplicateOptionNames.joinToString()}")
+        }
+
+        val updatedOptions =
+            request.options.map {
+                Option(
+                    name = it.name,
+                    quantity = it.quantity,
+                    product = existingProduct,
+                )
+            }
+
+        val updatedProduct =
+            Product(
+                id = existingProduct.id,
+                name = request.name,
+                price = request.price,
+                imageUrl = request.imageUrl,
+                options = updatedOptions,
+            )
+
+        val savedProduct = productRepository.save(updatedProduct)
+        return savedProduct.toResponse()
+    }
+
+    private fun Product.toResponse(): ProductResponse {
+        return ProductResponse(
+            id = this.id,
+            name = this.name,
+            price = this.price,
+            imageUrl = this.imageUrl,
+            options =
+                this.options.map {
+                    OptionResponse(
+                        id = it.id,
+                        name = it.name,
+                        quantity = it.quantity,
+                    )
+                },
+        )
+    }
+
+    fun delete(id: Long) {
+        productRepository.deleteById(id)
+    }
+}
