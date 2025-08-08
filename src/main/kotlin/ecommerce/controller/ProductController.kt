@@ -53,9 +53,7 @@ class ProductController(
         @PathVariable("id") id: Long,
         @RequestBody @Valid productRequest: ProductRequest,
     ): ResponseEntity<Void> {
-        val newProduct = productRequest.toProduct()
-        productRepositoryJpa.save(newProduct)
-
+        productService.updateProduct(id, productRequest)
         return ResponseEntity.ok().build()
     }
 

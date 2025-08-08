@@ -17,18 +17,54 @@ class ProductService(
         if (productRepositoryJpa.existsByName(productRequest.name)) {
             throw IllegalArgumentException("Product with name '${productRequest.name}' already exists.")
         }
+
         val options =
             productRequest.options.map {
                 OptionEntity(name = it.name, quantity = it.quantity)
-            }.toMutableList()
+            }
 
         val product =
             ProductEntity(
                 name = productRequest.name,
                 price = productRequest.price,
                 imageUrl = productRequest.imageUrl,
-                options = options,
+                options = options.toMutableList(),
             )
+
+        options.forEach { it.product = product }
+
+        return productRepositoryJpa.save(product)
+    }
+
+    fun updateProduct(
+        id: Long,
+        request: ProductRequest,
+    ): ProductEntity {
+        val product =
+            productRepositoryJpa.findById(id)
+                .orElseThrow { NoSuchElementException("Product with id $id not found") }
+
+        // Check for name uniqueness if name is being changed
+        if (product.name != request.name && productRepositoryJpa.existsByName(request.name)) {
+            throw IllegalArgumentException("Product with name '${request.name}' already exists.")
+        }
+
+        product.options.clear()
+        // this will execute the deletes before adding new ones
+        productRepositoryJpa.flush()
+
+        // update product fields
+        product.name = request.name
+        product.price = request.price
+        product.imageUrl = request.imageUrl
+
+        // Clear old options and add new ones
+        val newOptions =
+            request.options.map {
+                OptionEntity(name = it.name, quantity = it.quantity, product = product)
+            }
+
+        product.options.addAll(newOptions)
 
         return productRepositoryJpa.save(product)
     }
