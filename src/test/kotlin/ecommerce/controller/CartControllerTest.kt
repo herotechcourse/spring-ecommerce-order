@@ -119,7 +119,7 @@ class CartControllerTest
 
             val mockCartItem =
                 CartItem(
-                    product = Product(101L, "Who Hate Test", 9999.99, "https://example.com/who_hate_test.jpg"),
+                    product = Product("Who Hate Test", 9999.99, "https://example.com/who_hate_test.jpg", 101L),
                     cart = Cart(member = memberGuri),
                     quantity = 2,
                     createdAt = LocalDateTime.now(),
@@ -159,7 +159,7 @@ class CartControllerTest
                     role = Role.USER,
                 )
 
-            val product = Product(102L, "Lonely Dog Walk", 1000.0, "https://dog-walking-alone-not-funny-sometime.com")
+            val product = Product("Lonely Dog Walk", 1000.0, "https://dog-walking-alone-not-funny-sometime.com", 102L)
             val request = CartItemRequest(productId = product.id!!, quantity = 2)
             val cart =
                 Cart(
@@ -211,7 +211,7 @@ class CartControllerTest
 
             val mockCartItem =
                 CartItem(
-                    product = Product(101L, "Who Hate Test", 9999.99, "https://example.com/who_hate_test.jpg"),
+                    product = Product("Who Hate Test", 9999.99, "https://example.com/who_hate_test.jpg", 101L),
                     cart = Cart(member = memberGuri),
                     quantity = 2,
                     createdAt = LocalDateTime.now(),

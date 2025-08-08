@@ -12,9 +12,6 @@ import jakarta.persistence.Table
 @Entity
 @Table(name = "members")
 class Member(
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long? = null,
     @Column(name = "email", nullable = false)
     val email: String,
     @Column(name = "name", nullable = false)
@@ -23,6 +20,9 @@ class Member(
     var password: String,
     @Column(name = "role", nullable = false)
     val role: String = Role.USER.name,
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    val id: Long? = null,
 ) {
     fun validatePassword(password: String) {
         if (this.password != password) {

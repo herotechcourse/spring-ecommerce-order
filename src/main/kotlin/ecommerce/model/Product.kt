@@ -13,15 +13,15 @@ import jakarta.persistence.Table
 @Entity
 @Table(name = "products")
 class Product(
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var id: Long? = null,
     @Column(name = "name", nullable = false)
     var name: String,
     @Column(name = "price", nullable = false)
     var price: Double,
     @Column(name = "image_url", nullable = false)
     var imageUrl: String,
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    var id: Long? = null,
 ) {
     @OneToMany(mappedBy = "product", cascade = [CascadeType.PERSIST, CascadeType.REMOVE], fetch = FetchType.LAZY)
     var options: MutableList<Option> = mutableListOf()

@@ -20,6 +20,6 @@ data class ProductRequest(
     val options: List<OptionRequest>? = null,
 ) {
     fun toProduct(id: Long? = null): Product {
-        return Product(id, this.name, this.price, this.imageUrl)
+        return Product(this.name, this.price, this.imageUrl, id)
     }
 }
