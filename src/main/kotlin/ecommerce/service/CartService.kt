@@ -1,0 +1,52 @@
+package ecommerce.service
+
+import ecommerce.dto.CartRequest
+import ecommerce.dto.MemberStatsResponse
+import ecommerce.dto.ProductStatResponse
+import ecommerce.entity.Cart
+import ecommerce.entity.Member
+import ecommerce.repository.CartJpaRepository
+import ecommerce.repository.CartStaticsRepository
+import ecommerce.repository.ProductJpaRepository
+import org.springframework.data.repository.findByIdOrNull
+import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
+
+@Service
+class CartService(
+    private val cartRepository: CartJpaRepository,
+    private val productRepository: ProductJpaRepository,
+    private val cartStaticsRepository: CartStaticsRepository,
+) {
+    @Transactional
+    fun addToCart(
+        member: Member,
+        request: CartRequest,
+    ) {
+        val product = productRepository.findByIdOrNull(request.productId) ?: throw NoSuchElementException()
+        cartRepository.save(Cart(member, product))
+    }
+
+    @Transactional(readOnly = true)
+    fun getCartItems(memberId: Long): List<Cart> {
+        return cartRepository.findByMemberId(memberId)
+    }
+
+    @Transactional
+    fun removeFromCart(
+        memberId: Long,
+        productId: Long,
+    ) {
+        cartRepository.deleteByMemberIdAndProductId(memberId, productId)
+    }
+
+    @Transactional(readOnly = true)
+    fun getTop5MostAddedProducts(): List<ProductStatResponse> {
+        return cartStaticsRepository.getTop5MostAddedProducts()
+    }
+
+    @Transactional(readOnly = true)
+    fun getRecentlyActiveMembers(): List<MemberStatsResponse> {
+        return cartStaticsRepository.getRecentlyActiveMembers()
+    }
+}
