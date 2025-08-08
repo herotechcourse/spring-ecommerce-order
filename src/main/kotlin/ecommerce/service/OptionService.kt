@@ -19,10 +19,15 @@ class OptionService(
         name: String,
         price: Double,
         imageUrl: String,
-        options: List<OptionCreateDto>,
+        optionsDto: List<OptionCreateDto>,
     ): ProductEntity {
-        val options = options.map { OptionEntity(name = it.name, quantity = it.quantity) }
-        val product = ProductEntity(name = name, price = price, imageUrl = imageUrl, options = options.toMutableList())
+        val options = mutableListOf<OptionEntity>()
+        val product = ProductEntity(name = name, price = price, imageUrl = imageUrl, options = options)
+
+        optionsDto.forEach { optionDto ->
+            val option = optionDto.toOptionEntity(product)
+            options.add(option)
+        }
 
         return productRepositoryJpa.save(product)
     }
