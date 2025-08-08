@@ -6,7 +6,6 @@ import ecommerce.dto.PagedResponse
 import ecommerce.dto.ProductRequest
 import ecommerce.dto.ProductResponse
 import ecommerce.dto.RegisteredMember
-import ecommerce.service.mapper.ProductMapper
 import ecommerce.service.ProductService
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
@@ -42,12 +41,9 @@ class ProductController(private val productService: ProductService) {
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "10") size: Int,
     ): ResponseEntity<PagedResponse<ProductResponse>> {
-        val productPage = productService.getPages(page, size)
-
-        val body = ProductMapper.toPagedResponse(productPage)
-
+        val productPages = productService.getPages(page, size)
         return ResponseEntity.ok()
-            .body(body)
+            .body(productPages)
     }
 
     @PutMapping("/api/products/{id}")

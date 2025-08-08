@@ -2,13 +2,14 @@ package ecommerce.service
 
 import ecommerce.dto.CartItemRequest
 import ecommerce.dto.CartItemResponse
+import ecommerce.dto.PagedResponse
 import ecommerce.exception.NotFoundException
 import ecommerce.model.Cart
 import ecommerce.model.CartItem
-import ecommerce.service.mapper.CartItemMapper
 import ecommerce.repository.CartRepository
 import ecommerce.repository.MemberRepository
 import ecommerce.repository.ProductRepository
+import ecommerce.service.mapper.CartItemMapper
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
@@ -41,8 +42,6 @@ class CartService(
                 ?: cartRepository.save(Cart(member))
 
         val item = cart.addItem(product, request.quantity)
-        // no need to save `cart` here because of Cascade
-        // cartRepository.save(cart)
         return item
     }
 
@@ -59,15 +58,13 @@ class CartService(
                 ?: cartRepository.save(Cart(member))
 
         cart.removeItem(product, request.quantity)
-        // no need to save `cart` here because of Cascade
-        // cartRepository.save(cart)
     }
 
     fun getPages(
         memberId: Long,
         page: Int,
         size: Int,
-    ): PageImpl<CartItemResponse> {
+    ): PagedResponse<CartItemResponse> {
         val cart = findCart(memberId)
         val itemResponses = cart.items.map { CartItemMapper.toResponse(it) }
         val pageRequest = PageRequest.of(page, size, Sort.by("productName"))
@@ -75,6 +72,7 @@ class CartService(
         val end = min(start + pageRequest.pageSize, itemResponses.size)
 
         val pageContent = itemResponses.subList(start, end)
-        return PageImpl<CartItemResponse>(pageContent, pageRequest, itemResponses.size.toLong())
+        val pageImpl = PageImpl<CartItemResponse>(pageContent, pageRequest, itemResponses.size.toLong())
+        return CartItemMapper.toPagedResponse(pageImpl)
     }
 }

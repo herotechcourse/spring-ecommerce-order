@@ -6,8 +6,8 @@ import ecommerce.dto.CartItemResponse
 import ecommerce.dto.CartResponse
 import ecommerce.dto.PagedResponse
 import ecommerce.dto.RegisteredMember
-import ecommerce.service.mapper.CartItemMapper
 import ecommerce.service.CartService
+import ecommerce.service.mapper.CartItemMapper
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -38,11 +38,8 @@ class CartController(private val cartService: CartService) {
         @RequestParam(defaultValue = "10") size: Int,
     ): ResponseEntity<PagedResponse<CartItemResponse>> {
         val itemPages = cartService.getPages(member.id, page, size)
-
-        val body = CartItemMapper.toPagedResponse(itemPages)
-
         return ResponseEntity.ok()
-            .body(body)
+            .body(itemPages)
     }
 
     @PostMapping

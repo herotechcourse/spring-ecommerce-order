@@ -10,8 +10,8 @@ import ecommerce.exception.NotFoundException
 import ecommerce.exception.UnauthorizedException
 import ecommerce.infrastructure.JwtTokenProvider
 import ecommerce.model.Member
-import ecommerce.service.mapper.MemberMapper
 import ecommerce.repository.MemberRepository
+import ecommerce.service.mapper.MemberMapper
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 

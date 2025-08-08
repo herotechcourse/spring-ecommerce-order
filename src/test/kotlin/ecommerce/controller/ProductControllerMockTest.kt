@@ -7,8 +7,8 @@ import ecommerce.dto.RegisteredMember
 import ecommerce.dto.Role
 import ecommerce.infrastructure.AuthorizationExtractor
 import ecommerce.infrastructure.JwtTokenProvider
-import ecommerce.service.mapper.ProductMapper
 import ecommerce.service.ProductService
+import ecommerce.service.mapper.ProductMapper
 import org.assertj.core.api.Assertions.assertThat
 import org.json.JSONObject
 import org.junit.jupiter.api.BeforeEach
@@ -80,8 +80,10 @@ class ProductControllerMockTest
             setMockMemberTo(Role.USER)
 
             val testProduct = ProductMapper.toProductResponse(DatabaseFixture.createPaintingSadHuman())
+            val pageImpl = PageImpl(listOf(testProduct), PageRequest.of(0, 10), 20)
+            val pagedResponse = ProductMapper.toPagedResponse(pageImpl)
             whenever(productService.getPages(any(), any()))
-                .thenReturn(PageImpl(listOf(testProduct), PageRequest.of(0, 10), 20))
+                .thenReturn(pagedResponse)
 
             val result =
                 mockMvc.perform(get("/api/products-page"))

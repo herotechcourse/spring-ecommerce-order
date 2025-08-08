@@ -1,15 +1,16 @@
 package ecommerce.service
 
 import ecommerce.dto.OptionResponse
+import ecommerce.dto.PagedResponse
 import ecommerce.dto.ProductRequest
 import ecommerce.dto.ProductResponse
 import ecommerce.exception.ConflictException
 import ecommerce.exception.NotFoundException
 import ecommerce.model.Option
-import ecommerce.service.mapper.OptionMapper
-import ecommerce.service.mapper.ProductMapper
 import ecommerce.repository.OptionRepository
 import ecommerce.repository.ProductRepository
+import ecommerce.service.mapper.OptionMapper
+import ecommerce.service.mapper.ProductMapper
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
@@ -69,14 +70,15 @@ class ProductService(private val productRepository: ProductRepository, private v
     fun getPages(
         page: Int,
         size: Int,
-    ): PageImpl<ProductResponse> {
+    ): PagedResponse<ProductResponse> {
         val products = productRepository.findAll().map { ProductMapper.toProductResponse(it) }
         val pageRequest = PageRequest.of(page, size)
         val start = pageRequest.offset.toInt()
         val end = min(start + pageRequest.pageSize, products.size)
 
         val pageContent = products.subList(start, end)
-        return PageImpl<ProductResponse>(pageContent, pageRequest, products.size.toLong())
+        val pageImpl = PageImpl<ProductResponse>(pageContent, pageRequest, products.size.toLong())
+        return ProductMapper.toPagedResponse(pageImpl)
     }
 
     fun findOptions(id: Long): List<OptionResponse> {

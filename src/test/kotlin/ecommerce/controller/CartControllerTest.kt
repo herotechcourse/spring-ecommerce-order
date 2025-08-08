@@ -12,9 +12,9 @@ import ecommerce.model.Cart
 import ecommerce.model.CartItem
 import ecommerce.model.Member
 import ecommerce.model.Product
-import ecommerce.service.mapper.CartItemMapper
 import ecommerce.service.AuthService
 import ecommerce.service.CartService
+import ecommerce.service.mapper.CartItemMapper
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.mock
@@ -222,9 +222,11 @@ class CartControllerTest
                 Cart(id = 1L, member = memberGuri).apply {
                     items.add(mockCartItem)
                 }
+            val pageImpl = PageImpl(listOf(CartItemMapper.toResponse(mockCartItem)), PageRequest.of(3, 10), 20)
+            val pagedResponse = CartItemMapper.toPagedResponse(pageImpl)
             whenever(cartService.findCart(memberGuri.id!!)).thenReturn(mockCart)
             whenever(cartService.getPages(any(), any(), any()))
-                .thenReturn(PageImpl(listOf(CartItemMapper.toResponse(mockCartItem)), PageRequest.of(3, 10), 20))
+                .thenReturn(pagedResponse)
 
             mockMvc.get("/api/cart/wishlist") {
                 requestAttr("email", "guri@email.com")
