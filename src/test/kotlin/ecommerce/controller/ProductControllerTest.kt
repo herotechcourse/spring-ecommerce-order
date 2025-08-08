@@ -114,7 +114,7 @@ class ProductControllerTest {
                 options = defaultOptions(),
             )
 
-        val response =
+        var response =
             RestAssured.given()
                 .contentType(ContentType.JSON)
                 .body(updatedProduct)
@@ -123,6 +123,18 @@ class ProductControllerTest {
                 .extract()
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value())
+
+        response =
+            RestAssured.given()
+                .log().all()
+                .get("/products")
+                .then()
+                .extract()
+
+        val products: List<ProductEntity> =
+            response.body().jsonPath().getList("", ProductEntity::class.java)
+
+        assertThat(products.size).isEqualTo(1)
     }
 
     @Test

@@ -1,5 +1,6 @@
 package ecommerce.repository
 
+import ecommerce.dto.OptionCreateDto
 import ecommerce.entity.OptionEntity
 import ecommerce.entity.ProductEntity
 import org.assertj.core.api.Assertions.assertThat
@@ -81,15 +82,27 @@ internal class ProductRepositoryJpaTest
             name: String = "Test Product",
             price: Double = 9.99,
             imageUrl: String = "https://example.com/img.jpg",
-            options: MutableList<OptionEntity> =
+            optionsDto: MutableList<OptionCreateDto> =
                 mutableListOf(
-                    OptionEntity(name = "Blue XL", quantity = 99),
-                    OptionEntity(name = "Red Large", quantity = 42),
+                    OptionCreateDto(name = "Blue XL", quantity = 99),
+                    OptionCreateDto(name = "Red Large", quantity = 42),
                 ),
-        ) = ProductEntity(
-            name = name,
-            price = price,
-            imageUrl = imageUrl,
-            options = options,
-        )
+        ): ProductEntity {
+            val options =
+                optionsDto.map {
+                    OptionEntity(name = it.name, quantity = it.quantity)
+                }
+
+            val product =
+                ProductEntity(
+                    name = name,
+                    price = price,
+                    imageUrl = imageUrl,
+                    options = options.toMutableList(),
+                )
+
+            options.forEach { it.product = product }
+
+            return product
+        }
     }
