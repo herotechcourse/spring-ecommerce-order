@@ -12,7 +12,7 @@ import ecommerce.model.Cart
 import ecommerce.model.CartItem
 import ecommerce.model.Member
 import ecommerce.model.Product
-import ecommerce.model.mapper.CartItemMapper
+import ecommerce.service.mapper.CartItemMapper
 import ecommerce.service.AuthService
 import ecommerce.service.CartService
 import org.junit.jupiter.api.BeforeEach

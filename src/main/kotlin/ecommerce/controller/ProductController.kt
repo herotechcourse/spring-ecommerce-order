@@ -6,6 +6,7 @@ import ecommerce.dto.PagedResponse
 import ecommerce.dto.ProductRequest
 import ecommerce.dto.ProductResponse
 import ecommerce.dto.RegisteredMember
+import ecommerce.service.mapper.ProductMapper
 import ecommerce.service.ProductService
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
@@ -43,14 +44,7 @@ class ProductController(private val productService: ProductService) {
     ): ResponseEntity<PagedResponse<ProductResponse>> {
         val productPage = productService.getPages(page, size)
 
-        val body =
-            PagedResponse(
-                productPage.content,
-                productPage.number,
-                productPage.size,
-                productPage.totalPages,
-                productPage.totalElements,
-            )
+        val body = ProductMapper.toPagedResponse(productPage)
 
         return ResponseEntity.ok()
             .body(body)

@@ -10,6 +10,7 @@ import ecommerce.exception.NotFoundException
 import ecommerce.exception.UnauthorizedException
 import ecommerce.infrastructure.JwtTokenProvider
 import ecommerce.model.Member
+import ecommerce.service.mapper.MemberMapper
 import ecommerce.repository.MemberRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -25,7 +26,7 @@ class AuthService(
         if (member == null) {
             throw NotFoundException("Member not found")
         }
-        return member.toRegisteredMember()
+        return MemberMapper.toRegisteredMember(member)
     }
 
     fun findAdminMember(email: String): RegisteredMember {

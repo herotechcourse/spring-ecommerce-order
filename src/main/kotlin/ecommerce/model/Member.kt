@@ -1,6 +1,5 @@
 package ecommerce.model
 
-import ecommerce.dto.RegisteredMember
 import ecommerce.dto.Role
 import ecommerce.exception.UnauthorizedException
 import jakarta.persistence.Column
@@ -29,11 +28,6 @@ class Member(
         if (this.password != password) {
             throw UnauthorizedException("Incorrect password")
         }
-    }
-
-    fun toRegisteredMember(): RegisteredMember {
-        val role = Role.valueOf(this.role)
-        return RegisteredMember(this.id!!, email, role)
     }
 
     override fun equals(other: Any?): Boolean {

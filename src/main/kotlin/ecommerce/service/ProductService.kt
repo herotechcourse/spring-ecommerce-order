@@ -6,8 +6,8 @@ import ecommerce.dto.ProductResponse
 import ecommerce.exception.ConflictException
 import ecommerce.exception.NotFoundException
 import ecommerce.model.Option
-import ecommerce.model.mapper.OptionMapper
-import ecommerce.model.mapper.ProductMapper
+import ecommerce.service.mapper.OptionMapper
+import ecommerce.service.mapper.ProductMapper
 import ecommerce.repository.OptionRepository
 import ecommerce.repository.ProductRepository
 import org.springframework.data.domain.PageImpl
@@ -36,7 +36,7 @@ class ProductService(private val productRepository: ProductRepository, private v
     }
 
     fun read(): List<ProductResponse> {
-        val products = (productRepository.findAll()).map { ProductMapper.toProductDto(it) }
+        val products = (productRepository.findAll()).map { ProductMapper.toProductResponse(it) }
         return products
     }
 
@@ -70,7 +70,7 @@ class ProductService(private val productRepository: ProductRepository, private v
         page: Int,
         size: Int,
     ): PageImpl<ProductResponse> {
-        val products = productRepository.findAll().map { ProductMapper.toProductDto(it) }
+        val products = productRepository.findAll().map { ProductMapper.toProductResponse(it) }
         val pageRequest = PageRequest.of(page, size)
         val start = pageRequest.offset.toInt()
         val end = min(start + pageRequest.pageSize, products.size)

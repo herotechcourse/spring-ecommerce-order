@@ -6,7 +6,7 @@ import ecommerce.dto.CartItemResponse
 import ecommerce.dto.CartResponse
 import ecommerce.dto.PagedResponse
 import ecommerce.dto.RegisteredMember
-import ecommerce.model.mapper.CartItemMapper
+import ecommerce.service.mapper.CartItemMapper
 import ecommerce.service.CartService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -39,14 +39,7 @@ class CartController(private val cartService: CartService) {
     ): ResponseEntity<PagedResponse<CartItemResponse>> {
         val itemPages = cartService.getPages(member.id, page, size)
 
-        val body =
-            PagedResponse(
-                itemPages.content,
-                itemPages.number,
-                itemPages.size,
-                itemPages.totalPages,
-                itemPages.totalElements,
-            )
+        val body = CartItemMapper.toPagedResponse(itemPages)
 
         return ResponseEntity.ok()
             .body(body)
