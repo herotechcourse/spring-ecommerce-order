@@ -1,11 +1,12 @@
-# spring-ecommerce-order
+# Spring Ecommerce Order
+
+---
 
 ## Step 1-1 - Entity Mapping
 
 Goal: Transform Repository and entities using Spring Data JPA.
 
 ### Feature List
-
 - [x] **Transform Models into Entities**
     - [x] Product -> `Product @Entity`
     - [x] Member -> `Member @Entity`
@@ -52,7 +53,8 @@ Goal: Transform Repository and entities using Spring Data JPA.
 Goal: Implement pagination for both the product list and the wishlist view.
 Most web applications do not display all data at once. Instead, content is split into multiple pages. 
 Pagination allows users to define how data should be sorted, how many items are shown per page, and which page number to retrieve.
-- 
+
+### Feature List
 - [x] Sorting can also be used to prioritize which data appears first.
 - [x] Spring Data provides a convenient object called `Pageable`.
   - `Page<T>` – full pagination with total count, total pages, current page, etc.
@@ -83,12 +85,136 @@ Design and implement the feature considering the relationship between the Produc
 #### Test
 - [x] test Option
 
+----
+
+## Step 2-1 - External API
+Goal: Implement the "Place Order" feature using Stripe Payment Integration. </br>
+This feature allows users to place orders with online payment processing via **Stripe's Payment Intent API** (sandbox mode).
+It handles product stock updates, cart cleanup, payment confirmation, robust error handling for failed transactions, and storage of essential payment/order details.
+### Features
+1. Order Placement
+- [ ] User selects:
+    - Product option (e.g., size, color)
+    - Quantity
+    - Payment method (Stripe test card in sandbox)
+- [ ] API calculates total price and sends request to Stripe's Payment Intent Create API.
+
+2. Stripe Payment Integration 
+- [ ] Get Api key(use sandbox key)
+  - [ ] store in application-properties
+  - [ ] do not push!!
+- [ ] Uses POST https://api.stripe.com/v1/payment_intents with:
+  - [ ] amount 
+  - [ ] currency 
+  - [ ] payment_method 
+  - [ ] confirm=true 
+  - [ ] automatic payment methods enabled (automatic_payment_methods[enabled]=true)
+
+3. Stock Management
+- When payment is confirmed:
+  - [ ] Decrease stock for the purchased product option by the ordered quantity. 
+  - [ ] Ensure stock cannot go below zero. 
+- If payment fails:
+  - [ ] Stock remains unchanged.
+  
+4. Cart Cleanup
+- If the ordered product exists in the user’s cart:
+  - [ ] Remove the item from the cart after successful payment. 
+- If payment fails:
+  - [ ] Cart remains unchanged.
+  - [ ] -> NOTE: same transaction??
+
+5. Error Handling
+- If Stripe API request fails:
+  - [ ] Catch exception and map to user-friendly error message.
+  - [ ] message based on Stripe's codes
+    - _Expired session_ → "Your payment session has expired. Please try again."
+    - _Invalid payment method_ → "The payment method is invalid. Please check your card details."
+    - _Insufficient balance_ → "Insufficient funds. Please use another card."
+    - Other failures → "Payment could not be processed. Please try again."
+- [ ] Test with test cards provided in [Stripe official document](https://docs.stripe.com/testing?testing-method=card-numbers#declined-payments)
+    - 4000000000000069 – Expired card decline
+    - 4000 0000 0000 9995 – Insufficient funds
+    - 4000 0000 0000 0002 – Payment Declined
+    - 4000000000000127 – Incorrect CVC decline
+    - 4242424242424241 – Incorrect number decline
+    - 4242424242424242 – Valid Visa Card
+    - 5555555555554444 – Valid Master Card
+6. API Endpoints
+- `POST /orders/place`
+- Request
+`  {
+  "productOptionId": 123,
+  "quantity": 2,
+  "paymentMethod": "pm_card_visa"
+  }`
+- Response Success
+`  {
+  "status": "success",
+  "orderId": 456,
+  "message": "Payment successful. Your order has been placed."
+  }`
+- Response Failure
+`  {
+  "status": "error",
+  "message": "Insufficient funds. Please use another payment method."
+  }`
+
+## Step 2.2 - Orders Retrieval
+### Features
+1. Orders
+- [ ] Endpoint: `GET /orders`
+- [ ] optional: add pagination
+- [ ] Each order record should include:
+  - [ ] Order Date & Time (when payment was completed)
+  - [ ] Order Status (e.g., PENDING, PAID, FAILED, CANCELLED)
+  - [ ] Purchased Items (product names, options, quantities)
+  - [ ] Stripe Checkout Session ID (issued by Stripe)
+  - [ ] Payment Amount (in currency format)
+  - [ ] Optional Payment Details (e.g., payment method, last 4 digits of card, currency)
+    - [ ] can be stored optionally in the DB
+- Example Response
+`[
+  {
+    "orderId": 456,
+    "orderDateTime": "2025-08-09T14:35:00Z",
+    "status": "PAID",
+    "items": [
+      { "productName": "T-Shirt", "option": "Large", "quantity": 2 }
+    ],
+    "checkoutSessionId": "pi_3OKjdf9sjlkd09",
+    "amount": 3999,
+    "currency": "USD",
+    "paymentMethod": "visa"
+  }
+]
+`
+## Step 2.3 - Deployment
+You must deploy your existing service and ensure it can interact with the client.
+### Features
+- [ ] Write a deployment script to automate the deployment process. (`deploy.sh`)
+  - Pull latest code from repository. 
+  - Build project. 
+  - Run database migrations (if any). 
+  - Restart backend service.
+- [ ] Handle security issues when interacting with the client API.
+  - [ ] For example, resolve issues caused when the server and client have different Origin values.
+- [ ] HTTPS is optional
+- [ ] Cors Configuration #applyPermitDefaultValues()
+  - [ ] Allow all origins.
+  - [ ] Allow “simple” methods GET, HEAD and POST.
+  - [ ] Allow all headers.
+  - [ ] Set max age to 1800 seconds (30 minutes).
+- [ ] Test with MockMVC
+  - [ ] Test client → server calls in local & production.
+  - [ ] Confirm no CORS errors in browser console.
+
 ## Considerations
 
 - [x] remove Boolean return type from all delete methods
 - [ ] change Double to BigDecimal inside the Entity (Product/price)
 - [x] decide on where and how to use Models
     - Entity == Model
-- [ ] dont use Cascade.All but Persist, Merge etc.
+- [x] dont use Cascade.All but Persist, Merge etc.
 - [ ] move product-option mapping to the constructor
 - [ ] effective test: Create InMemory fake repos -> service uses the fake repos
