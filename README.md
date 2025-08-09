@@ -209,6 +209,21 @@ You must deploy your existing service and ensure it can interact with the client
   - [ ] Test client → server calls in local & production.
   - [ ] Confirm no CORS errors in browser console.
 
+## Action Plan for Step 2
+--- Saturday ---
+1. Design Order domain & DTOs (Order, OrderItem, enums, payment metadata).
+2. Add repositories (or entities).
+3. Add Stripe config + SDK dependency. (Use test/sandbox key in application.properties, never commit it.) Stripe Docs
+4. Implement StripeService to create/confirm PaymentIntents (with idempotency). Stripe Docs+1
+5. Implement OrderService.placeOrder() orchestration: validate stock, create PENDING order, call Stripe, finalize (decrement stock + cart cleanup) on success. Use DB locking & transactions when changing stock.
+6. Implement error mapping & friendly messages for Stripe decline codes (expired_card, insufficient_funds, incorrect_cvc, card_declined, etc.). Stripe Docs+1
+7. Add webhook endpoint (/webhooks/stripe) to process payment_intent.succeeded / fallback reconciliation (recommended). Stripe Docs
+--- Sunday ---
+8. Add controller endpoints: POST /orders/place and GET /orders (with pagination).
+9. Add tests: unit tests (mock Stripe), integration tests (Stripe test keys or WireMock), MockMvc tests for controllers.
+--- Monday ---
+10. Deploy: script (deploy.sh), run migrations, restart service, test client-server flows (CORS config).
+
 ## Considerations
 
 - [x] remove Boolean return type from all delete methods
