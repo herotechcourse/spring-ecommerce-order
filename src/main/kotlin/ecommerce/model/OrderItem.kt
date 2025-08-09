@@ -20,6 +20,6 @@ class OrderItem(
     @Column(nullable = false)
     val optionName: String,
     @Id
-    @GeneratedValue(GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 )
