@@ -19,9 +19,6 @@ class OrderItem(
     val productName: String,
     @Column(nullable = false)
     val optionName: String,
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_id", nullable = false)
-    val order: Order,
     @Id
     @GeneratedValue(GenerationType.IDENTITY)
     val id: Long? = null,

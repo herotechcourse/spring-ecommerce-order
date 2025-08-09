@@ -11,6 +11,7 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
+import jakarta.persistence.OneToMany
 import jakarta.persistence.OneToOne
 import jakarta.persistence.Table
 import java.time.LocalDateTime
@@ -18,7 +19,7 @@ import java.time.LocalDateTime
 @Entity
 @Table(name = "orders")
 class Order(
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
     val member: Member,
     @Column(name = "created_at", updatable = false)
@@ -26,8 +27,9 @@ class Order(
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     var status: OrderStatus = OrderStatus.PENDING,
-    @OneToOne(mappedBy = "order", fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST, CascadeType.REMOVE])
-    val item: OrderItem,
+    @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true)
+    @JoinColumn(name = "order_id")
+    val items: MutableList<OrderItem> = mutableListOf(),
     @Column(name = "payment_amount", nullable = false)
     var paymentAmount: Long,
     @Column(nullable = false)
@@ -38,4 +40,6 @@ class Order(
     var paymentMethod: String? = null,
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
-)
+) {
+    fun addItem(item: OrderItem) = items.add(item)
+}
