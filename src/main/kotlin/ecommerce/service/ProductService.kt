@@ -77,7 +77,7 @@ class ProductService(
     ): Page<ProductEntity> {
         val pageable = PageRequest.of(page, size, Sort.by(direction, sortBy))
 
-        return productRepositoryJpa.findAll(pageable)
+       return productRepositoryJpa.findAll(pageable)
     }
 
     fun getProductsByPrice(
@@ -88,5 +88,12 @@ class ProductService(
         val pageable = PageRequest.of(page, size)
 
         return productRepositoryJpa.findAllByPrice(price, pageable)
+    }
+
+    fun deleteProduct(id: Long) {
+        if (!productRepositoryJpa.existsById(id)) {
+            throw NoSuchElementException("Product with id $id not found")
+        }
+        productRepositoryJpa.deleteById(id)
     }
 }

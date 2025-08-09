@@ -2,7 +2,6 @@ package ecommerce.controller
 
 import ecommerce.dto.ProductRequest
 import ecommerce.entity.ProductEntity
-import ecommerce.repository.ProductRepositoryJpa
 import ecommerce.service.ProductService
 import jakarta.validation.Valid
 import org.springframework.data.domain.Page
@@ -28,7 +27,6 @@ import java.net.URI
 @RequestMapping("/products")
 class ProductController(
     private val productService: ProductService,
-    private val productRepositoryJpa: ProductRepositoryJpa,
 ) {
     @PostMapping()
     @ResponseBody
@@ -43,8 +41,11 @@ class ProductController(
 
     @GetMapping()
     @ResponseBody
-    fun readAll(): List<ProductEntity> {
-        return productRepositoryJpa.findAll()
+    fun readAll(
+        @RequestParam page: Int,
+        @RequestParam size: Int,
+    ): Page<ProductEntity> {
+        return productService.getAllProducts(page, size)
     }
 
     @PutMapping("/{id}")
@@ -55,16 +56,6 @@ class ProductController(
     ): ResponseEntity<Void> {
         productService.updateProduct(id, productRequest)
         return ResponseEntity.ok().build()
-    }
-
-    @DeleteMapping("/{id}")
-    @ResponseBody
-    fun delete(
-        @PathVariable("id") id: Long,
-    ): ResponseEntity<Void> {
-        productRepositoryJpa.deleteById(id)
-
-        return ResponseEntity.noContent().build()
     }
 
     @GetMapping("/?page=1&size=10")
@@ -86,5 +77,14 @@ class ProductController(
         @RequestParam size: Int,
     ): Page<ProductEntity> {
         return productService.getProductsByPrice(price, page, size)
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseBody
+    fun delete(
+        @PathVariable id: Long,
+    ): ResponseEntity<Void> {
+        productService.deleteProduct(id)
+        return ResponseEntity.noContent().build()
     }
 }

@@ -75,14 +75,14 @@ class ProductControllerTest {
         val response =
             RestAssured.given()
                 .log().all()
-                .get("/products")
+                .get("/products?page=0&size=10")
                 .then()
                 .log().all()
                 .extract()
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value())
 
         val products: List<ProductEntity> =
-            response.body().jsonPath().getList("", ProductEntity::class.java)
+            response.jsonPath().getList("content", ProductEntity::class.java)
         assertThat(products).anyMatch { it.name == "Mini Laptop" }
     }
 
@@ -127,12 +127,12 @@ class ProductControllerTest {
         response =
             RestAssured.given()
                 .log().all()
-                .get("/products")
+                .get("/products?page=0&size=10")
                 .then()
                 .extract()
 
         val products: List<ProductEntity> =
-            response.body().jsonPath().getList("", ProductEntity::class.java)
+            response.body().jsonPath().getList("content", ProductEntity::class.java)
 
         assertThat(products.size).isEqualTo(1)
     }
