@@ -77,7 +77,7 @@ class ProductService(
     ): Page<ProductEntity> {
         val pageable = PageRequest.of(page, size, Sort.by(direction, sortBy))
 
-       return productRepositoryJpa.findAll(pageable)
+        return productRepositoryJpa.findAll(pageable)
     }
 
     fun getProductsByPrice(
