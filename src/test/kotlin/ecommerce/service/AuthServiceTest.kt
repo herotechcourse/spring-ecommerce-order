@@ -15,16 +15,14 @@ import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 
-
 class AuthServiceTest {
-
     private val memberRepository = mock<MemberRepositoryJpa>()
     private val jwtTokenProvider = mock<JWTProvider>()
     private val authService = AuthService(jwtTokenProvider, memberRepository)
 
     @Test
     fun `createToken returns token when valid email and password`() {
-        val request = TokenRequest(name= "Jon", email = "user@example.com", password = "pass123", role = "ADMIN")
+        val request = TokenRequest(name = "Jon", email = "user@example.com", password = "pass123", role = "ADMIN")
         val member = MemberEntity(id = 1L, name = "User", email = request.email, password = request.password, role = "USER")
 
         `when`(memberRepository.findByEmail(request.email)).thenReturn(member)
@@ -37,44 +35,47 @@ class AuthServiceTest {
 
     @Test
     fun `createToken throws AuthorizationException when member not found`() {
-        val request = TokenRequest(name= "Jon", email = "user@example.com", password = "pass123", role = "ADMIN")
+        val request = TokenRequest(name = "Jon", email = "user@example.com", password = "pass123", role = "ADMIN")
 
         `when`(memberRepository.findByEmail(request.email)).thenReturn(null)
 
-        val exception = assertThrows<AuthorizationException> {
-            authService.createToken(request)
-        }
+        val exception =
+            assertThrows<AuthorizationException> {
+                authService.createToken(request)
+            }
         assertTrue(exception.message!!.contains("Member not found"))
     }
 
     @Test
     fun `createToken throws AuthorizationException when password is invalid`() {
-        val request = TokenRequest(name= "Jon", email = "user@example.com", password = "pass123", role = "USER")
+        val request = TokenRequest(name = "Jon", email = "user@example.com", password = "pass123", role = "USER")
         val member = MemberEntity(id = 1L, name = "User", email = request.email, password = "correctpass", role = "USER")
 
         `when`(memberRepository.findByEmail(request.email)).thenReturn(member)
 
-        val exception = assertThrows<AuthorizationException> {
-            authService.createToken(request)
-        }
+        val exception =
+            assertThrows<AuthorizationException> {
+                authService.createToken(request)
+            }
         assertTrue(exception.message!!.contains("Invalid password"))
     }
 
     @Test
     fun `register throws ValidationException when email already exists`() {
-        val request = TokenRequest(name= "Jon", email = "user@example.com", password = "pass123", role = "USER")
+        val request = TokenRequest(name = "Jon", email = "user@example.com", password = "pass123", role = "USER")
 
         `when`(memberRepository.existsByEmail(request.email)).thenReturn(true)
 
-        val exception = assertThrows<ValidationException> {
-            authService.register(request)
-        }
+        val exception =
+            assertThrows<ValidationException> {
+                authService.register(request)
+            }
         assertEquals("Email is already registered", exception.message)
     }
 
     @Test
     fun `register saves new member and returns token`() {
-        val request = TokenRequest(name= "Jon", email = "user@example.com", password = "pass123", role = "USER")
+        val request = TokenRequest(name = "Jon", email = "user@example.com", password = "pass123", role = "USER")
 
         `when`(memberRepository.existsByEmail(request.email)).thenReturn(false)
         val savedMember = MemberEntity(id = 10L, name = request.name, email = request.email, password = request.password, role = "USER")
@@ -114,9 +115,10 @@ class AuthServiceTest {
         `when`(jwtTokenProvider.getPayload(token)).thenReturn(email)
         `when`(memberRepository.findByEmail(email)).thenReturn(null)
 
-        val exception = assertThrows<AuthorizationException> {
-            authService.findMemberByToken(token)
-        }
+        val exception =
+            assertThrows<AuthorizationException> {
+                authService.findMemberByToken(token)
+            }
         assertTrue(exception.message!!.contains("Member not found"))
     }
 }
