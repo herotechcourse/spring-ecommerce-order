@@ -22,8 +22,10 @@ class CartService(
         memberId: Long,
         productId: Long,
     ) {
-        productRepositoryJpa.findById(productId)
-            ?: throw NoSuchElementException("Product not found")
+        val productOptional = productRepositoryJpa.findById(productId)
+        if (productOptional.isEmpty) {
+            throw NoSuchElementException("Product not found")
+        }
         cartRepository.add(memberId, productId)
     }
 
