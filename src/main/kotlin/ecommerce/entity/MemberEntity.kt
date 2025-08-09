@@ -31,4 +31,12 @@ class MemberEntity(
         updatable = false,
     )
     val cart: CartEntity? = null,
-)
+) {
+    protected constructor() : this(
+        email = "",
+        password = "",
+        role = "",
+        name = "",
+        cart = null,
+    )
+}

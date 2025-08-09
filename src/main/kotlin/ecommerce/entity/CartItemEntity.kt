@@ -15,18 +15,35 @@ import java.time.LocalDateTime
 
 @Entity
 @Table(name = "cart_item")
-class CartItemEntity(
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long? = null,
+class CartItemEntity() {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    val id: Long? = null
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cart_id", nullable = false)
-    val cart: CartEntity,
+    lateinit var cart: CartEntity
+
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "product_id", nullable = false)
-    val product: ProductEntity,
+    lateinit var product: ProductEntity
+
     @field:Positive
     @Column(nullable = false)
-    var quantity: Int,
+    var quantity: Int = 0
+
     @Column(name = "created_at", nullable = false)
-    val createdAt: LocalDateTime = LocalDateTime.now(),
-)
+    var createdAt: LocalDateTime = LocalDateTime.now()
+
+    constructor(
+        cart: CartEntity,
+        product: ProductEntity,
+        quantity: Int,
+        createdAt: LocalDateTime = LocalDateTime.now(),
+    ) : this() {
+        this.cart = cart
+        this.product = product
+        this.quantity = quantity
+        this.createdAt = createdAt
+    }
+}

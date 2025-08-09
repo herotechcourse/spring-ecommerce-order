@@ -29,6 +29,8 @@ class OptionEntity(
     @JsonIgnore
     var product: ProductEntity? = null,
 ) {
+    protected constructor() : this(name = "defaultOption", quantity = 1)
+
     init {
         require(name.length <= 50) { "name must not exceed 50 characters" }
         require(name.matches(Regex("^[\\p{L}\\p{N}\\s()\\[\\]+\\-&/_]*\$"))) {

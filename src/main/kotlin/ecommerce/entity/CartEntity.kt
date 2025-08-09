@@ -17,4 +17,6 @@ class CartEntity(
     val memberId: Long,
     @Column(name = "created_at", nullable = false)
     val createdAt: LocalDateTime = LocalDateTime.now(),
-)
+) {
+    protected constructor() : this(memberId = 0L)
+}

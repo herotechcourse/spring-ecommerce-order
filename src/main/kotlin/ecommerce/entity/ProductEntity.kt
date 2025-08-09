@@ -23,8 +23,8 @@ class ProductEntity(
     @OneToMany(
         cascade = [CascadeType.ALL],
         orphanRemoval = true,
+        mappedBy = "product",
     )
-    @Column(nullable = false, name = "option")
     val options: MutableList<OptionEntity> = mutableListOf(),
 ) {
     init {
@@ -45,4 +45,11 @@ class ProductEntity(
     override fun hashCode(): Int {
         return id?.hashCode() ?: 0
     }
+
+    protected constructor() : this(
+        name = "default",
+        price = 0.01,
+        imageUrl = "http://example.com/default.jpg",
+        options = mutableListOf(OptionEntity(name = "defaultOption", quantity = 1)),
+    )
 }
