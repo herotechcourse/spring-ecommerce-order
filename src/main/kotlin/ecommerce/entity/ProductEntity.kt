@@ -22,7 +22,6 @@ class ProductEntity(
     var imageUrl: String,
     @OneToMany(
         cascade = [CascadeType.ALL],
-        orphanRemoval = true,
         mappedBy = "product",
     )
     val options: MutableList<OptionEntity> = mutableListOf(),
