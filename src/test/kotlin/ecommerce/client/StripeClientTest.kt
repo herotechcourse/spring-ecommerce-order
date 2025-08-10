@@ -29,7 +29,7 @@ class StripeClientTest {
 
     @Test
     fun `should return body when Stripe responds successfully`() {
-        val req = PaymentRequest(1000, "usd", "card")
+        val req = PaymentRequest(1000.0, "usd", "card")
 
         val postSpec = mock(RestClient.RequestBodyUriSpec::class.java)
         val retrieveSpec = mock(RestClient.ResponseSpec::class.java)
@@ -59,7 +59,7 @@ class StripeClientTest {
 
     @Test
     fun `should throw BadRequestException when CardException occurs`() {
-        val req = PaymentRequest(1000, "usd", "card")
+        val req = PaymentRequest(1000.0, "usd", "card")
 
         val postSpec = mock(RestClient.RequestBodyUriSpec::class.java)
         val retrieveSpec = mock(RestClient.ResponseSpec::class.java)
@@ -90,7 +90,7 @@ class StripeClientTest {
 
     @Test
     fun `should throw RuntimeException when generic StripeException occurs`() {
-        val req = PaymentRequest(1000, "usd", "card")
+        val req = PaymentRequest(1000.0, "usd", "card")
 
         val postSpec = mock(RestClient.RequestBodyUriSpec::class.java)
         val retrieveSpec = mock(RestClient.ResponseSpec::class.java)
