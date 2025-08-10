@@ -1,5 +1,6 @@
 package ecommerce.exception
 
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.MethodArgumentNotValidException
@@ -33,6 +34,21 @@ class GlobalExceptionHandler {
     @ExceptionHandler(ForbiddenException::class)
     fun handleInternalError(e: ForbiddenException): ResponseEntity<String> {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.message)
+    }
+
+    @ExceptionHandler(BadRequestException::class)
+    fun handleInternalError(e: BadRequestException): ResponseEntity<String> {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.message)
+    }
+
+    @ExceptionHandler(ExternalServiceException::class)
+    fun handleInternalError(e: ExternalServiceException): ResponseEntity<String> {
+        val headers = HttpHeaders()
+        headers.add("Retry-After", "60")
+        return ResponseEntity
+            .status(HttpStatus.SERVICE_UNAVAILABLE)
+            .headers(headers)
+            .body(e.message)
     }
 
     @ExceptionHandler(Exception::class)
