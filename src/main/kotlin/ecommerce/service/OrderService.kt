@@ -4,6 +4,9 @@ import ecommerce.client.StripeClient
 import ecommerce.dto.order.PlaceOrderRequest
 import ecommerce.dto.order.PlaceOrderResponse
 import ecommerce.dto.order.PurchasedItem
+import ecommerce.exception.PaymentClientException
+import ecommerce.exception.PaymentDeclinedException
+import ecommerce.exception.PaymentServerException
 import ecommerce.repository.CartJpaRepository
 import ecommerce.repository.OptionJpaRepository
 import ecommerce.repository.ProductJpaRepository
@@ -42,21 +45,37 @@ class OrderService(
         val amountCents: Long = (product.price * 100.0 * request.quantity).roundToLong()
         val currency = "usd"
 
-        val payment = stripeClient.createPaymentIntent(amountCents, currency)
+        return try {
+            val payment = stripeClient.createPaymentIntent(amountCents, currency)
 
-        return PlaceOrderResponse(
-            orderStatus = payment.status.uppercase(),
-            paymentIntentId = payment.id,
-            amount = payment.amount,
-            currency = payment.currency,
-            items =
-                listOf(
-                    PurchasedItem(
-                        productId = product.id!!,
-                        optionId = option.id!!,
-                        quantity = request.quantity,
+            if (payment.status.equals("requires_payment_method", ignoreCase = true) ||
+                payment.lastPaymentError != null
+            ) {
+                val reason = payment.lastPaymentError?.code ?: "unknown_reason"
+                val message = payment.lastPaymentError?.message ?: "Payment failed"
+                throw PaymentDeclinedException("$reason: $message")
+            }
+
+            PlaceOrderResponse(
+                orderStatus = payment.status.uppercase(),
+                paymentIntentId = payment.id,
+                amount = payment.amount,
+                currency = payment.currency,
+                items =
+                    listOf(
+                        PurchasedItem(
+                            productId = product.id,
+                            optionId = option.id,
+                            quantity = request.quantity,
+                        ),
                     ),
-                ),
-        )
+            )
+        } catch (ex: PaymentDeclinedException) {
+            throw ex
+        } catch (ex: PaymentClientException) {
+            throw ex
+        } catch (ex: PaymentServerException) {
+            throw ex
+        }
     }
 }

@@ -1,5 +1,6 @@
 package ecommerce.exception
 
+import com.fasterxml.jackson.annotation.JsonInclude
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.MethodArgumentNotValidException
@@ -31,7 +32,6 @@ class GlobalExceptionHandler {
         val response =
             ErrorResponse(
                 message = ex.message ?: "Unauthorized",
-                errors = emptyList(),
             )
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response)
     }
@@ -45,11 +45,54 @@ class GlobalExceptionHandler {
             )
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error)
     }
+
+    // ---- Payments (Step 2.1) ----
+
+    @ExceptionHandler(PaymentDeclinedException::class)
+    fun handleDeclined(ex: PaymentDeclinedException): ResponseEntity<ErrorResponse> {
+        return ResponseEntity
+            .status(HttpStatus.PAYMENT_REQUIRED)
+            .body(
+                ErrorResponse(
+                    message = ex.message ?: "Payment declined",
+                    errors = emptyList(),
+                    code = "PAYMENT_DECLINED",
+                ),
+            )
+    }
+
+    @ExceptionHandler(PaymentClientException::class)
+    fun handleClientError(ex: PaymentClientException): ResponseEntity<ErrorResponse> {
+        return ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
+            .body(
+                ErrorResponse(
+                    message = ex.message ?: "Invalid payment request",
+                    errors = emptyList(),
+                    code = "PAYMENT_CLIENT_ERROR",
+                ),
+            )
+    }
+
+    @ExceptionHandler(PaymentServerException::class)
+    fun handleServerError(ex: PaymentServerException): ResponseEntity<ErrorResponse> {
+        return ResponseEntity
+            .status(HttpStatus.SERVICE_UNAVAILABLE)
+            .body(
+                ErrorResponse(
+                    message = ex.message ?: "Payment service unavailable",
+                    errors = emptyList(),
+                    code = "PAYMENT_SERVER_ERROR",
+                ),
+            )
+    }
 }
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 data class ErrorResponse(
     val message: String,
-    val errors: List<FieldError>,
+    val errors: List<FieldError> = emptyList(),
+    val code: String? = null,
 )
 
 data class FieldError(
