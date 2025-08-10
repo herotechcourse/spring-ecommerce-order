@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration
 
 @ConfigurationProperties(prefix = "stripe")
 data class StripeProperties(
-    val secretKey: String
+    val secretKey: String,
 )
 
 @Configuration

@@ -5,11 +5,11 @@ data class PlaceOrderResponse(
     val paymentIntentId: String?,
     val amount: Long?,
     val currency: String?,
-    val items: List<PurchasedItem>
+    val items: List<PurchasedItem>,
 )
 
 data class PurchasedItem(
     val productId: Long,
     val optionId: Long,
-    val quantity: Int
+    val quantity: Int,
 )

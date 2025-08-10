@@ -13,15 +13,14 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/api/orders")
-class OrderController (
-    private val orderService: OrderService
+class OrderController(
+    private val orderService: OrderService,
 ) {
-
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     fun placeOrder(
         @LoginMember memberId: Long,
-        @RequestBody request: PlaceOrderRequest
+        @RequestBody request: PlaceOrderRequest,
     ): PlaceOrderResponse {
         return orderService.placeOrder(memberId, request)
     }

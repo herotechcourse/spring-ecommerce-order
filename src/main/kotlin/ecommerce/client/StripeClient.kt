@@ -1,9 +1,9 @@
 package ecommerce.client
 
 import ecommerce.config.StripeProperties
+import ecommerce.dto.payment.StripePaymentResponse
 import ecommerce.exception.PaymentClientException
 import ecommerce.exception.PaymentServerException
-import ecommerce.dto.payment.StripePaymentResponse
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
@@ -12,19 +12,22 @@ import java.net.SocketTimeoutException
 
 @Component
 class StripeClient(
-    private val stripeProperties: StripeProperties
+    private val stripeProperties: StripeProperties,
 ) {
-
     private val restClient = RestClient.create()
 
-    fun createPaymentIntent(amount: Long, currency: String = "usd"): StripePaymentResponse {
-        val body = listOf(
-            "amount=$amount",
-            "currency=$currency",
-            "confirm=true",
-            "automatic_payment_methods[enabled]=true",
-            "automatic_payment_methods[allow_redirects]=never"
-        ).joinToString("&")
+    fun createPaymentIntent(
+        amount: Long,
+        currency: String = "usd",
+    ): StripePaymentResponse {
+        val body =
+            listOf(
+                "amount=$amount",
+                "currency=$currency",
+                "confirm=true",
+                "automatic_payment_methods[enabled]=true",
+                "automatic_payment_methods[allow_redirects]=never",
+            ).joinToString("&")
 
         return try {
             restClient.post()
