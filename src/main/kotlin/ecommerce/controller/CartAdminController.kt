@@ -4,7 +4,6 @@ import ecommerce.auth.annotation.LoginMember
 import ecommerce.dto.AuthenticatedUser
 import ecommerce.dto.MemberStatsResponse
 import ecommerce.dto.ProductStatResponse
-import ecommerce.entity.Member
 import ecommerce.service.CartService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping

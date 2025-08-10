@@ -7,24 +7,35 @@ import ecommerce.entity.Cart
 import ecommerce.entity.Member
 import ecommerce.repository.CartJpaRepository
 import ecommerce.repository.CartStaticsRepository
-import ecommerce.repository.ProductJpaRepository
-import org.springframework.data.repository.findByIdOrNull
+import ecommerce.repository.OptionJpaRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
 class CartService(
     private val cartRepository: CartJpaRepository,
-    private val productRepository: ProductJpaRepository,
     private val cartStaticsRepository: CartStaticsRepository,
+    private val optionRepository: OptionJpaRepository,
 ) {
     @Transactional
-    fun addToCart(
+    fun addOptionToCart(
         member: Member,
         request: CartRequest,
     ) {
-        val product = productRepository.findByIdOrNull(request.productId) ?: throw NoSuchElementException()
-        cartRepository.save(Cart(member, product))
+        val option =
+            optionRepository.findByProductIdAndId(
+                request.productId,
+                request.optionId,
+            ) ?: throw NoSuchElementException()
+
+        val cart =
+            cartRepository.findByMemberIdAndId(
+                member.id,
+                request.cartId,
+            ) ?: Cart(member)
+
+        cart.add(option, request.quantity)
+        cartRepository.save(cart)
     }
 
     @Transactional(readOnly = true)
@@ -33,11 +44,17 @@ class CartService(
     }
 
     @Transactional
-    fun removeFromCart(
-        memberId: Long,
-        productId: Long,
+    fun removeOptionFromCart(
+        member: Member,
+        request: CartRequest,
     ) {
-        cartRepository.deleteByMemberIdAndProductId(memberId, productId)
+        val cart =
+            cartRepository.findByMemberIdAndId(
+                member.id,
+                request.cartId,
+            ) ?: throw NoSuchElementException()
+
+        cart.remove(request.optionId, request.quantity)
     }
 
     @Transactional(readOnly = true)

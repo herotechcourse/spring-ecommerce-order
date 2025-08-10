@@ -6,5 +6,10 @@ import org.springframework.data.jpa.repository.JpaRepository
 interface OptionJpaRepository : JpaRepository<Option, Long> {
     fun findByProductId(productId: Long): List<Option>
 
+    fun findByProductIdAndId(
+        productId: Long,
+        id: Long,
+    ): Option?
+
     fun existsByProductId(productId: Long): Boolean
 }
