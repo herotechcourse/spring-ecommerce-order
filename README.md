@@ -31,10 +31,11 @@
 ### Features to implement step 2.1
 
 - [x] Load payment sandbox key and expose a configured payment client.
-- [ ] Order domain model:
-  - [ ] Order (PENDING/PAID/FAILED)
-  - [ ] OrderItem
-- [ ] Place order endpoint
+- [x] Order domain model:
+  - [x] Order (PENDING/PAID/FAILED).
+  - [x] OrderItem.
+- [ ] Place order endpoint.
 - [ ] Transaction flow: PENDING order → call payment → on success mark PAID and keep stock; on failure mark FAILED and restore stock.
-- [ ] Cart cleanup on success
-- [ ] User-facing error messages
+- [ ] Cart cleanup on success.
+- [ ] User-facing error messages.
+- [ ] Prevent double charges/stock changes. 
