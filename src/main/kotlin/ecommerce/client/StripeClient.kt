@@ -43,6 +43,7 @@ class StripeClient(
                     .toEntity(String::class.java)
 
             response.body
+            // TODO: remove if sure
 //        } catch (stripeException: StripeException) {
 //            if (stripeException is CardException) {
 //                throw BadRequestException("${stripeException.code}: ${stripeException.message}")
