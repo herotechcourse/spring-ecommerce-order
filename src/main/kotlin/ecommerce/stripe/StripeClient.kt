@@ -1,7 +1,7 @@
 package ecommerce.stripe
 
-import ecommerce.dto.stripe.PaymentRequest
-import ecommerce.dto.stripe.PaymentResponse
+import ecommerce.dto.PaymentRequest
+import ecommerce.dto.PaymentResponse
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
