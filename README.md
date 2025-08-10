@@ -132,14 +132,21 @@ It handles product stock updates, cart cleanup, payment confirmation, robust err
     - _Invalid payment method_ → "The payment method is invalid. Please check your card details."
     - _Insufficient balance_ → "Insufficient funds. Please use another card."
     - Other failures → "Payment could not be processed. Please try again."
-- [ ] Test with test cards provided in [Stripe official document](https://docs.stripe.com/testing?testing-method=card-numbers#declined-payments)
+~~- [ ] Test with test cards provided in [Stripe official document](https://docs.stripe.com/testing?testing-method=card-numbers#declined-payments)
     - 4000000000000069 – Expired card decline
     - 4000 0000 0000 9995 – Insufficient funds
     - 4000 0000 0000 0002 – Payment Declined
     - 4000000000000127 – Incorrect CVC decline
     - 4242424242424241 – Incorrect number decline
     - 4242424242424242 – Valid Visa Card
-    - 5555555555554444 – Valid Master Card
+    - 5555555555554444 – Valid Master Card~~
+- -> "When writing test code, use a PaymentMethod such as pm_card_visa instead of a card number. We don’t recommend using card numbers directly in API calls or server-side code, even in testing environments. If you do use them, your code might not be PCI-compliant when you go live. "
+- [ ] test with payment methods provided by the [Stripe official documentation](https://docs.stripe.com/testing?testing-method=payment-methods#visa)
+  - pm_card_visa
+  - pm_card_mastercard
+  - pm_card_amex 
+  - ...
+
 6. API Endpoints
 - `POST /orders/place`
 - Request
