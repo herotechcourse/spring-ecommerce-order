@@ -1,7 +1,6 @@
 package ecommerce.controller
 
 import ecommerce.annotations.LoginMember
-import ecommerce.dto.CartItem
 import ecommerce.dto.CartRequest
 import ecommerce.dto.MemberResponse
 import ecommerce.entity.CartItemEntity
@@ -30,7 +29,7 @@ class CartController(
         @RequestBody request: CartRequest,
         @LoginMember member: MemberResponse,
     ): ResponseEntity<Void> {
-        cartService.addToCart(member.id, request.productId)
+        cartService.addToCart(member.id, request.productOptionId)
 
         return ResponseEntity.created(
             URI.create("/api/cart"),
@@ -42,7 +41,7 @@ class CartController(
         @RequestBody request: CartRequest,
         @LoginMember member: MemberResponse,
     ): ResponseEntity<Void> {
-        cartService.removeFromCart(member.id, request.productId)
+        cartService.removeFromCart(member.id, request.productOptionId)
 
         return ResponseEntity.noContent().build()
     }
@@ -50,7 +49,7 @@ class CartController(
     @GetMapping
     fun getCart(
         @LoginMember member: MemberResponse,
-    ): List<CartItem> {
+    ): List<CartItemEntity> {
         return cartService.getCartItems(member.id)
     }
 

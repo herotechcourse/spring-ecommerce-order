@@ -28,6 +28,10 @@ class CartItemEntity() {
     @JoinColumn(name = "product_id", nullable = false)
     lateinit var product: ProductEntity
 
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "product_option_id", nullable = false)
+    lateinit var productOption: OptionEntity
+
     @field:Positive
     @Column(nullable = false)
     var quantity: Int = 0
@@ -38,11 +42,13 @@ class CartItemEntity() {
     constructor(
         cart: CartEntity,
         product: ProductEntity,
+        productOption: OptionEntity,
         quantity: Int,
         createdAt: LocalDateTime = LocalDateTime.now(),
     ) : this() {
         this.cart = cart
         this.product = product
+        this.productOption = productOption
         this.quantity = quantity
         this.createdAt = createdAt
     }

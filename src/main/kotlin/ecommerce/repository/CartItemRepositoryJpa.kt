@@ -17,5 +17,12 @@ interface CartItemRepositoryJpa : JpaRepository<CartItemEntity, Long> {
         pageable: Pageable,
     ): Page<CartItemEntity>
 
+    fun findByCartIdAndProductOptionId(
+        cartId: Long,
+        productOptionId: Long,
+    ): CartItemEntity?
+
+    fun findAllByCartId(cartId: Long): List<CartItemEntity>
+
     override fun findAll(pageable: Pageable): Page<CartItemEntity>
 }
