@@ -1,28 +1,62 @@
 package ecommerce.service
 
+import ecommerce.client.StripeClient
 import ecommerce.dto.order.PlaceOrderRequest
 import ecommerce.dto.order.PlaceOrderResponse
-import ecommerce.client.StripeClient
+import ecommerce.dto.order.PurchasedItem
+import ecommerce.repository.CartJpaRepository
+import ecommerce.repository.OptionJpaRepository
+import ecommerce.repository.ProductJpaRepository
 import org.springframework.stereotype.Service
+import kotlin.math.roundToLong
 
 @Service
 class OrderService(
-    private val stripeClient: StripeClient
+    private val stripeClient: StripeClient,
+    private val productRepository: ProductJpaRepository,
+    private val optionRepository: OptionJpaRepository,
+    private val cartRepository: CartJpaRepository,
 ) {
+    fun placeOrder(
+        memberId: Long,
+        request: PlaceOrderRequest,
+    ): PlaceOrderResponse {
+        require(request.quantity > 0) { "Quantity must be greater than 0." }
 
-    fun placeOrder(memberId: Long, request: PlaceOrderRequest): PlaceOrderResponse {
-        // TODO: validate stock, member, quantity
+        val product =
+            productRepository.findById(request.productId)
+                .orElseThrow { IllegalArgumentException("Product not found: ${request.productId}") }
 
-        // TODO: call stripeClient.createPaymentIntent(...)
-        // TODO: handle success vs decline
-        // TODO: persist order/payment in Step 2.2
+        val option =
+            optionRepository.findById(request.optionId)
+                .orElseThrow { IllegalArgumentException("Option not found: ${request.optionId}") }
+
+        if (option.product?.id != product.id) {
+            throw IllegalArgumentException("Option ${option.id} does not belong to product ${product.id}.")
+        }
+
+        if (option.quantity < request.quantity) {
+            throw IllegalArgumentException("Insufficient stock for option ${option.id}.")
+        }
+
+        val amountCents: Long = (product.price * 100.0 * request.quantity).roundToLong()
+        val currency = "usd"
+
+        val payment = stripeClient.createPaymentIntent(amountCents, currency)
 
         return PlaceOrderResponse(
-            orderStatus = "PENDING",
-            paymentIntentId = null,
-            amount = null,
-            currency = null,
-            items = emptyList()
+            orderStatus = payment.status.uppercase(),
+            paymentIntentId = payment.id,
+            amount = payment.amount,
+            currency = payment.currency,
+            items =
+                listOf(
+                    PurchasedItem(
+                        productId = product.id!!,
+                        optionId = option.id!!,
+                        quantity = request.quantity,
+                    ),
+                ),
         )
     }
 }
