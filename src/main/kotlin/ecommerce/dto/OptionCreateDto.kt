@@ -1,0 +1,23 @@
+package ecommerce.dto
+
+import ecommerce.entity.OptionEntity
+import ecommerce.entity.ProductEntity
+import jakarta.validation.constraints.Max
+import jakarta.validation.constraints.Min
+import jakarta.validation.constraints.Pattern
+import jakarta.validation.constraints.Size
+
+data class OptionCreateDto(
+    @field:Size(max = 50)
+    @field:Pattern(
+        regexp = "^[\\p{L}\\p{N}\\s()\\[\\]+\\-&/_]*\$",
+        message = "Invalid characters in option name",
+    )
+    val name: String,
+    @field:Min(1) @field:Max(99_999_999)
+    val quantity: Long,
+) {
+    fun toOptionEntity(product: ProductEntity): OptionEntity {
+        return OptionEntity(name = this.name, quantity = this.quantity, product = product)
+    }
+}
