@@ -94,21 +94,21 @@ It handles product stock updates, cart cleanup, payment confirmation, robust err
 ### Features
 1. Order Placement
 - [ ] User selects:
-    - Product option (e.g., size, color)
-    - Quantity
-    - Payment method (Stripe test card in sandbox)
+    - [x] Product option (e.g., size, color)
+    - [x] Quantity
+    - [x] Payment method (Stripe test card in sandbox)
 - [ ] API calculates total price and sends request to Stripe's Payment Intent Create API.
 
 2. Stripe Payment Integration 
-- [ ] Get Api key(use sandbox key)
-  - [ ] store in application-properties
-  - [ ] do not push!!
-- [ ] Uses POST https://api.stripe.com/v1/payment_intents with:
-  - [ ] amount 
-  - [ ] currency 
-  - [ ] payment_method 
-  - [ ] confirm=true 
-  - [ ] automatic payment methods enabled (automatic_payment_methods[enabled]=true)
+- [x] Get Api key(use sandbox key)
+  - [x] store in application-properties
+  - [x] do not push!!
+- [x] Uses POST https://api.stripe.com/v1/payment_intents with:
+  - [x] amount 
+  - [x] currency 
+  - [x] payment_method 
+  - [x] confirm=true 
+  - [x] automatic payment methods enabled (automatic_payment_methods[enabled]=true)
 
 3. Stock Management
 - When payment is confirmed:
@@ -126,8 +126,8 @@ It handles product stock updates, cart cleanup, payment confirmation, robust err
 
 5. Error Handling
 - If Stripe API request fails:
-  - [ ] Catch exception and map to user-friendly error message.
-  - [ ] message based on Stripe's codes
+  - [x] Catch exception and map to user-friendly error message.
+  - [x] message based on Stripe's codes
     - _Expired session_ → "Your payment session has expired. Please try again."
     - _Invalid payment method_ → "The payment method is invalid. Please check your card details."
     - _Insufficient balance_ → "Insufficient funds. Please use another card."
@@ -166,12 +166,12 @@ It handles product stock updates, cart cleanup, payment confirmation, robust err
 - [ ] Endpoint: `GET /orders`
 - [ ] optional: add pagination
 - [ ] Each order record should include:
-  - [ ] Order Date & Time (when payment was completed)
-  - [ ] Order Status (e.g., PENDING, PAID, FAILED, CANCELLED)
-  - [ ] Purchased Items (product names, options, quantities)
-  - [ ] Stripe Checkout Session ID (issued by Stripe)
-  - [ ] Payment Amount (in currency format)
-  - [ ] Optional Payment Details (e.g., payment method, last 4 digits of card, currency)
+  - [x] Order Date & Time (when payment was completed)
+  - [x] Order Status (e.g., PENDING, PAID, FAILED, CANCELLED)
+  - [x] Purchased Items (product names, options, quantities)
+  - [x] Stripe Checkout Session ID (issued by Stripe)
+  - [x] Payment Amount (in currency format)
+  - [x] Optional Payment Details (e.g., payment method, last 4 digits of card, currency)
     - [ ] can be stored optionally in the DB
 - Example Response
 `[
@@ -211,12 +211,12 @@ You must deploy your existing service and ensure it can interact with the client
 
 ## Action Plan for Step 2
 --- Saturday ---
-1. Design Order domain & DTOs (Order, OrderItem, enums, payment metadata).
-2. Add repositories (or entities).
-3. Add Stripe config + SDK dependency. (Use test/sandbox key in application.properties, never commit it.) Stripe Docs
-4. Implement StripeService to create/confirm PaymentIntents (with idempotency). Stripe Docs+1
+1. [x] Design Order domain & DTOs (Order, OrderItem, enums, payment metadata).
+2. [x] Add repositories (or entities).
+3. [x] Add Stripe config + SDK dependency. (Use test/sandbox key in application.properties, never commit it.) Stripe Docs
+4. [x] Implement StripeService to create/confirm PaymentIntents (with idempotency). Stripe Docs+1
 5. Implement OrderService.placeOrder() orchestration: validate stock, create PENDING order, call Stripe, finalize (decrement stock + cart cleanup) on success. Use DB locking & transactions when changing stock.
-6. Implement error mapping & friendly messages for Stripe decline codes (expired_card, insufficient_funds, incorrect_cvc, card_declined, etc.). Stripe Docs+1
+6. [x] Implement error mapping & friendly messages for Stripe decline codes (expired_card, insufficient_funds, incorrect_cvc, card_declined, etc.). Stripe Docs+1
 7. Add webhook endpoint (/webhooks/stripe) to process payment_intent.succeeded / fallback reconciliation (recommended). Stripe Docs
 --- Sunday ---
 8. Add controller endpoints: POST /orders/place and GET /orders (with pagination).
