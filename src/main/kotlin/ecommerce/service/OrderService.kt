@@ -3,17 +3,18 @@ package ecommerce.service
 import ecommerce.dto.OrderPlacementRequest
 import ecommerce.dto.OrderPlacementResponse
 import ecommerce.dto.OrderResponseStatus
-import ecommerce.dto.PaymentRequest
 import ecommerce.dto.RegisteredMember
 import ecommerce.exception.BadRequestException
 import ecommerce.exception.NotFoundException
+import ecommerce.model.Cart
+import ecommerce.model.Member
+import ecommerce.model.Option
 import ecommerce.model.Order
 import ecommerce.model.OrderItem
 import ecommerce.model.OrderStatus
 import ecommerce.repository.CartRepository
 import ecommerce.repository.MemberRepository
 import ecommerce.repository.OptionRepository
-import ecommerce.repository.OrderItemRepository
 import ecommerce.repository.OrderRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -22,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional
 class OrderService(
     private val orderRepository: OrderRepository,
-    private val orderItemRepository: OrderItemRepository,
     private val paymentService: PaymentService,
     private val optionRepository: OptionRepository,
     private val cartRepository: CartRepository,
@@ -32,21 +32,46 @@ class OrderService(
         req: OrderPlacementRequest,
         loginMember: RegisteredMember,
     ): OrderPlacementResponse {
+        val option = findAndValidateOption(req)
+
+        val member = findMember(loginMember)
+        val cart = cartRepository.findCartByMemberId(loginMember.id)
+
+        val totalAmount = (option.product.price * req.quantity)
+        val order = createPendingOrder(req, option, member, totalAmount)
+
+        paymentService.processPayment(order) // NOTE: this starts a new transaction, so order will be saved even if it fails
+        updateStockAndCart(cart, option, req.quantity)
+
+        return OrderPlacementResponse(
+            status = OrderResponseStatus.SUCCESS.name,
+            orderId = order.id,
+            message = "Payment successful. Order has been placed",
+        )
+    }
+
+    private fun findAndValidateOption(req: OrderPlacementRequest): Option {
         val option =
             optionRepository.findById(req.productOptionId)
                 .orElseThrow { NotFoundException("Option not found") }
         if (!option.isAvailable(req.quantity)) {
             throw BadRequestException("Out of stock")
         }
+        return option
+    }
 
-        val member =
-            memberRepository.findByEmail(loginMember.email)
-                ?: throw NotFoundException("User doesn't exists")
-        val cart = cartRepository.findCartByMemberId(loginMember.id)
-        val product = option.product
+    private fun findMember(loginMember: RegisteredMember): Member {
+        return memberRepository.findById(loginMember.id)
+            .orElseThrow { NotFoundException("Member not found") }
+    }
 
-        val totalAmount = (product.price * req.quantity)
-        val item = OrderItem(req.quantity, product.name, option.name)
+    private fun createPendingOrder(
+        req: OrderPlacementRequest,
+        option: Option,
+        member: Member,
+        totalAmount: Double,
+    ): Order {
+        val item = OrderItem(req.quantity, option.product.name, option.name)
         val order =
             orderRepository.save(
                 Order(
@@ -57,29 +82,18 @@ class OrderService(
                     status = OrderStatus.PENDING,
                 ),
             )
+        return order
+    }
 
-        // TODO: check if PaymentRequest should take arguments from order or request
+    private fun updateStockAndCart(
+        cart: Cart?,
+        option: Option,
+        quantity: Int,
+    ) {
         try {
-            val sessionId = paymentService.createPaymentIntent(PaymentRequest(totalAmount, "usd", req.paymentMethod))
-            order.status = OrderStatus.PAID
-            order.checkoutSessionId = sessionId
-            orderRepository.save(order)
-        } catch (e: Exception) {
-            order.status = OrderStatus.FAILED
-            orderRepository.save(order)
-            throw e
-        }
-
-        try {
-            cart?.removeItem(product, req.quantity)
+            cart?.removeItem(option.product, quantity)
         } catch (e: Exception) {
         }
-        option.decreaseQuantity(req.quantity)
-
-        return OrderPlacementResponse(
-            status = OrderResponseStatus.SUCCESS.name,
-            orderId = order.id,
-            message = "Payment successful. Order has been placed",
-        )
+        option.decreaseQuantity(quantity)
     }
 }
