@@ -36,6 +36,12 @@ class Option(
         }
     }
 
+    fun isAvailable(quantity: Int): Boolean {
+        if (quantity < 0) return false
+        if (quantity > this.quantity) return false
+        return true
+    }
+
     companion object {
         val allowedSpecialChars = setOf('(', ')', '[', ']', '+', '-', '&', '/', '_')
     }
