@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentMatchers.anyString
+import org.mockito.Mock
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
 import org.mockito.kotlin.argumentCaptor
@@ -22,7 +23,9 @@ import kotlin.test.assertTrue
 
 @Suppress("UNCHECKED_CAST")
 class StripeClientTest {
+    @Mock
     private val stripeProperties = StripeProperties(secretKey = "sk_test_123")
+
     private val restClient: RestClient = mock(RestClient::class.java)
 
     private val stripeClient = StripeClient(stripeProperties, restClient)
