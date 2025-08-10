@@ -30,7 +30,7 @@ class Order(
     @JoinColumn(name = "order_id")
     val items: MutableList<OrderItem> = mutableListOf(),
     @Column(name = "payment_amount", nullable = false)
-    var paymentAmount: Long,
+    var paymentAmount: Double,
     @Column(nullable = false)
     var currency: String = "usd",
     @Column(name = "checkout_session_id")
