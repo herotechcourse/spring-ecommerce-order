@@ -30,13 +30,13 @@ class Order(
     @JoinColumn(name = "order_id")
     val items: MutableList<OrderItem> = mutableListOf(),
     @Column(name = "payment_amount", nullable = false)
-    var paymentAmount: Double,
+    val paymentAmount: Double,
     @Column(nullable = false)
-    var currency: String = "usd",
+    val currency: String = "usd",
+    @Column(name = "payment_method", nullable = false)
+    val paymentMethod: String,
     @Column(name = "checkout_session_id")
     var checkoutSessionId: String? = null,
-    @Column(name = "payment_method")
-    var paymentMethod: String? = null,
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 ) {
