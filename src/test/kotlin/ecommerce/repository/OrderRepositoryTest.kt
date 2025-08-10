@@ -21,7 +21,7 @@ class OrderRepositoryTest {
     lateinit var memberRepository: MemberRepository
 
     @Test
-    fun `order should contain order item`()  {
+    fun `order should contain order item`() {
         val member = memberRepository.save(Member("member@mail.com", "name", "password", Role.USER.name))
         val order = orderRepository.save(Order(member = member, paymentAmount = 1000L))
         val orderId = order.id ?: throw Exception("order id is null")
@@ -33,7 +33,7 @@ class OrderRepositoryTest {
     }
 
     @Test
-    fun `order item should be saved when order is saved`()  {
+    fun `order item should be saved when order is saved`() {
         val member = memberRepository.save(Member("member@mail.com", "name", "password", Role.USER.name))
         val order = orderRepository.save(Order(member = member, paymentAmount = 1000L))
         val orderItem = OrderItem(2, "washing machine", "M1203")
