@@ -23,7 +23,7 @@ class CartController(
         @RequestBody request: CartRequest,
         @LoginMember member: Member,
     ): ResponseEntity<Unit> {
-        cartService.addToCart(member, request)
+        cartService.addOptionToCart(member, request)
         return ResponseEntity.ok().build()
     }
 
@@ -40,7 +40,7 @@ class CartController(
         @RequestBody request: CartRequest,
         @LoginMember member: Member,
     ): ResponseEntity<Unit> {
-        cartService.removeFromCart(member.id, request.productId)
+        cartService.removeOptionFromCart(member, request)
         return ResponseEntity.noContent().build()
     }
 }

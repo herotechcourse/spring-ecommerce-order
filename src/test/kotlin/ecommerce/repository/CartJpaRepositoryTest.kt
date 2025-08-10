@@ -9,7 +9,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
-import java.time.LocalDateTime
+import org.springframework.data.domain.PageRequest
 
 @DataJpaTest
 class CartJpaRepositoryTest
@@ -21,6 +21,7 @@ class CartJpaRepositoryTest
     ) {
         private lateinit var member: Member
         private lateinit var product: Product
+        private lateinit var cartSaved: Cart
 
         @BeforeEach
         fun setup() {
@@ -29,24 +30,25 @@ class CartJpaRepositoryTest
                     Member(name = "Alice", email = "alice@example.com", password = "pw"),
                 )
 
-            val option =
-                Option(
-                    name = "Standard",
-                    quantity = 1,
-                )
-
             val baseProduct =
                 Product(
                     name = "Widget",
                     price = 9.99,
                     imageUrl = "http://image.com/widget.png",
-                    options = listOf(option),
+                    options =
+                        listOf(
+                            Option(
+                                name = "Standard",
+                                quantity = 1,
+                            ),
+                        ),
                 )
 
             product = productRepository.save(baseProduct)
 
-            val now = LocalDateTime.now()
-            cartRepository.save(Cart(member = member, product = product, createdAt = now))
+            val cart = Cart(member)
+            cart.add(product.options.first(), 1)
+            cartSaved = cartRepository.save(cart)
         }
 
         @Test
@@ -57,9 +59,18 @@ class CartJpaRepositoryTest
         }
 
         @Test
-        fun `deleteByMemberIdAndProductId should remove item`() {
-            cartRepository.deleteByMemberIdAndProductId(member.id, product.id)
-            val items = cartRepository.findByMemberId(member.id)
-            assertThat(items).isEmpty()
+        fun `findByMemberIdAndId should return the cart for given member and id`() {
+            val found = cartRepository.findByMemberIdAndId(member.id, cartSaved.id)
+            assertThat(found).isNotNull
+            assertThat(found!!.id).isEqualTo(cartSaved.id)
+            assertThat(found.member.id).isEqualTo(member.id)
+        }
+
+        @Test
+        fun `findByMemberId with pageable should return a page`() {
+            val page = cartRepository.findByMemberId(member.id, PageRequest.of(0, 10))
+            assertThat(page.totalElements).isEqualTo(1)
+            assertThat(page.content).hasSize(1)
+            assertThat(page.content[0].id).isEqualTo(cartSaved.id)
         }
     }
