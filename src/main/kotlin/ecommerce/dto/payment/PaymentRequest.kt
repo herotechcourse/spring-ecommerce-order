@@ -1,4 +1,4 @@
-package ecommerce.dto
+package ecommerce.dto.payment
 
 data class PaymentRequest(
     val amount: Int,

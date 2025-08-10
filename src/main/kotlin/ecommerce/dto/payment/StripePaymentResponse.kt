@@ -1,4 +1,4 @@
-package ecommerce.dto
+package ecommerce.dto.payment
 
 import com.fasterxml.jackson.annotation.JsonProperty
 

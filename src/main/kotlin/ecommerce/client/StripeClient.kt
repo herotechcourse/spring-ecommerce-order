@@ -3,7 +3,7 @@ package ecommerce.client
 import ecommerce.config.StripeProperties
 import ecommerce.exception.PaymentClientException
 import ecommerce.exception.PaymentServerException
-import ecommerce.dto.StripePaymentResponse
+import ecommerce.dto.payment.StripePaymentResponse
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component

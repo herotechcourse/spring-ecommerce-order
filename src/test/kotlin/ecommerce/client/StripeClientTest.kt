@@ -1,6 +1,6 @@
 package ecommerce.client
 
-import ecommerce.dto.PaymentRequest
+import ecommerce.dto.payment.PaymentRequest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
