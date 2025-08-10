@@ -93,11 +93,11 @@ This feature allows users to place orders with online payment processing via **S
 It handles product stock updates, cart cleanup, payment confirmation, robust error handling for failed transactions, and storage of essential payment/order details.
 ### Features
 1. Order Placement
-- [ ] User selects:
+- [x] User selects:
     - [x] Product option (e.g., size, color)
     - [x] Quantity
     - [x] Payment method (Stripe test card in sandbox)
-- [ ] API calculates total price and sends request to Stripe's Payment Intent Create API.
+- [x] API calculates total price and sends request to Stripe's Payment Intent Create API.
 
 2. Stripe Payment Integration 
 - [x] Get Api key(use sandbox key)
@@ -112,26 +112,27 @@ It handles product stock updates, cart cleanup, payment confirmation, robust err
 
 3. Stock Management
 - When payment is confirmed:
-  - [ ] Decrease stock for the purchased product option by the ordered quantity. 
-  - [ ] Ensure stock cannot go below zero. 
+  - [x] Decrease stock for the purchased product option by the ordered quantity. 
+  - [x] Ensure stock cannot go below zero. 
 - If payment fails:
-  - [ ] Stock remains unchanged.
+  - [x] Stock remains unchanged.
   
 4. Cart Cleanup
 - If the ordered product exists in the user’s cart:
-  - [ ] Remove the item from the cart after successful payment. 
+  - [x] Remove the item from the cart after successful payment. 
 - If payment fails:
-  - [ ] Cart remains unchanged.
-  - [ ] -> NOTE: same transaction??
+  - [x] Cart remains unchanged.
 
 5. Error Handling
 - If Stripe API request fails:
   - [x] Catch exception and map to user-friendly error message.
   - [x] message based on Stripe's codes
-    - _Expired session_ → "Your payment session has expired. Please try again."
+    - [x] 4xx throws 400 BadRequestException()
+    - [x] 5xx throws 503 ExternalServiceException()
+    - ~~_Expired session_ → "Your payment session has expired. Please try again."
     - _Invalid payment method_ → "The payment method is invalid. Please check your card details."
     - _Insufficient balance_ → "Insufficient funds. Please use another card."
-    - Other failures → "Payment could not be processed. Please try again."
+    - Other failures → "Payment could not be processed. Please try again."~~
 ~~- [ ] Test with test cards provided in [Stripe official document](https://docs.stripe.com/testing?testing-method=card-numbers#declined-payments)
     - 4000000000000069 – Expired card decline
     - 4000 0000 0000 9995 – Insufficient funds
@@ -179,7 +180,8 @@ It handles product stock updates, cart cleanup, payment confirmation, robust err
   - [x] Stripe Checkout Session ID (issued by Stripe)
   - [x] Payment Amount (in currency format)
   - [x] Optional Payment Details (e.g., payment method, last 4 digits of card, currency)
-    - [ ] can be stored optionally in the DB
+    - [x] can be stored optionally in the DB
+    - -> stored inside Order
 - Example Response
 `[
   {
@@ -222,7 +224,7 @@ You must deploy your existing service and ensure it can interact with the client
 2. [x] Add repositories (or entities).
 3. [x] Add Stripe config + SDK dependency. (Use test/sandbox key in application.properties, never commit it.) Stripe Docs
 4. [x] Implement StripeService to create/confirm PaymentIntents (with idempotency). Stripe Docs+1
-5. Implement OrderService.placeOrder() orchestration: validate stock, create PENDING order, call Stripe, finalize (decrement stock + cart cleanup) on success. Use DB locking & transactions when changing stock.
+5. [x] Implement OrderService.placeOrder() orchestration: validate stock, create PENDING order, call Stripe, finalize (decrement stock + cart cleanup) on success. Use DB locking & transactions when changing stock.
 6. [x] Implement error mapping & friendly messages for Stripe decline codes (expired_card, insufficient_funds, incorrect_cvc, card_declined, etc.). Stripe Docs+1
 7. Add webhook endpoint (/webhooks/stripe) to process payment_intent.succeeded / fallback reconciliation (recommended). Stripe Docs
 --- Sunday ---
