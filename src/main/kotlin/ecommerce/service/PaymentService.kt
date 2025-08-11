@@ -1,6 +1,7 @@
 package ecommerce.service
 
 import ecommerce.client.StripeClient
+import ecommerce.dto.PaymentIntentIdResponse
 import ecommerce.dto.PaymentRequest
 import ecommerce.exception.BadRequestException
 import ecommerce.exception.ExternalServiceException
@@ -16,7 +17,7 @@ class PaymentService(
     private val orderRepository: OrderRepository,
 ) {
     @Transactional
-    fun createPaymentIntent(req: PaymentRequest): String? {
+    fun createPaymentIntent(req: PaymentRequest): PaymentIntentIdResponse {
         try {
             val response = stripeClient.createCheckoutSession(req)
             return response
@@ -33,12 +34,12 @@ class PaymentService(
     @Transactional
     fun processPayment(order: Order) {
         try {
-            order.checkoutSessionId =
-                createPaymentIntent(PaymentRequest(order.paymentAmount, order.currency, order.paymentMethod))?.take(255)
-            // TODO: remove take(255) and split session ID
+            val request = PaymentRequest(order.paymentAmount, order.currency, order.paymentMethod)
+            order.checkoutSessionId = createPaymentIntent(request).id
             order.setStatus(OrderStatus.PAID, "Payment successful. Order has been placed")
         } catch (e: Exception) {
-            order.setStatus(OrderStatus.FAILED, e.message ?: "Payment failed")
+            order.setStatus(OrderStatus.FAILED, "Payment failed. Reason: ${e.message?.take(100)}")
+            // TODO: remove take(100) and find a way to display a nice error message coming from Stripe
         }
     }
 

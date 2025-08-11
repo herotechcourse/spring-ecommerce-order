@@ -34,6 +34,14 @@ class StripeClientTest {
 
         val postSpec = mock(RestClient.RequestBodyUriSpec::class.java)
         val retrieveSpec = mock(RestClient.ResponseSpec::class.java)
+        val stripeJsonResponse =
+            """
+            {
+              "id": "pi_3Ruvv61KGHaCa7kl1sC7t88M",
+              "object": "payment_intent",
+              "amount": 720
+            }
+            """.trimIndent()
 
         `when`(restClient.post()).thenReturn(postSpec)
         `when`(postSpec.uri(anyString())).thenReturn(postSpec)
@@ -42,9 +50,9 @@ class StripeClientTest {
         `when`(postSpec.body(any<String>())).thenReturn(postSpec)
         `when`(postSpec.retrieve()).thenReturn(retrieveSpec)
         `when`(retrieveSpec.onStatus(any(), any())).thenReturn(retrieveSpec)
-        `when`(retrieveSpec.toEntity(String::class.java)).thenReturn(ResponseEntity.ok("ok-response"))
+        `when`(retrieveSpec.toEntity(String::class.java)).thenReturn(ResponseEntity.ok(stripeJsonResponse))
 
-        val result = stripeClient.createCheckoutSession(req)
+        val result = stripeClient.createCheckoutSession(req).id
 
         val bodyCaptor = argumentCaptor<String>()
         verify(postSpec).body(bodyCaptor.capture())
@@ -55,7 +63,7 @@ class StripeClientTest {
         assertTrue(capturedBody.contains("currency=usd"))
         assertTrue(capturedBody.contains("payment_method=card"))
 
-        assertEquals("ok-response", result)
+        assertEquals("pi_3Ruvv61KGHaCa7kl1sC7t88M", result)
     }
 
     @Test

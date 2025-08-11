@@ -1,7 +1,11 @@
 package ecommerce.client
 
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import ecommerce.config.StripeProperties
+import ecommerce.dto.PaymentIntentIdResponse
 import ecommerce.dto.PaymentRequest
+import ecommerce.dto.toPaymentIntentIdResponse
 import ecommerce.exception.BadRequestException
 import ecommerce.exception.ExternalServiceException
 import org.springframework.http.HttpHeaders
@@ -15,7 +19,7 @@ class StripeClient(
     private val stripeProperties: StripeProperties,
     private val restClient: RestClient,
 ) {
-    fun createCheckoutSession(req: PaymentRequest): String? {
+    fun createCheckoutSession(req: PaymentRequest): PaymentIntentIdResponse {
         val body =
             listOf(
                 "amount=${req.amount}",
@@ -36,7 +40,7 @@ class StripeClient(
                     .retrieve()
                     .toEntity(String::class.java)
 
-            response.body
+            extractPaymentIntentIdFromStripeResponse(response.body!!)
         } catch (e: RestClientResponseException) {
             val errorBody = e.responseBodyAsString
             val statusCode = e.statusCode
@@ -47,5 +51,12 @@ class StripeClient(
                 else -> IllegalArgumentException("Unexpected error: ${e.message}")
             }
         }
+    }
+
+    private fun extractPaymentIntentIdFromStripeResponse(responseBody: String): PaymentIntentIdResponse {
+        val mapper = jacksonObjectMapper()
+        val rootNode: JsonNode = mapper.readTree(responseBody)
+        val id = rootNode["id"].asText()
+        return id.toPaymentIntentIdResponse()
     }
 }
