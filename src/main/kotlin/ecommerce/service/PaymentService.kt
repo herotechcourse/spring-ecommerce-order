@@ -1,6 +1,8 @@
 package ecommerce.service
 
 import ecommerce.client.StripeClient
+import ecommerce.dto.OrderPlacementResponse
+import ecommerce.dto.OrderResponseStatus
 import ecommerce.dto.PaymentRequest
 import ecommerce.exception.BadRequestException
 import ecommerce.exception.ExternalServiceException
@@ -8,7 +10,6 @@ import ecommerce.model.Order
 import ecommerce.model.OrderStatus
 import ecommerce.repository.OrderRepository
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 
 @Service
@@ -31,17 +32,38 @@ class PaymentService(
         }
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    fun processPayment(order: Order) {
+    @Transactional
+    fun processPayment(order: Order): OrderPlacementResponse {
         try {
             val sessionId = createPaymentIntent(PaymentRequest(order.paymentAmount, order.currency, order.paymentMethod))
             order.status = OrderStatus.PAID
             order.checkoutSessionId = sessionId
-            orderRepository.save(order)
+            return OrderPlacementResponse(
+                status = OrderResponseStatus.SUCCESS.name,
+                orderId = order.id,
+                message = "Payment successful. Order has been placed",
+            )
         } catch (e: Exception) {
             order.status = OrderStatus.FAILED
-            orderRepository.save(order)
-            throw e
+            return OrderPlacementResponse(
+                status = OrderResponseStatus.FAILURE.name,
+                orderId = order.id,
+                message = e.message ?: "Payment failed",
+            )
         }
     }
+
+//    @Transactional(propagation = Propagation.REQUIRES_NEW, noRollbackFor = [Exception::class])
+//    fun processPayment(order: Order) {
+//        try {
+//            val sessionId = createPaymentIntent(PaymentRequest(order.paymentAmount, order.currency, order.paymentMethod))
+//            order.status = OrderStatus.PAID
+//            order.checkoutSessionId = sessionId
+//            orderRepository.save(order)
+//        } catch (e: Exception) {
+//            order.status = OrderStatus.FAILED
+//            orderRepository.save(order)
+//            throw e
+//        }
+//    }
 }

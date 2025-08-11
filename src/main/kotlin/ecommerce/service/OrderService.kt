@@ -3,7 +3,6 @@ package ecommerce.service
 import ecommerce.dto.OrderDto
 import ecommerce.dto.OrderPlacementRequest
 import ecommerce.dto.OrderPlacementResponse
-import ecommerce.dto.OrderResponseStatus
 import ecommerce.dto.RegisteredMember
 import ecommerce.exception.BadRequestException
 import ecommerce.exception.NotFoundException
@@ -39,17 +38,15 @@ class OrderService(
         val member = findMember(loginMember)
         val cart = cartRepository.findCartByMemberId(loginMember.id)
 
-        val totalAmount = (option.product.price * req.quantity)
+        val totalAmount = (option.product.price * req.quantity * 100).toInt()
         val order = createPendingOrder(req, option, member, totalAmount)
 
-        paymentService.processPayment(order) // NOTE: this starts a new transaction, so order will be saved even if it fails
-        updateStockAndCart(cart, option, req.quantity)
+        val response = paymentService.processPayment(order)
+        if (order.status == OrderStatus.PAID) {
+            updateStockAndCart(cart, option, req.quantity)
+        }
 
-        return OrderPlacementResponse(
-            status = OrderResponseStatus.SUCCESS.name,
-            orderId = order.id,
-            message = "Payment successful. Order has been placed",
-        )
+        return response
     }
 
     fun getAllOrdersForMember(memberId: Long): List<OrderDto> {
@@ -76,7 +73,7 @@ class OrderService(
         req: OrderPlacementRequest,
         option: Option,
         member: Member,
-        totalAmount: Double,
+        totalAmount: Int,
     ): Order {
         val item = OrderItem(req.quantity, option.product.name, option.name)
         val order =
