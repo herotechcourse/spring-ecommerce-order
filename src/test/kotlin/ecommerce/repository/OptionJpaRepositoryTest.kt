@@ -16,7 +16,7 @@ class OptionJpaRepositoryTest {
         val product =
             Product(
                 name = "product",
-                price = 0.2,
+                price = 2,
                 imageUrl = "https://image.png",
                 options = emptyList(),
             )
@@ -30,7 +30,7 @@ class OptionJpaRepositoryTest {
         val productWithOption =
             Product(
                 name = "product",
-                price = 0.2,
+                price = 2,
                 imageUrl = "https://image.png",
                 options = listOf(option),
             )

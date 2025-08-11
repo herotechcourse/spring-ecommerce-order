@@ -32,7 +32,7 @@ class CartPaginationTest
             val baseProduct =
                 Product(
                     name = "Product",
-                    price = 12.34,
+                    price = 12,
                     imageUrl = "http://image.com/paginated.png",
                     options =
                         listOf(

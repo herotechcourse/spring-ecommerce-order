@@ -28,13 +28,13 @@ class OrderItem(
     val productNameSnapshot: ProductName,
 
     @Column(nullable = false)
-    val priceSnapshot: Double,
+    val priceSnapshot: Int,
 
     @Column(nullable = false)
     val quantity: Int,
 
     @Column(nullable = false)
-    val subtotal: Double = priceSnapshot * quantity,
+    val subtotal: Int = priceSnapshot * quantity,
 
     @Column(nullable = false)
     val createdAt: LocalDateTime = LocalDateTime.now(),

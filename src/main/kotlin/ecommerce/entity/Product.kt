@@ -14,7 +14,7 @@ import jakarta.persistence.Table
 class Product(
     name: String,
     @Column(name = "price", nullable = false)
-    val price: Double,
+    val price: Int,
     @Column(name = "image_url")
     val imageUrl: String,
     options: List<Option>,

@@ -33,7 +33,7 @@ class CartJpaRepositoryTest
             val baseProduct =
                 Product(
                     name = "Widget",
-                    price = 9.99,
+                    price = 9,
                     imageUrl = "http://image.com/widget.png",
                     options =
                         listOf(

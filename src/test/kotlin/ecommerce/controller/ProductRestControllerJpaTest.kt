@@ -28,7 +28,7 @@ class ProductRestControllerJpaTest {
         val request =
             ProductRequest(
                 name = "chair",
-                price = 22.0,
+                price = 22,
                 imageUrl = "https://test.com/chair.jpg",
                 options =
                     listOf(

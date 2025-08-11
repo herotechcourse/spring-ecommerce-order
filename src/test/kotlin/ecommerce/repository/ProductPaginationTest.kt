@@ -23,7 +23,7 @@ class ProductPaginationTest(
             val baseProduct =
                 Product(
                     name = "Product $it",
-                    price = 10.0 + it,
+                    price = 10 + it,
                     imageUrl = "http://test.com/product$it.png",
                     options = listOf(option),
                 )
