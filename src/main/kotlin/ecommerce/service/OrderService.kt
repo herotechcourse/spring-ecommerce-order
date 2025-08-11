@@ -1,5 +1,6 @@
 package ecommerce.service
 
+import ecommerce.dto.OrderDto
 import ecommerce.dto.OrderPlacementRequest
 import ecommerce.dto.OrderPlacementResponse
 import ecommerce.dto.OrderResponseStatus
@@ -16,6 +17,7 @@ import ecommerce.repository.CartRepository
 import ecommerce.repository.MemberRepository
 import ecommerce.repository.OptionRepository
 import ecommerce.repository.OrderRepository
+import ecommerce.service.mapper.OrderMapper.toOrderDto
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -48,6 +50,11 @@ class OrderService(
             orderId = order.id,
             message = "Payment successful. Order has been placed",
         )
+    }
+
+    fun getAllOrdersForMember(memberId: Long): List<OrderDto> {
+        val orders = orderRepository.findAllByMemberId(memberId)
+        return orders.map { order -> order.toOrderDto() }
     }
 
     private fun findAndValidateOption(req: OrderPlacementRequest): Option {

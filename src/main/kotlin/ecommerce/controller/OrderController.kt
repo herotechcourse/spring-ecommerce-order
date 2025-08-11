@@ -14,20 +14,22 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class OrderController(
-    private val orderService: OrderService
+    private val orderService: OrderService,
 ) {
     @PostMapping("/orders/place")
     fun placeOrder(
         @Valid @RequestBody req: OrderPlacementRequest,
-        @LoginMember member: RegisteredMember
+        @LoginMember member: RegisteredMember,
     ): OrderPlacementResponse {
         val response = orderService.placeOrder(req, member)
         return response
     }
 
-//    @GetMapping("/orders")
-//    fun getOrders(@LoginMember member: RegisteredMember): List<OrderDto> {
-//        val orders = orderService.getAllOrdersForMember()
-//        return orders
-//    }
+    @GetMapping("/orders")
+    fun getOrders(
+        @LoginMember member: RegisteredMember,
+    ): List<OrderDto> {
+        val orders = orderService.getAllOrdersForMember(member.id)
+        return orders
+    }
 }
