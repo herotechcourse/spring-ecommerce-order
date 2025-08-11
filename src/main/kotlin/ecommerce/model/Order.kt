@@ -37,8 +37,17 @@ class Order(
     val paymentMethod: String,
     @Column(name = "checkout_session_id")
     var checkoutSessionId: String? = null,
+    var reason: String? = null,
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 ) {
-    fun addItem(item: OrderItem) = items.add(item)
+    fun addItem(item: OrderItem) = this.items.add(item)
+
+    fun setStatus(
+        status: OrderStatus,
+        message: String,
+    ) {
+        this.status = status
+        this.reason = message
+    }
 }
