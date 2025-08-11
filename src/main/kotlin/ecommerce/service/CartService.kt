@@ -43,6 +43,11 @@ class CartService(
         return cartRepository.findByMemberId(memberId)
     }
 
+    @Transactional(readOnly = true)
+    fun findCartByIdAndMemberId(cartId: Long, memberId: Long): Cart?{
+        return cartRepository.findByMemberIdAndId(memberId, cartId) ?: throw NoSuchElementException()
+    }
+
     @Transactional
     fun removeOptionFromCart(
         member: Member,
