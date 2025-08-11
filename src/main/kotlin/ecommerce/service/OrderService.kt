@@ -65,7 +65,6 @@ class OrderService(
         return try {
             val paymentIntent = stripeClient.createPaymentIntent(amountCents, currency)
 
-
             if (paymentIntent.status.equals("requires_payment_method", ignoreCase = true) ||
                 paymentIntent.lastPaymentError != null
             ) {
