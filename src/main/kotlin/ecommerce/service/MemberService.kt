@@ -45,4 +45,9 @@ class MemberService(
 
         return memberRepository.findById(memberId).orElse(null)
     }
+
+    @Transactional(readOnly = true)
+    fun findById(memberId: Long): Member {
+        return memberRepository.findById(memberId).get()
+    }
 }
