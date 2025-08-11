@@ -19,7 +19,6 @@ class OrderController(
     private val orderService: OrderService,
     private val orderQueryService: OrderQueryService,
 ) {
-
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     fun placeOrder(
@@ -29,7 +28,6 @@ class OrderController(
         return orderService.placeOrder(memberId, request)
     }
 
-
     @GetMapping
     fun getOrders(
         @LoginMember member: Member,
@@ -38,7 +36,6 @@ class OrderController(
         val orders = orderQueryService.getOrdersForMember(member.id, pageable)
         return ResponseEntity.ok(orders)
     }
-
 
     @GetMapping("/{orderId}")
     fun getOrderDetail(

@@ -7,5 +7,5 @@ data class OrderItemResponse(
     val optionName: String,
     val unitPrice: Long,
     val quantity: Int,
-    val lineTotal: Long
+    val lineTotal: Long,
 )

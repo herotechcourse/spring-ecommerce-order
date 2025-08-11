@@ -15,24 +15,27 @@ import org.springframework.transaction.annotation.Transactional
 class OrderQueryService(
     private val orderRepository: OrderJpaRepository,
     private val orderItemRepository: OrderItemJpaRepository,
-    private val paymentRepository: PaymentJpaRepository
+    private val paymentRepository: PaymentJpaRepository,
 ) {
-
-    fun getOrdersForMember(memberId: Long, pageable: Pageable): Page<OrderResponse> {
+    fun getOrdersForMember(
+        memberId: Long,
+        pageable: Pageable,
+    ): Page<OrderResponse> {
         return orderRepository.findByMemberId(memberId, pageable)
             .map { order ->
-                val items = orderItemRepository.findByOrderId(order.id)
-                    .map { item ->
-                        OrderItemResponse(
-                            productId = item.productId,
-                            productName = item.productName,
-                            optionId = item.optionId,
-                            optionName = item.optionName,
-                            unitPrice = item.unitPrice,
-                            quantity = item.quantity,
-                            lineTotal = item.lineTotal
-                        )
-                    }
+                val items =
+                    orderItemRepository.findByOrderId(order.id)
+                        .map { item ->
+                            OrderItemResponse(
+                                productId = item.productId,
+                                productName = item.productName,
+                                optionId = item.optionId,
+                                optionName = item.optionName,
+                                unitPrice = item.unitPrice,
+                                quantity = item.quantity,
+                                lineTotal = item.lineTotal,
+                            )
+                        }
 
                 val payment = paymentRepository.findByOrderId(order.id)
 
@@ -44,31 +47,36 @@ class OrderQueryService(
                     currency = order.currency,
                     paymentIntentId = payment?.intentId,
                     paymentStatus = payment?.status,
-                    items = items
+                    items = items,
                 )
             }
     }
 
-    fun getOrderDetail(memberId: Long, orderId: Long): OrderResponse {
-        val order = orderRepository.findById(orderId)
-            .orElseThrow { NoSuchElementException("Order not found: $orderId") }
+    fun getOrderDetail(
+        memberId: Long,
+        orderId: Long,
+    ): OrderResponse {
+        val order =
+            orderRepository.findById(orderId)
+                .orElseThrow { NoSuchElementException("Order not found: $orderId") }
 
         if (order.member.id != memberId) {
             throw IllegalAccessException("You are not allowed to view this order")
         }
 
-        val items = orderItemRepository.findByOrderId(order.id)
-            .map { item ->
-                OrderItemResponse(
-                    productId = item.productId,
-                    productName = item.productName,
-                    optionId = item.optionId,
-                    optionName = item.optionName,
-                    unitPrice = item.unitPrice,
-                    quantity = item.quantity,
-                    lineTotal = item.lineTotal
-                )
-            }
+        val items =
+            orderItemRepository.findByOrderId(order.id)
+                .map { item ->
+                    OrderItemResponse(
+                        productId = item.productId,
+                        productName = item.productName,
+                        optionId = item.optionId,
+                        optionName = item.optionName,
+                        unitPrice = item.unitPrice,
+                        quantity = item.quantity,
+                        lineTotal = item.lineTotal,
+                    )
+                }
 
         val payment = paymentRepository.findByOrderId(order.id)
 
@@ -80,7 +88,7 @@ class OrderQueryService(
             currency = order.currency,
             paymentIntentId = payment?.intentId,
             paymentStatus = payment?.status,
-            items = items
+            items = items,
         )
     }
 }

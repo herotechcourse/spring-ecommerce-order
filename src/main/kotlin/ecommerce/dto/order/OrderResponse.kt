@@ -11,5 +11,5 @@ data class OrderResponse(
     val currency: String,
     val paymentIntentId: String?,
     val paymentStatus: String?,
-    val items: List<OrderItemResponse>
+    val items: List<OrderItemResponse>,
 )
