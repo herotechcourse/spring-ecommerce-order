@@ -2,7 +2,6 @@ package ecommerce.client
 
 import ecommerce.config.StripeProperties
 import ecommerce.dto.PaymentRequest
-import ecommerce.dto.parseStripeError
 import ecommerce.exception.BadRequestException
 import ecommerce.exception.ExternalServiceException
 import org.springframework.http.HttpHeaders
