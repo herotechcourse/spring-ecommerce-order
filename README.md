@@ -24,20 +24,20 @@
     - [x] has a property `quantity` for ordering quantity
         - to subtract from `option` quantity, if order process with success - `@Transactional`
 4. Implement business logic for payment processing - `@Transactional`
-    - [ ] subtract order quantity from `option` quantity, when the order processed with success
-    - [ ] if the ordered product exists as a `CartItem` it should be removed from table and transferred to `Orders`
-    - [ ] **MUST** handle the error safely, when the payment approval API call fails
+    - [x] subtract order quantity from `option` quantity, when the order processed with success
+    - [x] if the ordered product exists as a `CartItem` it should be removed from table and transferred to `Orders`
+    - [x] **MUST** handle the error safely, when the payment approval API call fails
         - [ ] inform to the user cleary for the reason of failure of payment
         - [ ] display a proper error message why the payment failed
             - when the order failure due to payment rejection
             - e.g., expired session, invalid payment method, insufficient balance, etc.
 5. Implement **Orders** feature
-    - **MUST** be visible in `OrderRequest`
-        - [ ] has property `dateTime`
-        - [ ] has property `status`
-        - [ ] has property `List<PurchasedItem>`
-        - [ ] has property `checkoutSessionId` (issued by Stripe)
-        - [ ] has property `paymentAmount`
+    - **MUST** be visible in `OrderRequest` -> `OrderResponse`
+        - [x] has property `dateTime`
+        - [x] has property `status`
+        - [x] has property `List<PurchasedItem>`
+        - [x] has property `checkoutSessionId` (issued by Stripe)
+        - [x] has property `paymentAmount`
         - other payment fields can be stored **optionally** in DB
 
 ### Step 1
