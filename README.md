@@ -36,3 +36,30 @@
 -[x] Implement Place Order application flow
 -[x] Add acceptance & service tests covering
 
+## Step 2.2 - Orders
+
+### Implement the "Orders" feature.
+
+- [x] Order date and time
+- [x] Order status
+- [x] Purchased items
+- [x] Checkout session Id (issued by stripe)
+- [x] Payment amount
+
+
+## Step 2.3 - Deployment 
+
+### Features to Implement step 2.3
+
+- [x] Write a deployment script to automate the deployment process.
+- [x] Add a CORS configuration so the client (different Origin) can call the API.
+- [x] Handle security issues when interacting with the client API.
+
+### Deployment
+- Script `scripts/deploy.sh`:
+    - Stops old process (if running).
+    - Copies the new JAR into a deploy dir.
+    - Starts with `SPRING_PROFILES_ACTIVE=prod`.
+- Env vars:
+    - `STRIPE_SECRET_KEY` – Stripe test/secret key.
+    - `APP_CORS_ALLOWED_ORIGINS` – comma-separated origins (default `*`).
