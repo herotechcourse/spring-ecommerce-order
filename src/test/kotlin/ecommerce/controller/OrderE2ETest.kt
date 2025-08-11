@@ -5,7 +5,6 @@ import ecommerce.dto.OrderResponseStatus
 import ecommerce.dto.Role
 import ecommerce.dto.TokenRequest
 import ecommerce.model.Cart
-import ecommerce.model.CartItem
 import ecommerce.model.Member
 import ecommerce.model.Option
 import ecommerce.model.Product
@@ -61,6 +60,7 @@ class OrderE2ETest() {
     lateinit var optionM: Option
     lateinit var product: Product
     lateinit var member: Member
+    lateinit var cart: Cart
     lateinit var loginToken: String
 
     @BeforeEach
@@ -92,8 +92,10 @@ class OrderE2ETest() {
         product = productRepository.save(coffee) // cascade saves options too
         optionS = product.options[0]
         optionM = product.options[1]
-        val cart = cartRepository.save(Cart(member = member))
-        cartItemRepository.save(CartItem(coffee, cart, 2))
+        cart = cartRepository.save(Cart(member = member))
+        cart.addItem(product, 2)
+        cartItemRepository.save(cart.items[0])
+        cartRepository.save(cart)
     }
 
     @AfterEach
@@ -152,19 +154,151 @@ class OrderE2ETest() {
         assertThat(response.body().jsonPath().getString("message")).isEqualTo("Payment successful. Order has been placed")
     }
 
-    @Test
-    fun `test invalid payment methods`() {
+    @ParameterizedTest
+    @ValueSource(
+        strings = [
+            "pm_card_visa_chargeDeclined",
+            "pm_card_chargeDeclinedExpiredCard",
+            "pm_card_chargeCustomerFail",
+            "pm_card_visa_chargeDeclinedInsufficientFunds",
+        ],
+    )
+    fun `test invalid payment methods`(method: String) {
+        val req =
+            OrderPlacementRequest(
+                productOptionId = optionS.id,
+                quantity = 1,
+                paymentMethod = method,
+            )
+
+        val response =
+            RestAssured
+                .given()
+                .baseUri(baseUrl)
+                .header("Authorization", "Bearer $loginToken")
+                .body(req).contentType(ContentType.JSON)
+                .`when`()
+                .post("/api/orders/place")
+                .then().log().all()
+                .extract()
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value())
+        assertThat(response.body().jsonPath().getString("status")).isEqualTo(OrderResponseStatus.FAILURE.name)
+        assertThat(response.body().jsonPath().getString("message")).contains("Payment failed.")
+    }
+
+    private fun placeOrder(req: OrderPlacementRequest) {
+        RestAssured
+            .given()
+            .baseUri(baseUrl)
+            .header("Authorization", "Bearer $loginToken")
+            .body(req).contentType(ContentType.JSON)
+            .`when`()
+            .post("/api/orders/place")
+            .then().log().all()
+            .extract()
     }
 
     @Test
     fun `test retrieving all orders for user`() {
+        val req1 =
+            OrderPlacementRequest(
+                productOptionId = optionS.id,
+                quantity = 1,
+                paymentMethod = "pm_card_visa",
+            )
+        val req2 =
+            OrderPlacementRequest(
+                productOptionId = optionM.id,
+                quantity = 2,
+                paymentMethod = "pm_card_visa",
+            )
+        placeOrder(req1)
+        placeOrder(req2)
+
+        val response =
+            RestAssured
+                .given()
+                .baseUri(baseUrl)
+                .header("Authorization", "Bearer $loginToken")
+                .`when`()
+                .get("/api/orders")
+                .then().log().all()
+                .extract()
+
+        val jsonPath = response.body().jsonPath()
+
+        val orders = jsonPath.getList<Any>("") // empty string to get root array
+        assertThat(orders).hasSize(2)
+
+        val paymentAmounts = jsonPath.getList<Int>("paymentAmount")
+        assertThat(paymentAmounts).contains(360 * 2)
+        assertThat(paymentAmounts).contains(360 * 1)
+
+        val expected =
+            listOf(
+                listOf(mapOf("optionName" to "S", "productName" to "coffee", "quantity" to 1)),
+                listOf(mapOf("optionName" to "M", "productName" to "coffee", "quantity" to 2)),
+            )
+        val actual: List<List<Map<String, Any>>> = jsonPath.getList("items")
+        assertThat(actual).isEqualTo(expected)
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value())
     }
 
     @Test
     fun `test unavailable stock`() {
+        val req =
+            OrderPlacementRequest(
+                productOptionId = optionS.id,
+                quantity = 7,
+                paymentMethod = "pm_card_visa",
+            )
+
+        val response =
+            RestAssured
+                .given()
+                .baseUri(baseUrl)
+                .header("Authorization", "Bearer $loginToken")
+                .body(req).contentType(ContentType.JSON)
+                .`when`()
+                .post("/api/orders/place")
+                .then().log().all()
+                .extract()
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value())
     }
 
     @Test
     fun `test empty cart after successful order of the option inside the cart`() {
+        val req =
+            OrderPlacementRequest(
+                productOptionId = optionS.id,
+                quantity = 1,
+                paymentMethod = "pm_card_visa",
+            )
+
+        val itemsInCartBeforeRequest = cart.items[0].quantity
+
+        val response =
+            RestAssured
+                .given()
+                .baseUri(baseUrl)
+                .header("Authorization", "Bearer $loginToken")
+                .body(req).contentType(ContentType.JSON)
+                .`when`()
+                .post("/api/orders/place")
+                .then().log().all()
+                .extract()
+
+        val updatedCart = cartRepository.findCartWithItemsByMemberId(member.id!!) ?: error("Cart not found")
+        val itemsInCartAfterRequest = updatedCart.items[0].quantity
+
+        assertThat(itemsInCartBeforeRequest).isEqualTo(2)
+        assertThat(itemsInCartAfterRequest).isEqualTo(1)
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value())
+        assertThat(response.body().jsonPath().getString("status")).isEqualTo(OrderResponseStatus.SUCCESS.name)
+        assertThat(response.body().jsonPath().getString("message")).isEqualTo("Payment successful. Order has been placed")
     }
 }
