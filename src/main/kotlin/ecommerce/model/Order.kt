@@ -52,7 +52,7 @@ class Order(
     companion object {
         fun to(order: Order): OrderResponse {
             return OrderResponse(
-                orderData = order.createdAt,
+                orderDate = order.createdAt,
                 orderStatus = order.status,
                 orderItems = order.orderItems.map { OrderItem.to(it) },
                 checkoutSessionId = order.checkoutSessionId,

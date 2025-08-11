@@ -4,7 +4,7 @@ import ecommerce.model.OrderStatus
 import java.time.LocalDateTime
 
 data class OrderResponse(
-    val orderData: LocalDateTime,
+    val orderDate: LocalDateTime,
     val orderStatus: OrderStatus,
     val orderItems: List<OrderItemResponse>,
     val checkoutSessionId: String?,
