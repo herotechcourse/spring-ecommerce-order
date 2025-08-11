@@ -3,6 +3,7 @@ package ecommerce.service
 import ecommerce.dto.OrderDto
 import ecommerce.dto.OrderPlacementRequest
 import ecommerce.dto.OrderPlacementResponse
+import ecommerce.dto.OrderResponseStatus
 import ecommerce.dto.RegisteredMember
 import ecommerce.exception.BadRequestException
 import ecommerce.exception.NotFoundException
@@ -38,15 +39,19 @@ class OrderService(
         val member = findMember(loginMember)
         val cart = cartRepository.findCartByMemberId(loginMember.id)
 
-        val totalAmount = (option.product.price * req.quantity * 100).toInt()
+        val totalAmount = (option.product.price * req.quantity * 100).toInt() // TODO: move to domain
         val order = createPendingOrder(req, option, member, totalAmount)
 
-        val response = paymentService.processPayment(order)
+        paymentService.processPayment(order)
         if (order.status == OrderStatus.PAID) {
             updateStockAndCart(cart, option, req.quantity)
         }
 
-        return response
+        return OrderPlacementResponse(
+            status = if (order.status == OrderStatus.PAID) OrderResponseStatus.SUCCESS.name else OrderResponseStatus.FAILURE.name,
+            orderId = order.id,
+            message = order.reason ?: "",
+        )
     }
 
     fun getAllOrdersForMember(memberId: Long): List<OrderDto> {

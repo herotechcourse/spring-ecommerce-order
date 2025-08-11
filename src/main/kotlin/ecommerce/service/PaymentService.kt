@@ -1,8 +1,6 @@
 package ecommerce.service
 
 import ecommerce.client.StripeClient
-import ecommerce.dto.OrderPlacementResponse
-import ecommerce.dto.OrderResponseStatus
 import ecommerce.dto.PaymentRequest
 import ecommerce.exception.BadRequestException
 import ecommerce.exception.ExternalServiceException
@@ -27,29 +25,20 @@ class PaymentService(
         } catch (e: ExternalServiceException) {
             throw e
         } catch (e: Exception) {
-            // retry??
-            throw RuntimeException(e) // this should roll back the transaction
+            // TODO: retry payment??
+            throw RuntimeException(e)
         }
     }
 
     @Transactional
-    fun processPayment(order: Order): OrderPlacementResponse {
+    fun processPayment(order: Order) {
         try {
-            val sessionId = createPaymentIntent(PaymentRequest(order.paymentAmount, order.currency, order.paymentMethod))
-            order.status = OrderStatus.PAID
-            order.checkoutSessionId = sessionId
-            return OrderPlacementResponse(
-                status = OrderResponseStatus.SUCCESS.name,
-                orderId = order.id,
-                message = "Payment successful. Order has been placed",
-            )
+            order.checkoutSessionId =
+                createPaymentIntent(PaymentRequest(order.paymentAmount, order.currency, order.paymentMethod))?.take(255)
+            // TODO: remove take(255) and split session ID
+            order.setStatus(OrderStatus.PAID, "Payment successful. Order has been placed")
         } catch (e: Exception) {
-            order.status = OrderStatus.FAILED
-            return OrderPlacementResponse(
-                status = OrderResponseStatus.FAILURE.name,
-                orderId = order.id,
-                message = e.message ?: "Payment failed",
-            )
+            order.setStatus(OrderStatus.FAILED, e.message ?: "Payment failed")
         }
     }
 
