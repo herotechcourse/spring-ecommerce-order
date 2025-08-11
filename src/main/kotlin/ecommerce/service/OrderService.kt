@@ -1,5 +1,8 @@
 package ecommerce.service
 
+import com.stripe.exception.StripeException
+import ecommerce.handler.PaymentFailedException
+import ecommerce.handler.OrderCreationException
 import ecommerce.entity.Order
 import ecommerce.entity.OrderItem
 import ecommerce.entity.Payment
@@ -29,6 +32,8 @@ class OrderService(
         productOptionId: Long,
         amount: Int,
     ) {
+
+        try {
         val cart =
             cartRepository.findByMemberId(memberId)
                 ?: throw NoSuchElementException("Cart not found")
@@ -81,6 +86,11 @@ class OrderService(
 
         cart.cartItems.remove(cartItem)
         cartRepository.save(cart)
+        } catch (e: StripeException) {
+            throw PaymentFailedException("Payment failed: ${e.message}")
+        } catch (e: Exception) {
+            throw OrderCreationException("Order creation failed: ${e.message}")
+        }
     }
 
     @Transactional

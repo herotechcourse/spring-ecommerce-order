@@ -42,9 +42,9 @@
 - [x] Get API key 
 - [x] Placing an order with a selected product option and quantity
 - [x] If the ordered product exists in the user's cart, it should be removed from the cart
-- [ ] If the payment approval API call fails, you must handle the error safely:
-  - [ ] Ensure that the user is clearly informed of the failure reason
-  - [ ] In the case of a order failure due to payment rejection, display an appropriate error message
+- [x] If the payment approval API call fails, you must handle the error safely:
+  - [x] Ensure that the user is clearly informed of the failure reason
+  - [x] In the case of a order failure due to payment rejection, display an appropriate error message
 
 ## Order -> `Step 2-2`
 - [x] Order date and time
