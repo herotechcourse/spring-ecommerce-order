@@ -4,7 +4,9 @@ import ecommerce.service.AuthService
 import ecommerce.ui.CheckAdminInterceptor
 import ecommerce.ui.LoginMemberArgumentResolver
 import org.springframework.context.annotation.Configuration
+import org.springframework.http.HttpHeaders
 import org.springframework.web.method.support.HandlerMethodArgumentResolver
+import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 
@@ -20,5 +22,15 @@ class WebMvcConfiguration(
 
     override fun addArgumentResolvers(resolvers: MutableList<HandlerMethodArgumentResolver>) {
         resolvers.add(loginMemberArgumentResolver)
+    }
+
+    // TODO: assign 'allowedOrigins' to frontend address
+    override fun addCorsMappings(registry: CorsRegistry) {
+        registry.addMapping("/api/**")
+            .allowedOrigins("*")
+            .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+            .allowedHeaders("*")
+            .exposedHeaders(HttpHeaders.LOCATION)
+            .maxAge(3600)
     }
 }
