@@ -11,6 +11,7 @@ import ecommerce.repository.CartJpaRepository
 import ecommerce.repository.OptionJpaRepository
 import ecommerce.repository.ProductJpaRepository
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import kotlin.math.roundToLong
 
 @Service
@@ -20,6 +21,17 @@ class OrderService(
     private val optionRepository: OptionJpaRepository,
     private val cartRepository: CartJpaRepository,
 ) {
+    @Transactional
+    private fun applySuccessfulOrderChanges(memberId: Long, optionId: Long, quantity: Int) {
+        val option = optionRepository.findById(optionId)
+            .orElseThrow { IllegalArgumentException("Option not found: $optionId") }
+
+        option.subtract(quantity)
+        optionRepository.save(option)
+
+        cartRepository.deleteByMemberIdAndProductId(memberId, option.product!!.id)
+    }
+
     fun placeOrder(
         memberId: Long,
         request: PlaceOrderRequest,
@@ -55,6 +67,8 @@ class OrderService(
                 val message = payment.lastPaymentError?.message ?: "Payment failed"
                 throw PaymentDeclinedException("$reason: $message")
             }
+
+            applySuccessfulOrderChanges(memberId, option.id, request.quantity)
 
             PlaceOrderResponse(
                 orderStatus = payment.status.uppercase(),
