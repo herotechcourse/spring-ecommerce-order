@@ -49,5 +49,9 @@ INSERT INTO cart_items (member_id, product_id, option_id, quantity, created_at, 
 INSERT INTO cart_items (member_id, product_id, option_id, quantity, created_at, cart_id) VALUES (1, 6, 1, 1, CURRENT_TIMESTAMP - INTERVAL '6' DAY, 1);
 INSERT INTO cart_items (member_id, product_id, option_id, quantity, created_at, cart_id) VALUES (2, 6, 1, 1, CURRENT_TIMESTAMP - INTERVAL '7' DAY, 2);
 INSERT INTO cart_items (member_id, product_id, option_id, quantity, created_at, cart_id) VALUES (3, 3, 2, 1, CURRENT_TIMESTAMP - INTERVAL '8' DAY, 3);
-INSERT INTO cart_items (member_id, product_id, option_id, quantity, created_at, cart_id) VALUES (1, 1, 1, 1, CURRENT_TIMESTAMP - INTERVAL '9' DAY, 1);
+INSERT INTO cart_items (member_id, product_id, option_id, quantity, created_at, cart_id) VALUES (1, 1, 1, 100, CURRENT_TIMESTAMP - INTERVAL '9' DAY, 1);
 ;
+-- INSERT INTO orders () VALUES ();
+;
+-- INSERT INTO order_items (member_id, product_id, option_id, quantity, created_at, order_id) VALUES (1, 1, 1, 1, CURRENT_TIMESTAMP - INTERVAL '4' DAY, 1);
+-- INSERT INTO order_items (member_id, product_id, option_id, quantity, created_at, order_id) VALUES (1, 2, 1, 1, CURRENT_TIMESTAMP - INTERVAL '2' DAY, 1);

@@ -1,5 +1,6 @@
 package ecommerce.model
 
+import ecommerce.exception.InsufficientStockException
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
@@ -28,6 +29,7 @@ class Option(
     }
 
     fun subtract(quantity: Int) {
+        if (quantity > this.quantity) throw InsufficientStockException("Option quantity is not enough to take you order")
         this.quantity -= quantity
     }
 }
