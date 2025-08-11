@@ -1,7 +1,7 @@
 package ecommerce.controller
 
 import ecommerce.auth.annotation.LoginMember
-import ecommerce.dto.AuthenticatedUser
+import ecommerce.dto.AuthenticatedMember
 import ecommerce.dto.MemberStatsResponse
 import ecommerce.dto.ProductStatResponse
 import ecommerce.service.CartService
@@ -17,7 +17,7 @@ class CartAdminController(
 ) {
     @GetMapping("/top-products")
     fun getTopProducts(
-        @LoginMember member: AuthenticatedUser,
+        @LoginMember member: AuthenticatedMember,
     ): ResponseEntity<List<ProductStatResponse>> {
         val result = cartService.getTop5MostAddedProducts()
         return ResponseEntity.ok(result)
@@ -25,7 +25,7 @@ class CartAdminController(
 
     @GetMapping("/active-members")
     fun getActiveMembers(
-        @LoginMember member: AuthenticatedUser,
+        @LoginMember member: AuthenticatedMember,
     ): ResponseEntity<List<MemberStatsResponse>> {
         val result = cartService.getRecentlyActiveMembers()
         return ResponseEntity.ok(result)
