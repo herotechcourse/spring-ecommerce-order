@@ -39,7 +39,8 @@ class StripeClient(
                     .retrieve()
                     .toEntity(String::class.java)
 
-            response.body!!.toPaymentIntentResponse()
+            val responseBody = response.body ?: throw ExternalServiceException("Empty response from Stripe")
+            responseBody.toPaymentIntentResponse()
         } catch (e: RestClientResponseException) {
             val errorBody = e.responseBodyAsString
             val statusCode = e.statusCode

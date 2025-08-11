@@ -73,13 +73,22 @@ class StripeClientTest {
         val postSpec = mock(RestClient.RequestBodyUriSpec::class.java)
         val retrieveSpec = mock(RestClient.ResponseSpec::class.java)
         // Simulate Stripe returning an HTTP 500 error
+        val stripeErrorJson = """
+            {
+              "error": {
+                "message": "Card declined",
+                "type": "api_error",
+                "code": "internal_error"
+              }
+            }
+            """.trimIndent()
         val stripeError =
             RestClientResponseException(
                 "Bad Request",
                 400,
                 "Bad Request",
                 null,
-                """{"error":"Card declined"}""".toByteArray(),
+                stripeErrorJson.toByteArray(),
                 null,
             )
         `when`(restClient.post()).thenReturn(postSpec)
@@ -104,13 +113,22 @@ class StripeClientTest {
         val postSpec = mock(RestClient.RequestBodyUriSpec::class.java)
         val retrieveSpec = mock(RestClient.ResponseSpec::class.java)
         // Simulate Stripe returning an HTTP 500 error
+        val stripeErrorJson = """
+            {
+              "error": {
+                "message": "Stripe is down",
+                "type": "api_error",
+                "code": "internal_error"
+              }
+            }
+            """.trimIndent()
         val stripeError =
             RestClientResponseException(
                 "Internal Server Error",
                 500,
                 "Internal Server Error",
                 null,
-                """{"error":"Stripe is down"}""".toByteArray(),
+                stripeErrorJson.toByteArray(),
                 null,
             )
 
@@ -121,6 +139,7 @@ class StripeClientTest {
         `when`(postSpec.body(any<String>())).thenReturn(postSpec)
         `when`(postSpec.retrieve()).thenReturn(retrieveSpec)
         `when`(retrieveSpec.toEntity(String::class.java)).thenThrow(stripeError)
+
 
         assertThrows<ExternalServiceException> {
             stripeClient.createCheckoutSession(req)
