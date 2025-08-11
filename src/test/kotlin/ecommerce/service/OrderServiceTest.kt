@@ -23,7 +23,6 @@ import kotlin.jvm.optionals.getOrNull
 @Transactional
 class OrderServiceTest(
     @Autowired private val orderService: OrderService,
-    @Autowired private val orderPaymentService: OrderPaymentService,
     @Autowired private val memberRepository: MemberRepository,
     @Autowired private val cartItemRepository: CartItemRepository,
     @Autowired private val optionRepository: OptionRepository,
@@ -33,15 +32,17 @@ class OrderServiceTest(
     @Test
     fun readOrders() {
         val member = memberRepository.findAll().first()
+        val existingOrder = orderItemRepository.findAllByMember(member)
+
         val cartItemIds1 = listOf(1L)
-        val cartItemIds2 = listOf(2L)
+        val cartItemIds2 = listOf(12L)
 
         orderService.placeOrder(member.id, OrderPlaceForm(cartItemIds1))
         orderService.placeOrder(member.id, OrderPlaceForm(cartItemIds2))
 
         val orders = orderService.readOrders(member.id)
 
-        assertThat(orders).hasSize(2)
+        assertThat(orders.size - existingOrder.size).isEqualTo(2)
     }
 
     @Test
@@ -59,7 +60,7 @@ class OrderServiceTest(
     @Test
     fun `placeOrder() - return order when order processed well`() {
         val member = memberRepository.findAll().first()
-        val cartItemId = 2L
+        val cartItemId = 12L
         val cartItem = cartItemRepository.findById(cartItemId).get()
         val optionQuantityPre = cartItem.option.quantity
 

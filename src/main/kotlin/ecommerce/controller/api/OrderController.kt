@@ -1,6 +1,5 @@
 package ecommerce.controller.api
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import ecommerce.dto.OrderItemResponse
 import ecommerce.dto.OrderPlaceForm
 import ecommerce.dto.OrderResponse
@@ -26,9 +25,7 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/api/orders")
 class OrderController(
     private val orderService: OrderService,
-    private val objectMapper: ObjectMapper,
 ) {
-    // TODO: write test
     @GetMapping
     fun getOrdersByMemberId(
         @LoginMember member: Member,
@@ -37,7 +34,6 @@ class OrderController(
         return ResponseEntity.ok(orders)
     }
 
-    // TODO: write test
     @GetMapping("/{orderId}")
     fun getOrderById(
         @PathVariable orderId: Long,
@@ -47,7 +43,6 @@ class OrderController(
         return ResponseEntity.ok(order)
     }
 
-    // TODO: write test
     @PostMapping("/place")
     fun placeOrder(
         @Valid @RequestBody orderForm: OrderPlaceForm,
