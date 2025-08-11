@@ -37,6 +37,7 @@ class CartItem(
     companion object {
         fun to(cartItem: CartItem): CartItemResponse {
             return CartItemResponse(
+                itemId = cartItem.id,
                 productName = cartItem.product.name,
                 optionName = cartItem.option.name,
                 quantity = cartItem.quantity,

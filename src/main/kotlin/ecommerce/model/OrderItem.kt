@@ -32,10 +32,6 @@ class OrderItem(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0L,
 ) {
-    fun changeQuantity(quantity: Int) {
-        this.quantity += quantity
-    }
-
     companion object {
         fun from(cartItem: CartItem): OrderItem {
             return OrderItem(
@@ -48,6 +44,7 @@ class OrderItem(
 
         fun to(orderItem: OrderItem): OrderItemResponse {
             return OrderItemResponse(
+                itemId = orderItem.id,
                 productName = orderItem.product.name,
                 optionName = orderItem.option.name,
                 quantity = orderItem.quantity,
