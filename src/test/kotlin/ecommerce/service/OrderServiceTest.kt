@@ -20,6 +20,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mock
+import org.mockito.Mockito.doAnswer
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.never
 import org.mockito.Mockito.`when`
@@ -88,6 +89,11 @@ class OrderServiceTest {
         `when`(memberRepository.findById(member.id)).thenReturn(Optional.of(mock(Member::class.java)))
         `when`(cartRepository.findCartByMemberId(member.id)).thenReturn(mock(Cart::class.java))
         `when`(orderRepository.save(any())).thenReturn(savedOrder)
+        doAnswer { invocation ->
+            val order = invocation.arguments[0] as Order
+            order.setStatus(OrderStatus.PAID, "Payment successful. Order has been placed")
+            null
+        }.`when`(paymentService).processPayment(any())
 
         val response = orderService.placeOrder(req, member)
 
@@ -188,7 +194,11 @@ class OrderServiceTest {
         `when`(memberRepository.findById(member.id)).thenReturn(Optional.of(mock(Member::class.java)))
         `when`(cartRepository.findCartByMemberId(member.id)).thenReturn(null) // No cart
         `when`(orderRepository.save(any())).thenReturn(savedOrder)
-
+        doAnswer { invocation ->
+            val order = invocation.arguments[0] as Order
+            order.setStatus(OrderStatus.PAID, "Payment successful. Order has been placed")
+            null
+        }.`when`(paymentService).processPayment(any())
         val response = orderService.placeOrder(req, member)
 
         assertEquals("SUCCESS", response.status)

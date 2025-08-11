@@ -13,11 +13,9 @@ import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.verify
-import org.springframework.http.HttpStatus
-import org.springframework.http.HttpStatusCode
 import org.springframework.http.ResponseEntity
 import org.springframework.web.client.RestClient
-import java.util.function.Predicate
+import org.springframework.web.client.RestClientResponseException
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
@@ -32,7 +30,7 @@ class StripeClientTest {
 
     @Test
     fun `should return body when Stripe responds successfully`() {
-        val req = PaymentRequest(1000.0, "usd", "card")
+        val req = PaymentRequest(1000, "usd", "card")
 
         val postSpec = mock(RestClient.RequestBodyUriSpec::class.java)
         val retrieveSpec = mock(RestClient.ResponseSpec::class.java)
@@ -62,27 +60,27 @@ class StripeClientTest {
 
     @Test
     fun `should throw BadRequestException when CardException occurs`() {
-        val req = PaymentRequest(1000.0, "usd", "card")
+        val req = PaymentRequest(1000, "usd", "card")
 
         val postSpec = mock(RestClient.RequestBodyUriSpec::class.java)
         val retrieveSpec = mock(RestClient.ResponseSpec::class.java)
-
+        // Simulate Stripe returning an HTTP 500 error
+        val stripeError =
+            RestClientResponseException(
+                "Bad Request",
+                400,
+                "Bad Request",
+                null,
+                """{"error":"Card declined"}""".toByteArray(),
+                null,
+            )
         `when`(restClient.post()).thenReturn(postSpec)
         `when`(postSpec.uri(anyString())).thenReturn(postSpec)
         `when`(postSpec.header(anyString(), anyString())).thenReturn(postSpec)
         `when`(postSpec.contentType(any())).thenReturn(postSpec)
         `when`(postSpec.body(any<String>())).thenReturn(postSpec)
         `when`(postSpec.retrieve()).thenReturn(retrieveSpec)
-        `when`(retrieveSpec.onStatus(any(), any())).thenAnswer { invocation ->
-            val predicate = invocation.arguments[0] as Predicate<HttpStatusCode>
-            val errorHandler = invocation.arguments[1] as RestClient.ResponseSpec.ErrorHandler
-
-            if (predicate.test(HttpStatus.UNAUTHORIZED)) {
-                throw BadRequestException("Card declined: simulated error")
-            }
-
-            retrieveSpec
-        }
+        `when`(retrieveSpec.toEntity(String::class.java)).thenThrow(stripeError)
 
         val ex =
             assertThrows<BadRequestException> {
@@ -93,10 +91,20 @@ class StripeClientTest {
 
     @Test
     fun `should throw RuntimeException when generic StripeException occurs`() {
-        val req = PaymentRequest(1000.0, "usd", "card")
+        val req = PaymentRequest(1000, "usd", "card")
 
         val postSpec = mock(RestClient.RequestBodyUriSpec::class.java)
         val retrieveSpec = mock(RestClient.ResponseSpec::class.java)
+        // Simulate Stripe returning an HTTP 500 error
+        val stripeError =
+            RestClientResponseException(
+                "Internal Server Error",
+                500,
+                "Internal Server Error",
+                null,
+                """{"error":"Stripe is down"}""".toByteArray(),
+                null,
+            )
 
         `when`(restClient.post()).thenReturn(postSpec)
         `when`(postSpec.uri(anyString())).thenReturn(postSpec)
@@ -104,16 +112,7 @@ class StripeClientTest {
         `when`(postSpec.contentType(any())).thenReturn(postSpec)
         `when`(postSpec.body(any<String>())).thenReturn(postSpec)
         `when`(postSpec.retrieve()).thenReturn(retrieveSpec)
-        `when`(retrieveSpec.onStatus(any(), any())).thenAnswer { invocation ->
-            val predicate = invocation.arguments[0] as Predicate<HttpStatusCode>
-            val errorHandler = invocation.arguments[1] as RestClient.ResponseSpec.ErrorHandler
-
-            if (predicate.test(HttpStatus.UNAUTHORIZED)) {
-                throw ExternalServiceException("Service unreachable")
-            }
-
-            retrieveSpec
-        }
+        `when`(retrieveSpec.toEntity(String::class.java)).thenThrow(stripeError)
 
         assertThrows<ExternalServiceException> {
             stripeClient.createCheckoutSession(req)

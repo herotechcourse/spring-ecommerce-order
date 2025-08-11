@@ -1,7 +1,7 @@
 package ecommerce.controller
 
 import ecommerce.dto.OrderPlacementRequest
-import ecommerce.dto.RegisteredMember
+import ecommerce.dto.OrderResponseStatus
 import ecommerce.dto.Role
 import ecommerce.dto.TokenRequest
 import ecommerce.model.Cart
@@ -16,7 +16,6 @@ import ecommerce.repository.OptionRepository
 import ecommerce.repository.OrderItemRepository
 import ecommerce.repository.OrderRepository
 import ecommerce.repository.ProductRepository
-import ecommerce.service.OrderService
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
 import org.assertj.core.api.Assertions.assertThat
@@ -60,52 +59,52 @@ class OrderE2ETest() {
 
     lateinit var optionS: Option
     lateinit var optionM: Option
-    lateinit var coffee: Product
+    lateinit var product: Product
     lateinit var member: Member
     lateinit var loginToken: String
 
     @BeforeEach
-    fun setUp()  {
-        member = memberRepository.save(Member(
-            name = "user",
-            email = "user@mail.com",
-            password = "abcd1234",
-            role = Role.USER.name,
-        ))
+    fun setUp() {
+        member =
+            memberRepository.save(
+                Member(
+                    name = "user",
+                    email = "user@mail.com",
+                    password = "abcd1234",
+                    role = Role.USER.name,
+                ),
+            )
         loginToken = loginAs(member.email, member.password)
 
-        optionS = optionRepository.save(Option(
-            name = "S",
-            quantity = 2,
-        ))
+        val coffee =
+            Product(
+                name = "coffee",
+                price = 3.6,
+                imageUrl = "https://coffee.com",
+            )
 
-        optionM = optionRepository.save(Option(
-            name = "M",
-            quantity = 3,
-        ))
+        val s = Option(name = "S", quantity = 2)
+        val m = Option(name = "M", quantity = 3)
 
-        coffee = productRepository.save(Product(
-            name = "coffee",
-            price = 3.6,
-            imageUrl = "https://coffee.com",
-        ))
-        coffee.addOption(optionS)
-        coffee.addOption(optionM)
-        productRepository.save(coffee)
+        coffee.addOption(s) // sets option.product = coffee
+        coffee.addOption(m)
 
-        val cart = cartRepository.save(Cart(
-            member = member
-        ))
-
-        val cartItem = cartItemRepository.save(CartItem(coffee, cart, 2))
+        product = productRepository.save(coffee) // cascade saves options too
+        optionS = product.options[0]
+        optionM = product.options[1]
+        val cart = cartRepository.save(Cart(member = member))
+        cartItemRepository.save(CartItem(coffee, cart, 2))
     }
 
     @AfterEach
     fun tearDown() {
         cartItemRepository.deleteAll()
         cartRepository.deleteAll()
+        orderRepository.deleteAll()
+        orderItemRepository.deleteAll()
         memberRepository.deleteAll()
         productRepository.deleteAll()
+        optionRepository.deleteAll()
     }
 
     private fun loginAs(
@@ -130,45 +129,42 @@ class OrderE2ETest() {
     @ParameterizedTest
     @ValueSource(strings = ["pm_card_visa", "pm_card_amex", "pm_card_mastercard", "pm_card_discover"])
     fun `test valid payment methods`(method: String) {
-        val req = OrderPlacementRequest(
-            productOptionId = optionS.id,
-            quantity = 1,
-            paymentMethod = method,
-        )
+        val req =
+            OrderPlacementRequest(
+                productOptionId = optionS.id,
+                quantity = 1,
+                paymentMethod = method,
+            )
 
-        val response = RestAssured
-            .given()
-            .baseUri(baseUrl)
-            .header("Authorization", "Bearer $loginToken")
-            .body(req).contentType(ContentType.JSON)
-            .`when`()
-            .post("/api/orders/placement")
-            .then().log().all()
-            .extract()
+        val response =
+            RestAssured
+                .given()
+                .baseUri(baseUrl)
+                .header("Authorization", "Bearer $loginToken")
+                .body(req).contentType(ContentType.JSON)
+                .`when`()
+                .post("/api/orders/place")
+                .then().log().all()
+                .extract()
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value())
-        assertThat(response.body().jsonPath().getString("status")).isEqualTo("success")
+        assertThat(response.body().jsonPath().getString("status")).isEqualTo(OrderResponseStatus.SUCCESS.name)
         assertThat(response.body().jsonPath().getString("message")).isEqualTo("Payment successful. Order has been placed")
     }
 
     @Test
     fun `test invalid payment methods`() {
-
     }
 
     @Test
     fun `test retrieving all orders for user`() {
-
     }
 
     @Test
     fun `test unavailable stock`() {
-
     }
 
     @Test
     fun `test empty cart after successful order of the option inside the cart`() {
-
     }
-
 }
