@@ -1,7 +1,6 @@
 package ecommerce.controller.api
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.jsonMapper
 import ecommerce.dto.OrderItemResponse
 import ecommerce.dto.OrderPlaceForm
 import ecommerce.dto.OrderResponse
@@ -75,7 +74,7 @@ class OrderController(
         return ResponseEntity.badRequest().body(errorBody)
     }
 
-    @ExceptionHandler(IllegalArgumentException::class)
+    @ExceptionHandler(PaymentFailedException::class)
     fun handlePaymentFailedException(e: Exception): ResponseEntity<Map<String, Any>> {
         val error = mapOf("payment" to e.message)
         val errorBody = mapOf("errors" to error)
