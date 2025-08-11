@@ -2,10 +2,9 @@
 set -euo pipefail
 
 
-APP_NAME="spring-ecommerce"                            # just for display
-JAR_SOURCE=${1:-"build/libs/${APP_NAME}-0.0.1-SNAPSHOT.jar"}  # path to jar you want to deploy
-DEPLOY_DIR="/home/ubuntu/app"                          # target directory on the server
-
+APP_NAME="spring-ecommerce"
+JAR_SOURCE=${1:-"build/libs/${APP_NAME}-0.0.1-SNAPSHOT.jar"}
+DEPLOY_DIR="/home/ubuntu/app"
 
 JAR_NAME="$(basename "$JAR_SOURCE")"
 TARGET="${DEPLOY_DIR}/${JAR_NAME}"
@@ -21,14 +20,12 @@ if pgrep -f "$JAR_NAME" >/dev/null 2>&1; then
   sleep 5
 fi
 
-# Copy new jar
+
 echo "[deploy] Copying jar to ${TARGET}"
 cp "$JAR_SOURCE" "$TARGET"
 
-# Start new process
 echo "[deploy] Starting ${JAR_NAME}"
 cd "$DEPLOY_DIR"
-
 
 nohup java -jar "$TARGET" \
   --spring.profiles.active=prod \
