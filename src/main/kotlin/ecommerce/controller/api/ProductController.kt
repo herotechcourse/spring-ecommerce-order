@@ -52,9 +52,10 @@ class ProductController(private val productService: ProductService) {
     @GetMapping("{id}")
     fun getProduct(
         @PathVariable id: Long,
-    ): ResponseEntity<Product> {
+    ): ResponseEntity<ProductResponse> {
         val product = productService.findById(id)
-        return ResponseEntity.ok(product)
+        val productResponse = ProductResponse(product.id, product.name, product.price, product.imageUrl)
+        return ResponseEntity.ok(productResponse)
     }
 
     @GetMapping("{id}/options")

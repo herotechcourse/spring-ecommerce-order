@@ -37,16 +37,17 @@
 </main>
 </body>
 <script>
-    async function fetchProducts() {
+    async function fetchProducts(page = 0, size = 10) {
         try {
-            const response = await fetch('/api/products');
+            const response = await fetch(`/api/products?page=${`page`}&size=${size}`);
             if (!response.ok) throw new Error('Network response was not ok');
 
-            const products = await response.json();
+            const data = await response.json();
             const tableBody = document.getElementById('product-table-body');
             tableBody.innerHTML = ''; // Clear any existing rows
 
-            products.forEach(product => {
+            const items = data.content
+            items.forEach(product => {
                 const row = document.createElement('tr');
 
                 row.innerHTML = `
