@@ -1,7 +1,5 @@
 package ecommerce.client
 
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import ecommerce.config.StripeProperties
 import ecommerce.dto.PaymentIntentResponse
 import ecommerce.dto.PaymentRequest

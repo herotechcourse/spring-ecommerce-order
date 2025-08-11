@@ -26,7 +26,6 @@ class PaymentService(
         } catch (e: ExternalServiceException) {
             throw e
         } catch (e: Exception) {
-            // TODO: retry payment??
             throw RuntimeException(e)
         }
     }
@@ -38,8 +37,7 @@ class PaymentService(
             order.checkoutSessionId = createPaymentIntent(request).id
             order.setStatus(OrderStatus.PAID, "Payment successful. Order has been placed")
         } catch (e: Exception) {
-            order.setStatus(OrderStatus.FAILED, "Payment failed. Reason: ${e.message?.take(100)}")
-            // TODO: remove take(100) and find a way to display a nice error message coming from Stripe
+            order.setStatus(OrderStatus.FAILED, "Payment failed. Reason: ${e.message}")
         }
     }
 
