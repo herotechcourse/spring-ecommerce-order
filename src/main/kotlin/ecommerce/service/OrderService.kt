@@ -85,5 +85,17 @@ class OrderService(
 
     @Transactional
     fun markOrderAsPaid(paymentIntentId: String) {
+        val payment = paymentRepository.findByStripePaymentIntentId(paymentIntentId)
+            ?: throw NoSuchElementException("Payment not found for paymentIntentId $paymentIntentId")
+
+        payment.status = "PAID"
+        paymentRepository.save(payment)
+
+        val order = payment.order ?: throw IllegalStateException("Order for payment is null")
+
+        if(payment.status == "PAID") {
+            order.status = "PAID"
+        }
+        orderRepository.save(order)
     }
 }

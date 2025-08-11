@@ -17,8 +17,14 @@ class OrderController(private val orderService: OrderService) {
         @LoginMember member: MemberResponse,
         @RequestParam productOptionId: Long,
         @RequestParam amount: Int,
-    ): ResponseEntity<Void> {
+    ): ResponseEntity<String> {
         orderService.createOrder(member.id, productOptionId, amount)
-        return ResponseEntity.ok().build()
+        return ResponseEntity.ok("Order created successfully")
+    }
+
+    @PostMapping("/mark-paid")
+    fun markOrderAsPaid(@RequestParam paymentIntentId: String): ResponseEntity<String> {
+        orderService.markOrderAsPaid(paymentIntentId)
+        return ResponseEntity.ok("Order marked as paid")
     }
 }

@@ -56,6 +56,24 @@ class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error)
     }
 
+    @ExceptionHandler(PaymentFailedException::class)
+    fun handlePaymentFailed(ex: PaymentFailedException): ResponseEntity<Map<String, String>> {
+        val errorResponse = mapOf("error" to ex.message.orEmpty())
+        return ResponseEntity.status(HttpStatus.PAYMENT_REQUIRED).body(errorResponse)
+    }
+
+    @ExceptionHandler(OrderCreationException::class)
+    fun handleOrderCreationFailed(ex: OrderCreationException): ResponseEntity<Map<String, String>> {
+        val errorResponse = mapOf("error" to ex.message.orEmpty())
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse)
+    }
+
+    @ExceptionHandler(NoSuchElementException::class)
+    fun handleNotFound(ex: NoSuchElementException): ResponseEntity<Map<String, String>> {
+        val errorResponse = mapOf("error" to ex.message.orEmpty())
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse)
+    }
+
     data class ErrorResponse(
         val status: Int,
         val message: String,
