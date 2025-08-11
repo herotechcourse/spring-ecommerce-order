@@ -41,12 +41,12 @@ class GlobalExceptionHandler {
         val error =
             ErrorResponse(
                 message = "Validation failed",
-                errors = listOf(FieldError(ex.field, ex.message ?: "Invalid value")),
+                errors = listOf(FieldError(ex.field, ex.message)),
             )
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error)
     }
 
-    // ---- Payments (Step 2.1) ----
+    // (Step 2.1)
 
     @ExceptionHandler(PaymentDeclinedException::class)
     fun handleDeclined(ex: PaymentDeclinedException): ResponseEntity<ErrorResponse> {

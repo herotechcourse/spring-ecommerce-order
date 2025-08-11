@@ -22,6 +22,7 @@ class CartPaginationTest
     ) {
         private lateinit var member: Member
         private lateinit var product: Product
+        private lateinit var option: Option
 
         @BeforeEach
         fun setUp() {
@@ -39,7 +40,7 @@ class CartPaginationTest
                 )
             val savedProduct = productRepository.save(baseProduct)
 
-            val option =
+            val initialOption =
                 Option(
                     name = "PaginatedOption",
                     quantity = 1,
@@ -50,13 +51,23 @@ class CartPaginationTest
                     name = savedProduct.name,
                     price = savedProduct.price,
                     imageUrl = savedProduct.imageUrl,
-                    options = listOf(option),
+                    options = listOf(initialOption),
                     id = savedProduct.id,
                 )
             product = productRepository.save(productWithOption)
 
+            option = productRepository.findById(product.id).get().options.first()
+
             val now = LocalDateTime.now()
-            cartRepository.save(Cart(member = member, product = product, createdAt = now))
+            cartRepository.save(
+                Cart(
+                    member = member,
+                    product = product,
+                    option = option,
+                    quantity = 1,
+                    createdAt = now,
+                ),
+            )
         }
 
         @Test

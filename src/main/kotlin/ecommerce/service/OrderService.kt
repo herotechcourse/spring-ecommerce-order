@@ -22,14 +22,19 @@ class OrderService(
     private val cartRepository: CartJpaRepository,
 ) {
     @Transactional
-    private fun applySuccessfulOrderChanges(memberId: Long, optionId: Long, quantity: Int) {
-        val option = optionRepository.findById(optionId)
-            .orElseThrow { IllegalArgumentException("Option not found: $optionId") }
+    private fun applySuccessfulOrderChanges(
+        memberId: Long,
+        optionId: Long,
+        quantity: Int,
+    ) {
+        val option =
+            optionRepository.findById(optionId)
+                .orElseThrow { IllegalArgumentException("Option not found: $optionId") }
 
         option.subtract(quantity)
         optionRepository.save(option)
 
-        cartRepository.deleteByMemberIdAndProductId(memberId, option.product!!.id)
+        cartRepository.deleteByMemberIdAndOptionId(memberId, optionId)
     }
 
     fun placeOrder(

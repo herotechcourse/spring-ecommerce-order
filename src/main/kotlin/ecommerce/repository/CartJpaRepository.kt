@@ -19,4 +19,14 @@ interface CartJpaRepository : JpaRepository<Cart, Long> {
         memberId: Long,
         productId: Long,
     )
+
+    fun deleteByMemberIdAndOptionId(
+        memberId: Long,
+        optionId: Long,
+    ): Long
+
+    fun findByMemberIdAndOptionId(
+        memberId: Long,
+        optionId: Long,
+    ): Cart?
 }

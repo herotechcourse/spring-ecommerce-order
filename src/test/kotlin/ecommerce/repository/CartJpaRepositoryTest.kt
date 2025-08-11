@@ -21,6 +21,7 @@ class CartJpaRepositoryTest
     ) {
         private lateinit var member: Member
         private lateinit var product: Product
+        private lateinit var option: Option
 
         @BeforeEach
         fun setup() {
@@ -38,25 +39,35 @@ class CartJpaRepositoryTest
                 )
             val savedProduct = productRepository.save(baseProduct)
 
-            val option =
+            val initialOption =
                 Option(
                     name = "Standard",
                     quantity = 1,
                     product = savedProduct,
                 )
+
             val productWithOption =
                 Product(
                     name = savedProduct.name,
                     price = savedProduct.price,
                     imageUrl = savedProduct.imageUrl,
-                    options = listOf(option),
-                    id = savedProduct.id,
+                    options = listOf(initialOption),
+                    id = savedProduct.id, // keep same id
                 )
-
             product = productRepository.save(productWithOption)
 
+            option = productRepository.findById(product.id).get().options.first()
+
             val now = LocalDateTime.now()
-            cartRepository.save(Cart(member = member, product = product, createdAt = now))
+            cartRepository.save(
+                Cart(
+                    member = member,
+                    product = product,
+                    option = option,
+                    quantity = 1,
+                    createdAt = now,
+                ),
+            )
         }
 
         @Test

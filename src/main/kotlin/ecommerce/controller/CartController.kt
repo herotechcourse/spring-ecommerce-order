@@ -8,6 +8,7 @@ import ecommerce.service.CartService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -35,12 +36,12 @@ class CartController(
         return ResponseEntity.ok(cartItems)
     }
 
-    @DeleteMapping
+    @DeleteMapping("/{optionId}")
     fun removeFromCart(
-        @RequestBody request: CartRequest,
+        @PathVariable optionId: Long,
         @LoginMember member: Member,
     ): ResponseEntity<Unit> {
-        cartService.removeFromCart(member.id, request.productId)
+        cartService.removeFromCart(member.id, optionId)
         return ResponseEntity.noContent().build()
     }
 }
