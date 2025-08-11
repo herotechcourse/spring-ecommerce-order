@@ -39,6 +39,21 @@
         - [x] has property `checkoutSessionId` (issued by Stripe)
         - [x] has property `paymentAmount`
         - other payment fields can be stored **optionally** in DB
+6. Set up the Deployment
+    - [x] write a shell script to automate **deployment** process
+        - [x] `start.sh` to auto kill and start new application
+        - [x] `_deploy.sh` to build and upload the build to remote instance, and execute `start.sh` in remote
+    - [ ] handle security issue when interacting with the client API
+        - [x] resole CORS (Cross-Origin Resource Sharing)
+            - [x] Allow all origins
+            - [x] Allow "simple" methods `GET`, `HEAD`, and `POST`
+            - [x] Allow all headers
+            - [x] set max age to 1800 seconds (30 minutes)
+        - [ ] login user
+        - [ ] login session 
+        - [ ] admin user
+        - [ ] admin control
+    - [ ] (optional) set up HTTPS
 
 ### Step 1
 
