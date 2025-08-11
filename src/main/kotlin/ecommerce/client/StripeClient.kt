@@ -5,10 +5,10 @@ import ecommerce.dto.PaymentRequest
 import ecommerce.exception.BadRequestException
 import ecommerce.exception.ExternalServiceException
 import org.springframework.http.HttpHeaders
-import org.springframework.http.HttpStatusCode
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
+import org.springframework.web.client.RestClientResponseException
 
 @Component
 class StripeClient(
@@ -34,28 +34,24 @@ class StripeClient(
                     .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                     .body(body)
                     .retrieve()
-                    .onStatus(HttpStatusCode::is4xxClientError) { response, errorBody ->
-                        throw BadRequestException("An error occurred during payment: $errorBody")
-                    }
-                    .onStatus(HttpStatusCode::is5xxServerError) { response, errorBody ->
-                        throw ExternalServiceException("Stripe down: $errorBody")
-                    }
+//                    .onStatus(HttpStatusCode::is4xxClientError) { response, errorBody ->
+//                        throw BadRequestException("An error occurred during payment: ${errorBody.body}")
+//                    }
+//                    .onStatus(HttpStatusCode::is5xxServerError) { response, errorBody ->
+//                        throw ExternalServiceException("Stripe down: $errorBody")
+//                    }
                     .toEntity(String::class.java)
 
             response.body
-            // TODO: remove if sure
-//        } catch (stripeException: StripeException) {
-//            if (stripeException is CardException) {
-//                throw BadRequestException("${stripeException.code}: ${stripeException.message}")
-//            } else {
-//                throw RuntimeException("Stripe error: ${stripeException.code}", stripeException)
-//            }
-        } catch (e: BadRequestException) {
-            throw e
-        } catch (e: ExternalServiceException) {
-            throw e
-        } catch (e: Exception) {
-            throw kotlin.IllegalArgumentException("Unexpected error: ${e.message}")
+        } catch (e: RestClientResponseException) {
+            val errorBody = e.responseBodyAsString
+            val statusCode = e.statusCode
+
+            throw when {
+                statusCode.is4xxClientError -> BadRequestException("An error occurred during payment: $errorBody")
+                statusCode.is5xxServerError -> ExternalServiceException("Stripe down: $errorBody")
+                else -> IllegalArgumentException("Unexpected error: ${e.message}")
+            }
         }
     }
 }
