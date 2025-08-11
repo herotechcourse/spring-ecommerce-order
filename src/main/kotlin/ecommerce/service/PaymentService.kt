@@ -1,7 +1,7 @@
 package ecommerce.service
 
 import ecommerce.client.StripeClient
-import ecommerce.dto.PaymentIntentIdResponse
+import ecommerce.dto.PaymentIntentResponse
 import ecommerce.dto.PaymentRequest
 import ecommerce.exception.BadRequestException
 import ecommerce.exception.ExternalServiceException
@@ -17,7 +17,7 @@ class PaymentService(
     private val orderRepository: OrderRepository,
 ) {
     @Transactional
-    fun createPaymentIntent(req: PaymentRequest): PaymentIntentIdResponse {
+    fun createPaymentIntent(req: PaymentRequest): PaymentIntentResponse {
         try {
             val response = stripeClient.createCheckoutSession(req)
             return response

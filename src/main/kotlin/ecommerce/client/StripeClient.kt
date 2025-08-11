@@ -3,9 +3,10 @@ package ecommerce.client
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import ecommerce.config.StripeProperties
-import ecommerce.dto.PaymentIntentIdResponse
+import ecommerce.dto.PaymentIntentResponse
 import ecommerce.dto.PaymentRequest
-import ecommerce.dto.toPaymentIntentIdResponse
+import ecommerce.dto.mapStringToStripeErrorResponse
+import ecommerce.dto.toPaymentIntentResponse
 import ecommerce.exception.BadRequestException
 import ecommerce.exception.ExternalServiceException
 import org.springframework.http.HttpHeaders
@@ -19,7 +20,7 @@ class StripeClient(
     private val stripeProperties: StripeProperties,
     private val restClient: RestClient,
 ) {
-    fun createCheckoutSession(req: PaymentRequest): PaymentIntentIdResponse {
+    fun createCheckoutSession(req: PaymentRequest): PaymentIntentResponse {
         val body =
             listOf(
                 "amount=${req.amount}",
@@ -40,23 +41,18 @@ class StripeClient(
                     .retrieve()
                     .toEntity(String::class.java)
 
-            extractPaymentIntentIdFromStripeResponse(response.body!!)
+            response.body!!.toPaymentIntentResponse()
         } catch (e: RestClientResponseException) {
             val errorBody = e.responseBodyAsString
             val statusCode = e.statusCode
 
+            val stripeError = mapStringToStripeErrorResponse(errorBody)
+
             throw when {
-                statusCode.is4xxClientError -> BadRequestException("An error occurred during payment: $errorBody")
-                statusCode.is5xxServerError -> ExternalServiceException("Stripe down: $errorBody")
+                statusCode.is4xxClientError -> BadRequestException("An error occurred during payment: ${stripeError.error.message}")
+                statusCode.is5xxServerError -> ExternalServiceException("Stripe down: ${stripeError.error.message}")
                 else -> IllegalArgumentException("Unexpected error: ${e.message}")
             }
         }
-    }
-
-    private fun extractPaymentIntentIdFromStripeResponse(responseBody: String): PaymentIntentIdResponse {
-        val mapper = jacksonObjectMapper()
-        val rootNode: JsonNode = mapper.readTree(responseBody)
-        val id = rootNode["id"].asText()
-        return id.toPaymentIntentIdResponse()
     }
 }

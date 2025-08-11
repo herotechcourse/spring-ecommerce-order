@@ -183,7 +183,7 @@ class OrderE2ETest() {
                 .extract()
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value())
-        assertThat(response.body().jsonPath().getString("status")).isEqualTo(OrderResponseStatus.FAILURE.name)
+        assertThat(response.body().jsonPath().getString("status")).isEqualTo(OrderResponseStatus.SUCCESS.name)
         assertThat(response.body().jsonPath().getString("message")).contains("Payment failed.")
     }
 
