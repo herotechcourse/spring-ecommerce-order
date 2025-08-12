@@ -39,7 +39,7 @@ class OrderService(
         val member = findMember(loginMember)
         val cart = cartRepository.findCartByMemberId(loginMember.id)
 
-        val totalAmount = (option.product.price * req.quantity * 100).toInt() // TODO: move to domain
+        val totalAmount = option.totalPriceInCents(req.quantity)
         val order = createPendingOrder(req, option, member, totalAmount)
 
         paymentService.processPayment(order)
