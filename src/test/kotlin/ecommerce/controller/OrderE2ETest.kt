@@ -93,7 +93,7 @@ class OrderE2ETest() {
         optionS = product.options[0]
         optionM = product.options[1]
         cart = cartRepository.save(Cart(member = member))
-        cart.addItem(product, 2)
+        cart.addItem(optionS, 2)
         cartItemRepository.save(cart.items[0])
         cartRepository.save(cart)
     }

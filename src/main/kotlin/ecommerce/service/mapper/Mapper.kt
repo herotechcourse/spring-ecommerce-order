@@ -20,10 +20,12 @@ object CartItemMapper {
     fun toResponse(cartItem: CartItem) =
         CartItemResponse(
             quantity = cartItem.quantity,
-            productId = cartItem.product.id ?: 0,
-            productName = cartItem.product.name,
-            productPrice = cartItem.product.price,
-            productImageUrl = cartItem.product.imageUrl,
+            productId = cartItem.option.id,
+            productName = cartItem.option.name,
+            productPrice = cartItem.option.product.price,
+            productImageUrl = cartItem.option.product.imageUrl,
+            optionId = cartItem.option.id,
+            optionName = cartItem.option.name,
         )
 
     fun toPagedResponse(productPage: PageImpl<CartItemResponse>) =

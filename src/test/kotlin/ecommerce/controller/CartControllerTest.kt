@@ -11,6 +11,7 @@ import ecommerce.infrastructure.JwtTokenProvider
 import ecommerce.model.Cart
 import ecommerce.model.CartItem
 import ecommerce.model.Member
+import ecommerce.model.Option
 import ecommerce.model.Product
 import ecommerce.service.AuthService
 import ecommerce.service.CartService
@@ -117,9 +118,22 @@ class CartControllerTest
                     role = Role.USER.name,
                 )
 
+            val mockProduct =
+                Product(
+                    name = "Test Coffee",
+                    price = 3.60,
+                    imageUrl = "https://example.com/image.jpg",
+                    id = 55L,
+                )
+
+            val mockOption =
+                Option("Who Hate Test", 9, 101L).apply {
+                    product = mockProduct
+                }
+
             val mockCartItem =
                 CartItem(
-                    product = Product("Who Hate Test", 9999.99, "https://example.com/who_hate_test.jpg", 101L),
+                    option = mockOption,
                     cart = Cart(member = memberGuri),
                     quantity = 2,
                     createdAt = LocalDateTime.now(),
@@ -137,7 +151,7 @@ class CartControllerTest
                 requestAttr("email", "guri@email.com")
             }
                 .andExpect { status { isOk() } }
-            jsonPath("$.productId").value(101)
+            jsonPath("$.optionId").value(101)
             jsonPath("$.quantity").value(2)
         }
 
@@ -160,13 +174,14 @@ class CartControllerTest
                 )
 
             val product = Product("Lonely Dog Walk", 1000.0, "https://dog-walking-alone-not-funny-sometime.com", 102L)
-            val request = CartItemRequest(productId = product.id!!, quantity = 2)
+            val option = Option("S", 3, 102L).apply { this.product = product }
+            val request = CartItemRequest(optionId = option.id, quantity = 2)
             val cart =
                 Cart(
                     id = 1L,
                     member = memberGuri,
                 )
-            val mockCartItem = CartItem(product = product, cart = cart, quantity = 2, id = 1L)
+            val mockCartItem = CartItem(option = option, cart = cart, quantity = 2, id = 1L)
 
             whenever(cartService.addItem(registeredMember.id, request)).thenReturn(mockCartItem)
             whenever(cartService.addItem(eq(1L), any())).thenReturn(mockCartItem)
@@ -177,7 +192,7 @@ class CartControllerTest
             }
                 .andExpect {
                     status { isCreated() }
-                    jsonPath("$.productId").value(102)
+                    jsonPath("$.optionId").value(102)
                     jsonPath("$.quantity").value(2)
                 }
         }
@@ -185,7 +200,7 @@ class CartControllerTest
         @Test
         fun `should delete item from cart`() {
             val member = RegisteredMember(id = 1L, email = "guri@email.com", role = Role.USER)
-            val request = CartItemRequest(productId = 101L, quantity = 1)
+            val request = CartItemRequest(optionId = 101L, quantity = 1)
 
             doNothing().whenever(cartService).deleteItem(member.id, request)
 
@@ -208,10 +223,22 @@ class CartControllerTest
                     password = "very_cute_dog",
                     role = Role.USER.name,
                 )
+            val mockProduct =
+                Product(
+                    name = "Test Coffee",
+                    price = 3.60,
+                    imageUrl = "https://example.com/image.jpg",
+                    id = 55L,
+                )
+
+            val mockOption =
+                Option("Who Hate Test", 9, 101L).apply {
+                    product = mockProduct
+                }
 
             val mockCartItem =
                 CartItem(
-                    product = Product("Who Hate Test", 9999.99, "https://example.com/who_hate_test.jpg", 101L),
+                    option = mockOption,
                     cart = Cart(member = memberGuri),
                     quantity = 2,
                     createdAt = LocalDateTime.now(),
@@ -232,7 +259,7 @@ class CartControllerTest
                 requestAttr("email", "guri@email.com")
             }
                 .andExpect { status { isOk() } }
-            jsonPath("$.productId").value(101)
+            jsonPath("$.optionId").value(101)
             jsonPath("$.quantity").value(2)
             jsonPath("$.totalPages").value(2)
             jsonPath("$.totalElements").value(20)

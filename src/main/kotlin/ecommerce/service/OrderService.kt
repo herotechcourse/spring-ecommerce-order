@@ -100,7 +100,7 @@ class OrderService(
         quantity: Int,
     ) {
         try {
-            cart?.removeItem(option.product, quantity)
+            cart?.removeItem(option, quantity)
         } catch (e: Exception) {
         }
         option.decreaseQuantity(quantity)

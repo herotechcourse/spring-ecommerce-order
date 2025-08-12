@@ -14,7 +14,7 @@ import java.time.LocalDateTime
 /**
  * Table cart_items {
  *   cart_id bigint [ref: > carts.id]
- *   product_id bigint [ref: > products.id]
+ *   option_id bigint [ref: > options.id]
  *   quantity int [default: 1]
  *   created_at timestamp [default: current_timestamp]
  *   id bigint [pk, increment]
@@ -25,9 +25,9 @@ import java.time.LocalDateTime
 @Entity
 @Table(name = "cart_items")
 class CartItem(
-    @JoinColumn(name = "product_id", nullable = false)
+    @JoinColumn(name = "option_id", nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
-    var product: Product,
+    var option: Option,
     @JoinColumn(name = "cart_id", nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
     var cart: Cart,

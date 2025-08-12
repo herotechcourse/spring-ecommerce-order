@@ -47,6 +47,6 @@ class Option(
     }
 
     companion object {
-        val allowedSpecialChars = setOf('(', ')', '[', ']', '+', '-', '&', '/', '_')
+        val allowedSpecialChars = setOf('(', ')', '[', ']', '+', '-', '&', '/', '_', ' ')
     }
 }
