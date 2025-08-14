@@ -2,7 +2,7 @@ package ecommerce.e2e
 
 import ecommerce.dto.CartItemRequest
 import ecommerce.dto.RegistrationRequest
-import ecommerce.dto.enum.CartHistoryStatus
+import ecommerce.enum.CartHistoryStatus
 import ecommerce.repository.CartHistoryJpaRepository
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
@@ -15,9 +15,11 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpStatus
 import org.springframework.test.annotation.DirtiesContext
+import org.springframework.test.context.ActiveProfiles
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD) // changed this cause double regist
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@ActiveProfiles("test")
 class CartControllerTest {
     lateinit var token: String
 
@@ -45,7 +47,7 @@ class CartControllerTest {
     fun addToCart() {
         val productToCart =
             CartItemRequest(
-                productId = 1,
+                optionId = 1,
                 quantity = 2,
             )
 
@@ -68,7 +70,7 @@ class CartControllerTest {
     fun `update quantity if product already in cart`() {
         val productToCart =
             CartItemRequest(
-                productId = 1,
+                optionId = 1,
                 quantity = 2,
             )
 
@@ -82,8 +84,8 @@ class CartControllerTest {
 
         val newProduct =
             CartItemRequest(
-                productId = 1,
-                quantity = 10,
+                optionId = 1,
+                quantity = 4,
             )
 
         val response =
@@ -97,7 +99,7 @@ class CartControllerTest {
 
         Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value())
         val json = JSONObject(response.asString())
-        assertThat(json.get("quantity")).isEqualTo(10)
+        assertThat(json.get("quantity")).isEqualTo(4)
     }
 
     @Test
@@ -133,13 +135,11 @@ class CartControllerTest {
         val jsonObjectBefore = JSONObject(getResponse.asString())
         assertThat(jsonObjectBefore.get("totalElements")).isEqualTo(1)
 
-        val cartItemId = getResponse.body().jsonPath().getLong("content[0].productId")
-
         val deleteResponse =
             RestAssured.given().log().all()
                 .auth().oauth2(token)
                 .accept(ContentType.JSON)
-                .`when`().delete("/api/user/wishes/$cartItemId")
+                .`when`().delete("/api/user/wishes/1")
                 .then().log().all().extract()
 
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value())
@@ -160,7 +160,7 @@ class CartControllerTest {
     fun `when product added to cart should add a new cart history element in the table`() {
         val productToCart =
             CartItemRequest(
-                productId = 1,
+                optionId = 1,
                 quantity = 2,
             )
 
@@ -176,7 +176,7 @@ class CartControllerTest {
         Assertions.assertThat(addProduct.statusCode()).isEqualTo(HttpStatus.OK.value())
         val historyEntries = cartHistoryJpaRepository.findAll()
         Assertions.assertThat(historyEntries).anySatisfy {
-            Assertions.assertThat(it.product.id).isEqualTo(productToCart.productId)
+            Assertions.assertThat(it.option.id).isEqualTo(productToCart.optionId)
             Assertions.assertThat(it.quantity).isEqualTo(productToCart.quantity)
             Assertions.assertThat(it.status).isEqualTo(CartHistoryStatus.ADDED)
         }

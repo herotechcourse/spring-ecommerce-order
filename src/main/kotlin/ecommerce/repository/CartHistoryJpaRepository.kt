@@ -12,14 +12,14 @@ interface CartHistoryJpaRepository : JpaRepository<CartHistory, Long> {
     @Query(
         """
         SELECT new ecommerce.dto.TopProductStats(
-        ch.product.name,
-        COUNT(ch.product.name),
+        ch.option.product.name,
+        COUNT(ch.option.product.name),
         MAX(ch.createdAt)
     )
     FROM CartHistory ch
     WHERE ch.createdAt >= :since
-    GROUP BY ch.product.name
-    ORDER BY COUNT(ch.product.name) DESC, MAX(ch.createdAt) DESC
+    GROUP BY ch.option.product.name
+    ORDER BY COUNT(ch.option.product.name) DESC, MAX(ch.createdAt) DESC
     """,
     )
     fun getTopProducts(
@@ -39,6 +39,4 @@ interface CartHistoryJpaRepository : JpaRepository<CartHistory, Long> {
     fun getTop5ActiveUsers(
         @Param("since") since: LocalDateTime,
     ): List<ActiveUsersResponse>
-
-    fun deleteAllByProductId(productId: Long)
 }

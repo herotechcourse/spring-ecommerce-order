@@ -2,13 +2,13 @@ package ecommerce.service
 
 import ecommerce.dto.CartItemRequest
 import ecommerce.dto.CartItemResponse
-import ecommerce.exception.ElementNotFoundException
 import ecommerce.mapper.toDto
+import ecommerce.model.Cart
 import ecommerce.model.CartHistory
 import ecommerce.model.CartItem
 import ecommerce.repository.CartHistoryJpaRepository
 import ecommerce.repository.CartJpaRepository
-import ecommerce.repository.ProductJpaRepository
+import ecommerce.repository.OptionJpaRepository
 import ecommerce.repository.getByIdOrThrow
 import ecommerce.repository.getByMemberId
 import org.springframework.data.domain.Page
@@ -21,22 +21,23 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class CartService(
     private val cartJpaRepository: CartJpaRepository,
-    private val productJpaRepository: ProductJpaRepository,
     private val cartHistoryJpaRepository: CartHistoryJpaRepository,
+    private val optionJpaRepository: OptionJpaRepository,
 ) {
     fun addOrUpdateCartItem(
         memberId: Long,
         request: CartItemRequest,
     ): CartItemResponse {
-        val product = productJpaRepository.getByIdOrThrow(request.productId)
+        val option = optionJpaRepository.getByIdOrThrow(request.optionId)
         val cart = cartJpaRepository.getByMemberId(memberId)
-        val cartItem = CartItem(cart, product, request.quantity)
+        val cartItem = CartItem(cart, option, request.quantity)
         cart.addOrUpdateCartItem(cartItem)
 
-        cartHistoryJpaRepository.save(CartHistory(cart.member, product, request.quantity))
+        cartHistoryJpaRepository.save(CartHistory(cart.member, option, request.quantity))
 
+        cartJpaRepository.save(cart)
         return cart.cartProducts
-            .first { it.product.id == product.id }
+            .first { it.option.id == option.id }
             .toDto()
     }
 
@@ -54,11 +55,15 @@ class CartService(
 
     fun deleteProductFromCart(
         memberId: Long,
-        productId: Long,
+        optionId: Long,
     ) {
         val cart = cartJpaRepository.getByMemberId(memberId)
-        val deleted = cart.deleteCartProduct(productId)
-        if (!deleted) throw ElementNotFoundException("Element not in the cart")
+        cart.deleteCartProduct(optionId)
         cartJpaRepository.save(cart)
+    }
+
+    fun cartCheckOut(cart: Cart) {
+        cart.cartProducts.forEach { it.option.reduceOptionQuantity(it.quantity) }
+        cart.cleanCart()
     }
 }

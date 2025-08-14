@@ -9,9 +9,6 @@ import ecommerce.exception.ProductDeleteException
 import ecommerce.exception.ProductUpdateException
 import ecommerce.mapper.toDto
 import ecommerce.mapper.toEntity
-import ecommerce.repository.CartHistoryJpaRepository
-import ecommerce.repository.CartItemJpaRepository
-import ecommerce.repository.OptionJpaRepository
 import ecommerce.repository.ProductJpaRepository
 import ecommerce.repository.existsByIdOrThrow
 import ecommerce.repository.existsByNameOrThrow
@@ -26,9 +23,6 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class ProductService(
     private val productJpaRepository: ProductJpaRepository,
-    private val optionJpaRepository: OptionJpaRepository,
-    private val cartHistoryJpaRepository: CartHistoryJpaRepository,
-    private val cartItemJpaRepository: CartItemJpaRepository,
 ) {
     fun findById(id: Long): ProductResponse {
         val product = productJpaRepository.getByIdOrThrow(id)
@@ -67,7 +61,7 @@ class ProductService(
         val newProduct =
             product.copy(
                 name = productRequest.name ?: product.name,
-                price = productRequest.price ?: product.price,
+                price = productRequest.price?.toBigDecimal() ?: product.price,
                 imageUrl = productRequest.imageUrl ?: product.imageUrl,
             )
         try {

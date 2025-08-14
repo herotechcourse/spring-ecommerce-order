@@ -1,3 +1,3 @@
 package ecommerce.exception
 
-class InsufficientQuantityException(message: String) : RuntimeException()
+class InsufficientQuantityException(message: String) : RuntimeException(message)

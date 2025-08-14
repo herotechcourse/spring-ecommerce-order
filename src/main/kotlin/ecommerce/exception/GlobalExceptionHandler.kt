@@ -28,6 +28,7 @@ class GlobalExceptionHandler {
             RuntimeException::class,
             InsufficientQuantityException::class,
             IllegalArgumentException::class,
+            CartException::class,
         ],
     )
     fun handleBadRequest(ex: RuntimeException) = buildErrorResponse(HttpStatus.BAD_REQUEST, ex)
@@ -61,6 +62,9 @@ class GlobalExceptionHandler {
 
     @ExceptionHandler(UnauthorizedException::class)
     fun handleUnauthorizedException(ex: UnauthorizedException) = buildErrorResponse(HttpStatus.UNAUTHORIZED, ex)
+
+    @ExceptionHandler(StripeServerException::class)
+    fun handleStripeServerPaymentError(ex: StripePaymentException) = buildErrorResponse(HttpStatus.BAD_GATEWAY, ex)
 
     fun buildErrorResponse(
         status: HttpStatus,
