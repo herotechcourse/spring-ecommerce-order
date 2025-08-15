@@ -28,6 +28,6 @@ class Product(
 ) {
     init {
         require(options.isNotEmpty()) { "at least one option must be specified" }
-        require(options.distinct().size == options.size) { "Options must be distinct" }
+        require(options.map { it.name }.distinct().size == options.size) { "Options must be distinct" }
     }
 }

@@ -1,9 +1,9 @@
 package ecommerce.config.interceptor
 
+import ecommerce.infrastructure.JwtProvider
 import ecommerce.model.User
 import ecommerce.repository.UserRepository
 import ecommerce.utils.exception.UnauthorisedUserException
-import ecommerce.utils.infrastructure.JwtProvider
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.web.servlet.HandlerInterceptor

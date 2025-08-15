@@ -5,6 +5,8 @@ import ecommerce.dto.error.ErrorResponse
 import ecommerce.utils.exception.CartOperationException
 import ecommerce.utils.exception.DuplicateProductNameException
 import ecommerce.utils.exception.EntityNotFoundException
+import ecommerce.utils.exception.LowStockException
+import ecommerce.utils.exception.StripeException
 import ecommerce.utils.exception.UnauthorisedUserException
 import ecommerce.utils.exception.UserAlreadyExistsException
 import ecommerce.utils.exception.UserCredentialException
@@ -98,6 +100,22 @@ class GlobalExceptionHandler {
         request: HttpServletRequest,
     ): ResponseEntity<ErrorResponse> {
         return errorResponse(HttpStatus.BAD_REQUEST, ex.message ?: "BAD_REQUEST", request)
+    }
+
+    @ExceptionHandler(StripeException::class)
+    fun handleStripeException(
+        ex: StripeException,
+        request: HttpServletRequest,
+    ): ResponseEntity<ErrorResponse> {
+        return errorResponse(HttpStatus.BAD_REQUEST, ex.message ?: "BAD_REQUEST", request)
+    }
+
+    @ExceptionHandler(LowStockException::class)
+    fun handleLowStockException(
+        ex: LowStockException,
+        request: HttpServletRequest,
+    ): ResponseEntity<ErrorResponse> {
+        return errorResponse(HttpStatus.NOT_FOUND, ex.message ?: "NOT_FOUND", request)
     }
 
     private fun errorResponse(

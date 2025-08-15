@@ -1,5 +1,6 @@
 package ecommerce.controller.admin
 
+import ecommerce.controller.BaseApiTest
 import ecommerce.dto.auth.LoginRequest
 import ecommerce.dto.products.OptionDTO
 import ecommerce.dto.products.OptionPatchDTO
@@ -9,6 +10,7 @@ import ecommerce.enums.UserRole
 import ecommerce.model.Option
 import ecommerce.model.Product
 import ecommerce.model.User
+import ecommerce.repository.CartRepository
 import ecommerce.repository.OptionRepository
 import ecommerce.repository.ProductRepository
 import ecommerce.repository.UserRepository
@@ -26,7 +28,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpStatus
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-class AdminProductControllerTest {
+class AdminProductControllerTest : BaseApiTest() {
     private lateinit var token: String
 
     @Autowired
@@ -40,6 +42,9 @@ class AdminProductControllerTest {
 
     @Autowired
     private lateinit var optionRepository: OptionRepository
+
+    @Autowired
+    private lateinit var cartRepository: CartRepository
 
     @BeforeEach
     fun initBefore() {
@@ -58,6 +63,7 @@ class AdminProductControllerTest {
     @AfterEach
     fun initAfter() {
         optionRepository.deleteAll()
+        cartRepository.deleteAll()
         userRepository.deleteAll()
         productRepository.deleteAll()
     }

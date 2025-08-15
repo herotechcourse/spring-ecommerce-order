@@ -23,7 +23,7 @@ class Option(
     val id: Long = 0L,
 ) {
     init {
-        require(quantity in MIN_QUANTITY..MAX_QUANTITY) { "quantity must be positive" }
+        require(quantity in MIN_QUANTITY..MAX_QUANTITY) { "quantity must be positive and less than $MAX_QUANTITY." }
         require(price >= MIN_PRICE) { "price must be greater than 0.01" }
         require(name.trim().isNotEmpty()) { "name must not be empty" }
         require(name.length <= NAME_MAX_LENGTH) { "name must be less than 50 characters" }
@@ -43,6 +43,13 @@ class Option(
         optionPatchDTO.price?.let { price = it }
         optionPatchDTO.quantity?.let { quantity = it }
         optionPatchDTO.imageUrl?.let { imageUrl = it }
+    }
+
+    fun decrementQuantity(count: Int = 1) {
+        if (quantity < count) {
+            throw IllegalArgumentException("quantity must be positive and greater than $quantity")
+        }
+        quantity -= count
     }
 
     companion object {

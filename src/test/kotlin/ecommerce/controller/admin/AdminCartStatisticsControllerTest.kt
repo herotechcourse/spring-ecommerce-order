@@ -1,5 +1,6 @@
 package ecommerce.controller.admin
 
+import ecommerce.controller.BaseApiTest
 import ecommerce.dto.auth.LoginRequest
 import ecommerce.enums.UserRole
 import ecommerce.model.User
@@ -16,7 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpStatus
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-class AdminCartStatisticsControllerTest {
+class AdminCartStatisticsControllerTest : BaseApiTest() {
     private lateinit var token: String
 
     @Autowired
@@ -27,6 +28,7 @@ class AdminCartStatisticsControllerTest {
 
     @BeforeEach
     fun initBefore() {
+        RestAssured.port = 80
         val user =
             userRepository.save(
                 User(

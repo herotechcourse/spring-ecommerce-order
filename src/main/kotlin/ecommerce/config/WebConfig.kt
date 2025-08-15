@@ -5,7 +5,9 @@ import ecommerce.config.interceptor.AdminInterceptor
 import ecommerce.config.interceptor.MemberInterceptor
 import ecommerce.repository.UserRepository
 import org.springframework.context.annotation.Configuration
+import org.springframework.http.HttpHeaders
 import org.springframework.web.method.support.HandlerMethodArgumentResolver
+import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 
@@ -17,7 +19,7 @@ class WebConfig(
 ) : WebMvcConfigurer {
     override fun addInterceptors(registry: InterceptorRegistry) {
         registry.addInterceptor(authInterceptor)
-            .addPathPatterns("/api/member/cart/**", "/api/member/wish-list/**")
+            .addPathPatterns("/api/member/cart/**", "/api/member/order/**")
         registry.addInterceptor(adminInterceptor)
             .addPathPatterns("/api/admin/products/**", "/api/admin/cart_statistics/**")
         super.addInterceptors(registry)
@@ -30,5 +32,13 @@ class WebConfig(
             )
         resolvers.addAll(additionalResolvers)
         super.addArgumentResolvers(resolvers)
+    }
+
+    override fun addCorsMappings(registry: CorsRegistry) {
+        registry.addMapping("/**")
+            .allowedOrigins("*")
+            .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+            .allowedHeaders("*")
+            .exposedHeaders(HttpHeaders.LOCATION)
     }
 }

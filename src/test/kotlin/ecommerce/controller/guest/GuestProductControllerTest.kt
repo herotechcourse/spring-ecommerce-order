@@ -1,5 +1,6 @@
 package ecommerce.controller.guest
 
+import ecommerce.controller.BaseApiTest
 import ecommerce.dto.products.ProductResponseDTO
 import ecommerce.model.Option
 import ecommerce.model.Product
@@ -17,7 +18,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpStatus
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-class GuestProductControllerTest {
+class GuestProductControllerTest : BaseApiTest() {
     @Autowired
     private lateinit var productRepository: ProductRepository
 

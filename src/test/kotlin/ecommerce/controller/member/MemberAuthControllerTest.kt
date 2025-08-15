@@ -1,5 +1,6 @@
 package ecommerce.controller.member
 
+import ecommerce.controller.BaseApiTest
 import ecommerce.dto.auth.LoginRequest
 import ecommerce.dto.user.UserRequestDTO
 import ecommerce.model.User
@@ -13,7 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpStatus
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-class MemberAuthControllerTest {
+class MemberAuthControllerTest : BaseApiTest() {
     @Autowired
     private lateinit var userRepository: UserRepository
 
@@ -38,14 +39,13 @@ class MemberAuthControllerTest {
 
     @Test
     fun login() {
-        val user =
-            userRepository.save(
-                User(
-                    "temp2@temp.com",
-                    "test-456",
-                    "test",
-                ),
-            )
+        userRepository.save(
+            User(
+                "temp2@temp.com",
+                "test-456",
+                "test",
+            ),
+        )
         val loginRequest =
             LoginRequest(
                 "temp2@temp.com",

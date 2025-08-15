@@ -8,18 +8,22 @@ import jakarta.persistence.Enumerated
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
-import jakarta.persistence.JoinColumn
-import jakarta.persistence.ManyToOne
 import java.time.LocalDateTime
 
 @Entity
 class CartStatistic(
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    var user: User,
-    @ManyToOne
-    @JoinColumn(name = "option_id", nullable = false)
-    var option: Option,
+    @Column(name = "user_id", nullable = false)
+    var userId: Long,
+    @Column(name = "user_email", nullable = false)
+    var userEmail: String,
+    @Column(name = "user_name", nullable = false)
+    var userName: String,
+    @Column(name = "option_id", nullable = false)
+    var optionId: Long,
+    @Column(name = "option_name", nullable = false)
+    var optionName: String,
+    @Column(name = "option_price", nullable = false)
+    var optionPrice: Double,
     @Column(name = "action", nullable = false)
     @Enumerated(EnumType.STRING)
     var action: CartAction,
