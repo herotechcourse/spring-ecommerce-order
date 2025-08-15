@@ -2,7 +2,7 @@ package ecommerce.config.interceptor
 
 import ecommerce.annotation.CheckAdminOnly
 import ecommerce.annotation.IgnoreCheckLogin
-import ecommerce.entities.Member
+import ecommerce.entities.MemberEntity
 import ecommerce.exception.ForbiddenException
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
@@ -28,8 +28,8 @@ class CheckRoleInterceptor : HandlerInterceptor {
                 method.isAnnotationPresent(CheckAdminOnly::class.java) ||
                     handler.beanType.isAnnotationPresent(CheckAdminOnly::class.java)
             if (isAdminOnly) {
-                val role = request.getAttribute("role") as? Member.Role
-                if (role != Member.Role.ADMIN) {
+                val role = request.getAttribute("role") as? MemberEntity.Role
+                if (role != MemberEntity.Role.ADMIN) {
                     throw ForbiddenException("Access denied: admin role required")
                 }
             }

@@ -1,7 +1,7 @@
 package ecommerce.controller.wish.usecase
 
-import ecommerce.model.WishItemRequestDTO
-import ecommerce.model.WishItemResponseDTO
+import ecommerce.dto.WishItemRequestDTO
+import ecommerce.dto.WishItemResponseDTO
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 

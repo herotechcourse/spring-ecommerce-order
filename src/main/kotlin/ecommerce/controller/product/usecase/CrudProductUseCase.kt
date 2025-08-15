@@ -1,8 +1,8 @@
 package ecommerce.controller.product.usecase
 
-import ecommerce.model.ProductPatchDTO
-import ecommerce.model.ProductRequestDTO
-import ecommerce.model.ProductResponseDTO
+import ecommerce.dto.ProductPatchDTO
+import ecommerce.dto.ProductRequestDTO
+import ecommerce.dto.ProductResponseDTO
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 

@@ -1,6 +1,6 @@
 package ecommerce.mappers
 
-import ecommerce.entities.WishItem
-import ecommerce.model.WishItemResponseDTO
+import ecommerce.dto.WishItemResponseDTO
+import ecommerce.entities.WishItemEntity
 
-fun WishItem.toDTO() = WishItemResponseDTO(id, member.id, product.toDTO(), addedAt)
+fun WishItemEntity.toDTO() = WishItemResponseDTO(id, member.id, product.toDTO(), addedAt)

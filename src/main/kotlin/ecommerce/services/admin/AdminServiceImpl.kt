@@ -3,11 +3,11 @@ package ecommerce.services.admin
 import ecommerce.controller.admin.usecase.CreateOptionUseCase
 import ecommerce.controller.admin.usecase.FindMembersWithRecentCartActivityUseCase
 import ecommerce.controller.admin.usecase.FindTopProductsUseCase
+import ecommerce.dto.ActiveMemberDTO
+import ecommerce.dto.OptionDTO
+import ecommerce.dto.TopProductDTO
 import ecommerce.exception.NoSuchElementException
 import ecommerce.mappers.toEntity
-import ecommerce.model.ActiveMemberDTO
-import ecommerce.model.OptionDTO
-import ecommerce.model.TopProductDTO
 import ecommerce.repositories.CartItemRepository
 import ecommerce.repositories.ProductRepository
 import org.springframework.data.repository.findByIdOrNull

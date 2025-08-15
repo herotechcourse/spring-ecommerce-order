@@ -3,9 +3,9 @@ package ecommerce.controller.product
 import ecommerce.annotation.CheckAdminOnly
 import ecommerce.annotation.IgnoreCheckLogin
 import ecommerce.controller.product.usecase.CrudProductUseCase
-import ecommerce.model.ProductPatchDTO
-import ecommerce.model.ProductRequestDTO
-import ecommerce.model.ProductResponseDTO
+import ecommerce.dto.ProductPatchDTO
+import ecommerce.dto.ProductRequestDTO
+import ecommerce.dto.ProductResponseDTO
 import jakarta.validation.Valid
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -23,26 +23,26 @@ import org.springframework.web.bind.annotation.RestController
 import java.net.URI
 
 @RestController
-class ProductController(private val productService: CrudProductUseCase) {
+class ProductController(private val crudProductUseCase: CrudProductUseCase) {
     @IgnoreCheckLogin
     @GetMapping(PRODUCT_PATH)
     fun getProducts(
         @PageableDefault(size = 10, sort = ["name"], direction = Sort.Direction.ASC)
         pageable: Pageable,
-    ): Page<ProductResponseDTO> = productService.findAll(pageable)
+    ): Page<ProductResponseDTO> = crudProductUseCase.findAll(pageable)
 
     @IgnoreCheckLogin
     @GetMapping(PRODUCT_PATH_ID)
     fun getProductById(
         @PathVariable id: Long,
-    ): ResponseEntity<ProductResponseDTO> = ResponseEntity.ok(productService.findById(id))
+    ): ResponseEntity<ProductResponseDTO> = ResponseEntity.ok(crudProductUseCase.findById(id))
 
     @CheckAdminOnly
     @PostMapping(PRODUCT_PATH)
     fun createProduct(
         @Valid @RequestBody productRequestDTO: ProductRequestDTO,
     ): ResponseEntity<ProductResponseDTO> {
-        val saved = productService.save(productRequestDTO)
+        val saved = crudProductUseCase.save(productRequestDTO)
         return ResponseEntity.created(URI.create("$PRODUCT_PATH/${saved.id}")).body(saved)
     }
 
@@ -51,28 +51,28 @@ class ProductController(private val productService: CrudProductUseCase) {
     fun updateProductById(
         @Valid @RequestBody productDTO: ProductRequestDTO,
         @PathVariable id: Long,
-    ): ResponseEntity<ProductResponseDTO> = ResponseEntity.ok(productService.updateById(id, productDTO))
+    ): ResponseEntity<ProductResponseDTO> = ResponseEntity.ok(crudProductUseCase.updateById(id, productDTO))
 
     @CheckAdminOnly
     @PatchMapping(PRODUCT_PATH_ID)
     fun patchProductById(
         @Valid @RequestBody productPatchDTO: ProductPatchDTO,
         @PathVariable id: Long,
-    ): ResponseEntity<ProductResponseDTO> = ResponseEntity.ok(productService.patchById(id, productPatchDTO))
+    ): ResponseEntity<ProductResponseDTO> = ResponseEntity.ok(crudProductUseCase.patchById(id, productPatchDTO))
 
     @CheckAdminOnly
     @DeleteMapping(PRODUCT_PATH_ID)
     fun deleteProductById(
         @PathVariable id: Long,
     ): ResponseEntity<Unit> {
-        productService.deleteById(id)
+        crudProductUseCase.deleteById(id)
         return ResponseEntity.noContent().build()
     }
 
     @CheckAdminOnly
     @DeleteMapping(PRODUCT_PATH)
     fun deleteAllProducts(): ResponseEntity<String> {
-        productService.deleteAll()
+        crudProductUseCase.deleteAll()
         return ResponseEntity.noContent().build()
     }
 

@@ -1,10 +1,12 @@
 package ecommerce.config.resolvers
 
 import ecommerce.annotation.LoginMember
-import ecommerce.controller.member.usecase.CrudMemberUseCase
 import ecommerce.exception.AuthorizationException
+import ecommerce.mappers.toDTO
 import ecommerce.mappers.toLoginDTO
+import ecommerce.repositories.MemberRepository
 import org.springframework.core.MethodParameter
+import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.stereotype.Component
 import org.springframework.web.bind.support.WebDataBinderFactory
 import org.springframework.web.context.request.NativeWebRequest
@@ -14,7 +16,7 @@ import org.springframework.web.method.support.ModelAndViewContainer
 
 @Component
 class LoginMemberArgumentResolver(
-    private val memberService: CrudMemberUseCase,
+    private val memberRepository: MemberRepository,
 ) : HandlerMethodArgumentResolver {
     override fun supportsParameter(parameter: MethodParameter): Boolean {
         return parameter.hasParameterAnnotation(LoginMember::class.java)
@@ -29,6 +31,9 @@ class LoginMemberArgumentResolver(
         val email =
             webRequest.getAttribute("email", RequestAttributes.SCOPE_REQUEST) as? String
                 ?: throw AuthorizationException("Email attribute missing")
-        return memberService.findByEmail(email).toLoginDTO()
+        return memberRepository.findByEmail(email)?.toDTO()?.toLoginDTO() ?: throw EmptyResultDataAccessException(
+            "Member with Email $email not found",
+            1,
+        )
     }
 }

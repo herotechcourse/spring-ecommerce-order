@@ -1,13 +1,13 @@
 package ecommerce.services.product
 
 import ecommerce.controller.product.usecase.CrudProductUseCase
+import ecommerce.dto.ProductPatchDTO
+import ecommerce.dto.ProductRequestDTO
+import ecommerce.dto.ProductResponseDTO
 import ecommerce.exception.NotFoundException
 import ecommerce.exception.OperationFailedException
 import ecommerce.mappers.toDTO
 import ecommerce.mappers.toEntity
-import ecommerce.model.ProductPatchDTO
-import ecommerce.model.ProductRequestDTO
-import ecommerce.model.ProductResponseDTO
 import ecommerce.repositories.ProductRepository
 import org.springframework.context.annotation.Primary
 import org.springframework.data.domain.Page
@@ -30,9 +30,9 @@ class ProductServiceImpl(
 
     @Transactional(readOnly = true)
     override fun findById(id: Long): ProductResponseDTO {
-        val product = productRepository.findByIdOrNull(id)
-
-        if (product == null) throw NotFoundException("Product with id=$id not found")
+        val product =
+            productRepository.findByIdOrNull(id)
+                ?: throw NotFoundException("Product with id=$id not found")
         return product.toDTO()
     }
 

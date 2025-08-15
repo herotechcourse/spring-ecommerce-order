@@ -1,6 +1,6 @@
 package ecommerce.repositories
 
-import ecommerce.entities.Option
+import ecommerce.entities.OptionEntity
 import org.springframework.data.jpa.repository.JpaRepository
 
-interface OptionRepository : JpaRepository<Option, Long>
+interface OptionRepository : JpaRepository<OptionEntity, Long>

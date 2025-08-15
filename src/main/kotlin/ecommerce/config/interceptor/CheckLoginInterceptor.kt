@@ -1,7 +1,7 @@
 package ecommerce.config.interceptor
 
 import ecommerce.annotation.IgnoreCheckLogin
-import ecommerce.entities.Member
+import ecommerce.entities.MemberEntity
 import ecommerce.exception.AuthorizationException
 import ecommerce.infrastructure.JwtTokenProvider
 import jakarta.servlet.http.HttpServletRequest
@@ -37,7 +37,7 @@ class CheckLoginInterceptor(private val jwtTokenProvider: JwtTokenProvider) : Ha
         return header.removePrefix("Bearer ").trim()
     }
 
-    private fun checkAndExtractAdminCredentials(token: String): Pair<String, Member.Role> {
+    private fun checkAndExtractAdminCredentials(token: String): Pair<String, MemberEntity.Role> {
         if (!jwtTokenProvider.validateToken(token)) {
             throw AuthorizationException("Invalid or expired token")
         }

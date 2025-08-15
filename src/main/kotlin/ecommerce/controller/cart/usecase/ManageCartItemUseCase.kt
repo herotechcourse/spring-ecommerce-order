@@ -1,7 +1,7 @@
 package ecommerce.controller.cart.usecase
 
-import ecommerce.model.CartItemRequestDTO
-import ecommerce.model.CartItemResponseDTO
+import ecommerce.dto.CartItemRequestDTO
+import ecommerce.dto.CartItemResponseDTO
 
 interface ManageCartItemUseCase {
     fun addOrUpdate(

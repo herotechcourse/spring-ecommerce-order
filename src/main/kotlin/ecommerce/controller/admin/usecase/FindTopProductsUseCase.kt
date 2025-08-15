@@ -1,6 +1,6 @@
 package ecommerce.controller.admin.usecase
 
-import ecommerce.model.TopProductDTO
+import ecommerce.dto.TopProductDTO
 
 interface FindTopProductsUseCase {
     fun findProducts(): List<TopProductDTO>

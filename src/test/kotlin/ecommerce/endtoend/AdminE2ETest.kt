@@ -1,20 +1,27 @@
 package ecommerce.endtoend
 
-import ecommerce.model.ActiveMemberDTO
-import ecommerce.model.OptionDTO
-import ecommerce.model.ProductResponseDTO
-import ecommerce.model.TopProductDTO
+import ecommerce.dto.ActiveMemberDTO
+import ecommerce.dto.OptionDTO
+import ecommerce.dto.ProductResponseDTO
+import ecommerce.dto.TopProductDTO
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
 import jakarta.transaction.Transactional
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.context.annotation.Bean
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.test.annotation.DirtiesContext
+import org.springframework.web.client.ResourceAccessException
+import org.springframework.web.client.RestClient
 import java.time.LocalDateTime
 import kotlin.jvm.java
 
@@ -22,9 +29,18 @@ import kotlin.jvm.java
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @Transactional
 class AdminE2ETest {
+    @TestConfiguration
+    class TestRestClientConfig {
+        @Bean
+        fun restClient(builder: RestClient.Builder): RestClient = builder.build()
+    }
+
     lateinit var token: String
 
     lateinit var product: ProductResponseDTO
+
+    @Autowired
+    lateinit var restClient: RestClient
 
     @BeforeEach
     fun setup() {
@@ -138,6 +154,7 @@ class AdminE2ETest {
                 name = "Test Option",
                 quantity = 10,
                 productId = product.id,
+                unitPrice = 100.0,
             )
 
         val response =
@@ -160,6 +177,7 @@ class AdminE2ETest {
                 name = longName,
                 quantity = 10,
                 productId = product.id,
+                unitPrice = 100.0,
             )
 
         val response =
@@ -181,6 +199,7 @@ class AdminE2ETest {
                 name = "Test Option",
                 quantity = 0,
                 productId = product.id,
+                unitPrice = 100.0,
             )
 
         val response =
@@ -202,6 +221,7 @@ class AdminE2ETest {
                 name = "Test Option",
                 quantity = 100_000_000,
                 productId = product.id,
+                unitPrice = 100.0,
             )
 
         val response =
@@ -233,6 +253,7 @@ class AdminE2ETest {
                 name = "Test Option",
                 quantity = 10,
                 productId = product.id,
+                unitPrice = 100.0,
             )
 
         RestAssured.given()
@@ -253,5 +274,21 @@ class AdminE2ETest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value())
         assertThat(response.body().jsonPath().getString("message"))
             .contains("Option with name 'Test Option' already exists")
+    }
+
+    @Test
+    fun `should timeout after configured time`() {
+        val start = System.currentTimeMillis()
+        val e =
+            assertThrows<ResourceAccessException> {
+                restClient.get()
+                    .uri("http://localhost:8080/admin/slow")
+                    .retrieve()
+                    .body(String::class.java)
+            }
+        val duration = System.currentTimeMillis() - start
+        println("Request failed in $duration ms")
+        assertTrue(duration < 11000)
+        println(e.message)
     }
 }

@@ -2,12 +2,12 @@ package ecommerce.services.wish
 
 import ecommerce.controller.member.usecase.CrudMemberUseCase
 import ecommerce.controller.wish.usecase.CrudWishItemUseCase
-import ecommerce.entities.WishItem
+import ecommerce.dto.WishItemRequestDTO
+import ecommerce.dto.WishItemResponseDTO
+import ecommerce.entities.WishItemEntity
 import ecommerce.exception.OperationFailedException
 import ecommerce.mappers.toDTO
 import ecommerce.mappers.toEntity
-import ecommerce.model.WishItemRequestDTO
-import ecommerce.model.WishItemResponseDTO
 import ecommerce.repositories.ProductRepository
 import ecommerce.repositories.WishItemRepository
 import org.springframework.dao.EmptyResultDataAccessException
@@ -31,11 +31,12 @@ class WishItemServiceImpl(
     ): WishItemResponseDTO {
         validateProductExists(wishItemRequestDTO.productId)
 
-        val product = productRepository.findByIdOrNull(wishItemRequestDTO.productId)
-        if (product == null) throw OperationFailedException("Invalid Product Id ${wishItemRequestDTO.productId}")
+        val product =
+            productRepository.findByIdOrNull(wishItemRequestDTO.productId)
+                ?: throw OperationFailedException("Invalid Product Id ${wishItemRequestDTO.productId}")
         val member = memberService.findById(memberId)
         return wishItemRepository.save(
-            WishItem(
+            WishItemEntity(
                 member = member.toEntity(),
                 product = product,
                 addedAt = LocalDateTime.now(),

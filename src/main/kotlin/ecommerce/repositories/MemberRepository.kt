@@ -1,12 +1,12 @@
 package ecommerce.repositories
 
-import ecommerce.entities.Member
+import ecommerce.entities.MemberEntity
 import org.springframework.data.jpa.repository.JpaRepository
 
-interface MemberRepository : JpaRepository<Member, Long> {
-    fun findByEmail(email: String): Member?
+interface MemberRepository : JpaRepository<MemberEntity, Long> {
+    fun findByEmail(email: String): MemberEntity?
 
-    fun save(member: Member): Member?
+    fun save(member: MemberEntity): MemberEntity?
 
     fun existsByEmail(email: String): Boolean
 }

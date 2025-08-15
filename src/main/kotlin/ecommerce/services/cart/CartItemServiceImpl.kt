@@ -2,14 +2,14 @@ package ecommerce.services.cart
 
 import ecommerce.controller.cart.usecase.ManageCartItemUseCase
 import ecommerce.controller.member.usecase.CrudMemberUseCase
-import ecommerce.entities.CartItem
+import ecommerce.dto.CartItemRequestDTO
+import ecommerce.dto.CartItemResponseDTO
+import ecommerce.entities.CartItemEntity
 import ecommerce.exception.OperationFailedException
 import ecommerce.mappers.toDTO
 import ecommerce.mappers.toEntity
-import ecommerce.model.CartItemRequestDTO
-import ecommerce.model.CartItemResponseDTO
 import ecommerce.repositories.CartItemRepository
-import ecommerce.repositories.ProductRepository
+import ecommerce.repositories.OptionRepository
 import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -19,7 +19,7 @@ import java.time.LocalDateTime
 @Service
 class CartItemServiceImpl(
     private val cartItemRepository: CartItemRepository,
-    private val productRepository: ProductRepository,
+    private val optionRepository: OptionRepository,
     private val memberService: CrudMemberUseCase,
 ) : ManageCartItemUseCase {
     @Transactional
@@ -27,10 +27,10 @@ class CartItemServiceImpl(
         cartItemRequestDTO: CartItemRequestDTO,
         memberId: Long,
     ): CartItemResponseDTO {
-        validateProductExists(cartItemRequestDTO.productId)
+        validateOptionExists(cartItemRequestDTO.optionId)
 
         val cartItem =
-            if (!cartItemRepository.existsByProductIdAndMemberId(cartItemRequestDTO.productId, memberId)) {
+            if (!cartItemRepository.existsByOptionIdAndMemberId(cartItemRequestDTO.optionId, memberId)) {
                 handleCreate(cartItemRequestDTO, memberId)
             } else {
                 handleUpdate(cartItemRequestDTO, memberId)
@@ -47,7 +47,7 @@ class CartItemServiceImpl(
             CartItemResponseDTO(
                 id = cartItem.id,
                 memberId = cartItem.member.id,
-                product = cartItem.product.toDTO(),
+                option = cartItem.option.toDTO(),
                 quantity = cartItem.quantity,
                 addedAt = cartItem.addedAt,
             )
@@ -59,12 +59,12 @@ class CartItemServiceImpl(
         cartItemRequestDTO: CartItemRequestDTO,
         memberId: Long,
     ) {
-        cartItemRepository.deleteByProductIdAndMemberId(cartItemRequestDTO.productId, memberId)
+        cartItemRepository.deleteByOptionIdAndMemberId(cartItemRequestDTO.optionId, memberId)
     }
 
-    private fun validateProductExists(productId: Long) {
-        if (!productRepository.existsById(productId)) {
-            throw EmptyResultDataAccessException("Product with ID $productId does not exist", 1)
+    private fun validateOptionExists(optionId: Long) {
+        if (!optionRepository.existsById(optionId)) {
+            throw EmptyResultDataAccessException("Product with ID $optionId does not exist", 1)
         }
     }
 
@@ -76,15 +76,17 @@ class CartItemServiceImpl(
     private fun handleCreate(
         cartItemRequestDTO: CartItemRequestDTO,
         memberId: Long,
-    ): CartItem {
-        val product = productRepository.findByIdOrNull(cartItemRequestDTO.productId)
-        if (product == null) throw OperationFailedException("Invalid Product Id ${cartItemRequestDTO.productId}")
+    ): CartItemEntity {
+        val option =
+            optionRepository.findByIdOrNull(cartItemRequestDTO.optionId)
+                ?: throw OperationFailedException("Invalid Product Id ${cartItemRequestDTO.optionId}")
+        option.checkStock(cartItemRequestDTO.quantity)
         val member = memberService.findById(memberId)
         return cartItemRepository.save(
-            CartItem(
+            CartItemEntity(
                 member = member.toEntity(),
-                product = product,
-                quantity = if (cartItemRequestDTO.quantity == 0) 1 else cartItemRequestDTO.quantity,
+                option = option,
+                quantity = cartItemRequestDTO.quantity,
                 addedAt = LocalDateTime.now(),
             ),
         )
@@ -93,10 +95,10 @@ class CartItemServiceImpl(
     private fun handleUpdate(
         cartItemRequestDTO: CartItemRequestDTO,
         memberId: Long,
-    ): CartItem {
+    ): CartItemEntity {
         val existing =
             cartItemRepository
-                .findByProductIdAndMemberId(cartItemRequestDTO.productId, memberId)
+                .findByOptionIdAndMemberId(cartItemRequestDTO.optionId, memberId)
                 ?: throw OperationFailedException("Cart item not found")
 
         if (cartItemRequestDTO.quantity <= 0) throw OperationFailedException("Quantity must be greater than zero")

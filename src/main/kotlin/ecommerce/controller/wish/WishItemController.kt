@@ -1,10 +1,10 @@
 package ecommerce.controller.wish
 
 import ecommerce.annotation.LoginMember
-import ecommerce.model.MemberLoginDTO
-import ecommerce.model.WishItemRequestDTO
-import ecommerce.model.WishItemResponseDTO
-import ecommerce.services.wish.WishItemServiceImpl
+import ecommerce.controller.wish.usecase.CrudWishItemUseCase
+import ecommerce.dto.MemberLoginDTO
+import ecommerce.dto.WishItemRequestDTO
+import ecommerce.dto.WishItemResponseDTO
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
@@ -19,14 +19,14 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/api/wish")
-class WishItemController(private val wishItemService: WishItemServiceImpl) {
+class WishItemController(private val crudWishItemUseCase: CrudWishItemUseCase) {
     @GetMapping
     fun getAllByMember(
         @LoginMember member: MemberLoginDTO,
         @PageableDefault(size = 10, direction = Sort.Direction.ASC)
         page: Pageable,
     ): Page<WishItemResponseDTO> {
-        return wishItemService.findByMember(member.id, page = page)
+        return crudWishItemUseCase.findByMember(member.id, page = page)
     }
 
     @PostMapping
@@ -34,7 +34,7 @@ class WishItemController(private val wishItemService: WishItemServiceImpl) {
         @RequestBody wishItemRequestDTO: WishItemRequestDTO,
         @LoginMember member: MemberLoginDTO,
     ): ResponseEntity<WishItemResponseDTO> {
-        val wishItemResponseDTO = wishItemService.save(wishItemRequestDTO, member.id)
+        val wishItemResponseDTO = crudWishItemUseCase.save(wishItemRequestDTO, member.id)
         return ResponseEntity.ok().body(wishItemResponseDTO)
     }
 
@@ -43,7 +43,7 @@ class WishItemController(private val wishItemService: WishItemServiceImpl) {
         @RequestBody wishItemRequestDTO: WishItemRequestDTO,
         @LoginMember member: MemberLoginDTO,
     ): ResponseEntity<Unit> {
-        wishItemService.delete(wishItemRequestDTO, member.id)
+        crudWishItemUseCase.delete(wishItemRequestDTO, member.id)
         return ResponseEntity.noContent().build()
     }
 }

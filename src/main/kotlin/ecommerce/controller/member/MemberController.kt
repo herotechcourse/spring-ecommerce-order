@@ -2,11 +2,11 @@ package ecommerce.controller.member
 
 import ecommerce.controller.member.usecase.AuthUseCase
 import ecommerce.controller.member.usecase.CrudMemberUseCase
+import ecommerce.dto.MemberRegisterDTO
+import ecommerce.dto.TokenRequestDTO
+import ecommerce.dto.TokenResponseDTO
 import ecommerce.infrastructure.AuthorizationExtractor
-import ecommerce.model.MemberDTO
-import ecommerce.model.MemberRegisterDTO
-import ecommerce.model.TokenRequestDTO
-import ecommerce.model.TokenResponseDTO
+import ecommerce.model.Member
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
@@ -21,13 +21,13 @@ import org.springframework.web.bind.annotation.RestController
 class MemberController(
     private val authService: AuthUseCase,
     private val authorizationExtractor: AuthorizationExtractor,
-    private val memberService: CrudMemberUseCase,
+    private val crudMemberUseCase: CrudMemberUseCase,
 ) {
     @PostMapping("/register")
     fun register(
         @Valid @RequestBody memberRegisterDTO: MemberRegisterDTO,
     ): ResponseEntity<TokenResponseDTO> {
-        val memberDTO: MemberDTO = memberService.save(memberRegisterDTO)
+        val memberDTO: Member = crudMemberUseCase.save(memberRegisterDTO)
         val tokenResponse = authService.createToken(memberDTO)
         return ResponseEntity.ok().body(tokenResponse)
     }
@@ -41,7 +41,7 @@ class MemberController(
     }
 
     @GetMapping("/me/token")
-    fun findMyInfo(request: HttpServletRequest): ResponseEntity<MemberDTO> {
+    fun findMyInfo(request: HttpServletRequest): ResponseEntity<Member> {
         val token = authorizationExtractor.extractToken(request)
         val member = authService.findMemberByToken(token)
         return ResponseEntity.ok().body(member)

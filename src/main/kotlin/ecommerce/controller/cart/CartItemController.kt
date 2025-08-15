@@ -2,9 +2,9 @@ package ecommerce.controller.cart
 
 import ecommerce.annotation.LoginMember
 import ecommerce.controller.cart.usecase.ManageCartItemUseCase
-import ecommerce.model.CartItemRequestDTO
-import ecommerce.model.CartItemResponseDTO
-import ecommerce.model.MemberLoginDTO
+import ecommerce.dto.CartItemRequestDTO
+import ecommerce.dto.CartItemResponseDTO
+import ecommerce.dto.MemberLoginDTO
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
@@ -15,12 +15,12 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/api/cart")
-class CartItemController(private val cartItemService: ManageCartItemUseCase) {
+class CartItemController(private val cartItemUseCase: ManageCartItemUseCase) {
     @GetMapping
     fun getCartItemsWithProducts(
         @LoginMember member: MemberLoginDTO,
     ): ResponseEntity<List<CartItemResponseDTO>> {
-        val cartItems = cartItemService.findByMember(member.id)
+        val cartItems = cartItemUseCase.findByMember(member.id)
         return ResponseEntity.ok().body(cartItems)
     }
 
@@ -29,7 +29,7 @@ class CartItemController(private val cartItemService: ManageCartItemUseCase) {
         @RequestBody cartItemRequestDTO: CartItemRequestDTO,
         @LoginMember member: MemberLoginDTO,
     ): ResponseEntity<CartItemResponseDTO> {
-        val cartItemResponseDTO = cartItemService.addOrUpdate(cartItemRequestDTO, member.id)
+        val cartItemResponseDTO = cartItemUseCase.addOrUpdate(cartItemRequestDTO, member.id)
         return ResponseEntity.ok().body(cartItemResponseDTO)
     }
 
@@ -38,7 +38,7 @@ class CartItemController(private val cartItemService: ManageCartItemUseCase) {
         @RequestBody cartItemRequestDTO: CartItemRequestDTO,
         @LoginMember member: MemberLoginDTO,
     ): ResponseEntity<Unit> {
-        cartItemService.delete(cartItemRequestDTO, member.id)
+        cartItemUseCase.delete(cartItemRequestDTO, member.id)
         return ResponseEntity.noContent().build()
     }
 }

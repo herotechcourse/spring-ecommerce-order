@@ -1,6 +1,6 @@
 package ecommerce.mappers
 
-import ecommerce.entities.CartItem
-import ecommerce.model.CartItemResponseDTO
+import ecommerce.dto.CartItemResponseDTO
+import ecommerce.entities.CartItemEntity
 
-fun CartItem.toDTO() = CartItemResponseDTO(id, member.id, product.toDTO(), quantity, addedAt)
+fun CartItemEntity.toDTO() = CartItemResponseDTO(id, member.id, option.toDTO(), quantity, addedAt)

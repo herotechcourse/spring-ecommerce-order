@@ -1,14 +1,14 @@
 package ecommerce.mappers
 
-import ecommerce.entities.Member
-import ecommerce.model.MemberDTO
-import ecommerce.model.MemberLoginDTO
-import ecommerce.model.MemberRegisterDTO
+import ecommerce.dto.MemberLoginDTO
+import ecommerce.dto.MemberRegisterDTO
+import ecommerce.entities.MemberEntity
+import ecommerce.model.Member
 
-fun Member.toDTO() = MemberDTO(name, email, password, role, id)
+fun MemberEntity.toDTO() = Member(name, email, password, role, id)
 
-fun MemberDTO.toLoginDTO() = MemberLoginDTO(id)
+fun Member.toLoginDTO() = MemberLoginDTO(id)
 
-fun MemberDTO.toEntity() = Member(name, email, password, role, id = id!!)
+fun Member.toEntity() = MemberEntity(name, email, password, role, id = id)
 
-fun MemberRegisterDTO.toEntity() = Member(name, email, password)
+fun MemberRegisterDTO.toEntity() = MemberEntity(name, email, password)

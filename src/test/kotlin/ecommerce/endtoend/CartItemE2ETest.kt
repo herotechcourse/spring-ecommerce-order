@@ -1,9 +1,10 @@
 package ecommerce.endtoend
 
-import ecommerce.model.CartItemRequestDTO
-import ecommerce.model.CartItemResponseDTO
-import ecommerce.model.PageResponseDTO
-import ecommerce.model.ProductResponseDTO
+import ecommerce.dto.CartItemRequestDTO
+import ecommerce.dto.CartItemResponseDTO
+import ecommerce.dto.OptionDTO
+import ecommerce.dto.PageResponseDTO
+import ecommerce.dto.ProductResponseDTO
 import io.restassured.RestAssured
 import io.restassured.common.mapper.TypeRef
 import io.restassured.http.ContentType
@@ -20,8 +21,8 @@ import java.time.LocalDateTime
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 class CartItemE2ETest {
     lateinit var token: String
-    private val productId: Long = 1L
-    private val request get() = CartItemRequestDTO(productId = productId, quantity = 2)
+    private val optionId: Long = 1L
+    private val request get() = CartItemRequestDTO(optionId = optionId, quantity = 2)
 
     @BeforeEach
     fun setup() {
@@ -46,8 +47,8 @@ class CartItemE2ETest {
     fun `add cart item`() {
         val cartItem = addCartItemAndReturn()
 
-        assertThat(cartItem.product).isInstanceOf(ProductResponseDTO::class.java)
-        assertThat(cartItem.product.id).isEqualTo(productId)
+        assertThat(cartItem.option).isInstanceOf(OptionDTO::class.java)
+        assertThat(cartItem.option.id).isEqualTo(optionId)
         assertThat(cartItem.quantity).isEqualTo(2)
         assertThat(cartItem.addedAt).isBefore(LocalDateTime.now().plusMinutes(1))
     }
@@ -70,7 +71,7 @@ class CartItemE2ETest {
         val cartItem = items.first()
         with(cartItem) {
             assertThat(quantity).isEqualTo(addedItem.quantity)
-            assertThat(product.id).isEqualTo(productId)
+            assertThat(option.id).isEqualTo(optionId)
             assertThat(addedAt).isBefore(LocalDateTime.now().plusMinutes(1))
             assertThat(addedAt).isAfter(LocalDateTime.now().minusDays(1))
         }
@@ -78,15 +79,14 @@ class CartItemE2ETest {
 
     @Test
     fun `delete cart item`() {
-        val cartItem = addCartItemAndReturn()
-        val products =
-            RestAssured.given()
-                .header("Authorization", "Bearer $token")
-                .accept(MediaType.APPLICATION_JSON_VALUE)
-                .get("/api/products")
-                .then().log().all()
-                .statusCode(HttpStatus.OK.value())
-                .extract().body().`as`(object : TypeRef<PageResponseDTO<ProductResponseDTO>>() {})
+        addCartItemAndReturn()
+        RestAssured.given()
+            .header("Authorization", "Bearer $token")
+            .accept(MediaType.APPLICATION_JSON_VALUE)
+            .get("/api/products")
+            .then().log().all()
+            .statusCode(HttpStatus.OK.value())
+            .extract().body().`as`(object : TypeRef<PageResponseDTO<ProductResponseDTO>>() {})
 
         RestAssured.given()
             .header("Authorization", "Bearer $token")

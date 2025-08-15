@@ -1,7 +1,7 @@
 package ecommerce.endtoend
 
-import ecommerce.model.MemberDTO
-import ecommerce.model.TokenResponseDTO
+import ecommerce.dto.TokenResponseDTO
+import ecommerce.model.Member
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
 import org.assertj.core.api.Assertions.assertThat
@@ -41,7 +41,7 @@ class MemberE2ETest {
         val accessToken =
             RestAssured
                 .given().log().all()
-                .body(MemberDTO(name = NAME, email = EMAIL, password = PASSWORD))
+                .body(Member(name = NAME, email = EMAIL, password = PASSWORD))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .accept(MediaType.APPLICATION_JSON_VALUE)
                 .`when`().post("/api/members/register")
@@ -56,7 +56,7 @@ class MemberE2ETest {
                 .accept(MediaType.APPLICATION_JSON_VALUE)
                 .`when`().get("/api/members/me/token")
                 .then().log().all()
-                .statusCode(HttpStatus.OK.value()).extract().`as`(MemberDTO::class.java)
+                .statusCode(HttpStatus.OK.value()).extract().`as`(Member::class.java)
 
         assertThat(member.email).isEqualTo(EMAIL)
     }

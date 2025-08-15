@@ -11,7 +11,7 @@ class AuthorizationExtractor {
         var authHeaderValue = headerValue.substring(BEARER_TYPE.length).trim()
         val commaIndex = authHeaderValue.indexOf(',')
         if (commaIndex > 0) {
-            authHeaderValue = authHeaderValue.substring(0, commaIndex)
+            authHeaderValue = authHeaderValue.take(commaIndex)
         }
         return authHeaderValue
     }

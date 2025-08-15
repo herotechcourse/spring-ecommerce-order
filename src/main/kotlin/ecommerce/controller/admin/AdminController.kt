@@ -1,12 +1,13 @@
 package ecommerce.controller.admin
 
 import ecommerce.annotation.CheckAdminOnly
+import ecommerce.annotation.IgnoreCheckLogin
 import ecommerce.controller.admin.usecase.CreateOptionUseCase
 import ecommerce.controller.admin.usecase.FindMembersWithRecentCartActivityUseCase
 import ecommerce.controller.admin.usecase.FindTopProductsUseCase
-import ecommerce.model.ActiveMemberDTO
-import ecommerce.model.OptionDTO
-import ecommerce.model.TopProductDTO
+import ecommerce.dto.ActiveMemberDTO
+import ecommerce.dto.OptionDTO
+import ecommerce.dto.TopProductDTO
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
@@ -34,5 +35,12 @@ class AdminController(
     ): ResponseEntity<Unit> {
         createOptionUseCase.create(optionDTO)
         return ResponseEntity.ok().build()
+    }
+
+    @IgnoreCheckLogin
+    @GetMapping("/slow")
+    fun slow(): String {
+        Thread.sleep(15_000) // simulate 15s delay
+        return "Done"
     }
 }

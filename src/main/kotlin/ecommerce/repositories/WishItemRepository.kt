@@ -1,22 +1,22 @@
 package ecommerce.repositories
 
-import ecommerce.entities.WishItem
+import ecommerce.entities.WishItemEntity
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
 
-interface WishItemRepository : JpaRepository<WishItem, Long> {
-    fun findByMemberId(memberId: Long): List<WishItem>
+interface WishItemRepository : JpaRepository<WishItemEntity, Long> {
+    fun findByMemberId(memberId: Long): List<WishItemEntity>
 
     fun findByMemberId(
         memberId: Long,
         page: Pageable,
-    ): Page<WishItem>
+    ): Page<WishItemEntity>
 
     fun findByProductIdAndMemberId(
         productId: Long,
         memberId: Long,
-    ): WishItem?
+    ): WishItemEntity?
 
     fun deleteByProductIdAndMemberId(
         productId: Long,

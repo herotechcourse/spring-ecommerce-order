@@ -1,0 +1,51 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: dev.dockerfile
+    container_name: spring-ecommerce-app
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_HOST: db
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${DB_NAME}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      JWT_EXPIRATION_TIME: ${JWT_EXPIRATION_TIME}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY}
+    depends_on:
+      - db
+    volumes:
+      - ./src:/home/gradle/project/src
+      - ./build.gradle.kts:/home/gradle/project/build.gradle.kts
+      - ./settings.gradle.kts:/home/gradle/project/settings.gradle.kts
+      - ./gradle:/home/gradle/project/gradle
+      - ~/.gradle:/home/gradle/.gradle
+    networks:
+      - ecommerce-network
+
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ecommerce
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - ecommerce-network
+
+volumes:
+  pgdata:
+
+networks:
+  ecommerce-network:
+    driver: bridge

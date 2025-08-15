@@ -2,8 +2,8 @@ package ecommerce.controller.product
 
 import ecommerce.annotation.IgnoreCheckLogin
 import ecommerce.controller.product.usecase.CrudProductUseCase
-import ecommerce.model.ProductRequestDTO
-import ecommerce.model.ProductResponseDTO
+import ecommerce.dto.ProductRequestDTO
+import ecommerce.dto.ProductResponseDTO
 import jakarta.validation.Valid
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 
 @Controller
-class ProductViewController(private val productService: CrudProductUseCase) {
+class ProductViewController(private val crudProductUseCase: CrudProductUseCase) {
     @IgnoreCheckLogin
     @GetMapping
     fun showProducts(
@@ -23,7 +23,7 @@ class ProductViewController(private val productService: CrudProductUseCase) {
         @PageableDefault(size = 10, sort = ["name"], direction = Sort.Direction.DESC)
         pageable: Pageable,
     ): String {
-        val products = productService.findAll(pageable)
+        val products = crudProductUseCase.findAll(pageable)
 
         model.addAttribute("products", products.content)
         model.addAttribute("currentPage", products.number)
@@ -42,7 +42,7 @@ class ProductViewController(private val productService: CrudProductUseCase) {
         pageable: Pageable,
     ): String {
         if (bindingResult.hasErrors()) {
-            val products = productService.findAll(pageable)
+            val products = crudProductUseCase.findAll(pageable)
             model.addAttribute("products", products.content)
             model.addAttribute("currentPage", products.number)
             model.addAttribute("totalPages", products.totalPages)
@@ -50,7 +50,7 @@ class ProductViewController(private val productService: CrudProductUseCase) {
             model.addAttribute("hasErrors", bindingResult.hasErrors())
             return "product-list"
         }
-        productService.save(productDTO)
+        crudProductUseCase.save(productDTO)
         return "redirect:/"
     }
 }

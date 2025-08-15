@@ -1,8 +1,8 @@
 package ecommerce.repositories
 
-import ecommerce.entities.Product
+import ecommerce.entities.ProductEntity
 import org.springframework.data.jpa.repository.JpaRepository
 
-interface ProductRepository : JpaRepository<Product, Long> {
+interface ProductRepository : JpaRepository<ProductEntity, Long> {
     fun existsByName(name: String): Boolean
 }

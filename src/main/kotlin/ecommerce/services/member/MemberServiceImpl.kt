@@ -1,11 +1,11 @@
 package ecommerce.services.member
 
 import ecommerce.controller.member.usecase.CrudMemberUseCase
+import ecommerce.dto.MemberRegisterDTO
 import ecommerce.exception.OperationFailedException
 import ecommerce.mappers.toDTO
 import ecommerce.mappers.toEntity
-import ecommerce.model.MemberDTO
-import ecommerce.model.MemberRegisterDTO
+import ecommerce.model.Member
 import ecommerce.repositories.MemberRepository
 import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.data.repository.findByIdOrNull
@@ -15,23 +15,23 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class MemberServiceImpl(private val memberRepository: MemberRepository) : CrudMemberUseCase {
     @Transactional(readOnly = true)
-    override fun findAll(): List<MemberDTO> {
+    override fun findAll(): List<Member> {
         return memberRepository.findAll().map { it.toDTO() }
     }
 
     @Transactional(readOnly = true)
-    override fun findById(id: Long): MemberDTO =
+    override fun findById(id: Long): Member =
         memberRepository.findByIdOrNull(id)?.toDTO()
             ?: throw EmptyResultDataAccessException("Member with ID $id not found", 1)
 
     @Transactional(readOnly = true)
-    override fun findByEmail(email: String): MemberDTO {
+    override fun findByEmail(email: String): Member {
         return memberRepository.findByEmail(email)?.toDTO()
             ?: throw EmptyResultDataAccessException("Member with Email $email not found", 1)
     }
 
     @Transactional
-    override fun save(memberRegisterDTO: MemberRegisterDTO): MemberDTO {
+    override fun save(memberRegisterDTO: MemberRegisterDTO): Member {
         validateEmailUniqueness(memberRegisterDTO.email)
         val saved =
             memberRepository.save(memberRegisterDTO.toEntity())

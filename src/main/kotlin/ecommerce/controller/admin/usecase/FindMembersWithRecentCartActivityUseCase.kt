@@ -1,6 +1,6 @@
 package ecommerce.controller.admin.usecase
 
-import ecommerce.model.ActiveMemberDTO
+import ecommerce.dto.ActiveMemberDTO
 
 interface FindMembersWithRecentCartActivityUseCase {
     fun findMembers(): List<ActiveMemberDTO>
