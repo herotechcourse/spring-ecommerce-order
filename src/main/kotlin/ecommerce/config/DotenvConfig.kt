@@ -7,10 +7,11 @@ import org.springframework.context.annotation.Configuration
 class DotenvConfig {
     companion object {
         init {
-            val dotenv = Dotenv
-                .configure()
-                .ignoreIfMissing()
-                .load()
+            val dotenv =
+                Dotenv
+                    .configure()
+                    .ignoreIfMissing()
+                    .load()
             dotenv.entries().forEach { System.setProperty(it.key, it.value) }
         }
     }

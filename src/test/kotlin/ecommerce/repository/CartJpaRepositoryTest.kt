@@ -52,7 +52,7 @@ class CartJpaRepositoryTest
                     price = savedProduct.price,
                     imageUrl = savedProduct.imageUrl,
                     options = listOf(initialOption),
-                    id = savedProduct.id, // keep same id
+                    id = savedProduct.id,
                 )
             product = productRepository.save(productWithOption)
 
