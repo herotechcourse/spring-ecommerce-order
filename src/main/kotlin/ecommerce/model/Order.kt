@@ -30,6 +30,8 @@ class Order(
     var status: OrderStatus = OrderStatus.PRE_PAYMENT,
     @Column(nullable = false)
     var paymentAmount: Double = 0.0,
+    @Column(nullable = false)
+    var currency: String = "USD",
     @Column
     var paymentMethod: String? = null,
     @Column

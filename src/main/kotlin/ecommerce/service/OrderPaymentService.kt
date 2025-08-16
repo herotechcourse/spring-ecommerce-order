@@ -11,17 +11,20 @@ import org.springframework.stereotype.Service
 class OrderPaymentService(
     private val stripeClient: StripeClient,
 ) {
-    fun initiatePayment(
-        order: Order,
-        paymentMethod: String = "pm_card_visa",
-    ): PaymentResponse {
+    fun initiatePayment(order: Order): PaymentResponse {
+        val paymentMethod = order.paymentMethod ?: throw PaymentFailedException(MESSAGE_PAYMENT_METHOD_REQUIRED)
         val paymentRequest =
             PaymentRequest(
                 amount = order.paymentAmount.toInt(),
-                currency = "usd",
+                currency = order.currency,
                 paymentMethod = paymentMethod,
             )
         return stripeClient.createCheckoutSession(paymentRequest)
-            ?: throw PaymentFailedException("Payment failed with null")
+            ?: throw PaymentFailedException(MESSAGE_PAYMENT_FAILED_WITH_NULL)
+    }
+
+    companion object {
+        const val MESSAGE_PAYMENT_METHOD_REQUIRED = "Payment method required"
+        const val MESSAGE_PAYMENT_FAILED_WITH_NULL = "Payment failed with null"
     }
 }

@@ -61,12 +61,18 @@ class OrderService(
         val orderItems = cartItems.map { OrderItem.from(it) }
         orderItems.forEach { it.option.subtract(it.quantity) }
         val options = orderItems.map { it.option }
-        val order = Order(member = member, orderItems = orderItems, paymentMethod = orderForm.paymentMethod)
+        val order =
+            Order(
+                member = member,
+                orderItems = orderItems,
+                currency = orderForm.currency,
+                paymentMethod = orderForm.paymentMethod,
+            )
         order.status = OrderStatus.POST_PAYMENT
         member.addOrder(order)
         val paymentResponse =
             try {
-                orderPaymentService.initiatePayment(order, orderForm.paymentMethod)
+                orderPaymentService.initiatePayment(order)
             } catch (e: IllegalArgumentException) {
                 throw PaymentFailedException(e.message ?: "Payment failed")
             }
