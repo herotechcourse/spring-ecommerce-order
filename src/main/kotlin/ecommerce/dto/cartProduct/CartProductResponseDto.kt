@@ -1,5 +1,5 @@
 package ecommerce.dto.cartProduct
 
-class CartProductResponse(
+class CartProductResponseDto(
     val products: List<CartProductRequestDto>,
 )

@@ -1,0 +1,13 @@
+spring:
+  profiles:
+    active: prod
+
+server:
+  port: 8080
+
+stripe:
+  secret-key: ${STRIPE_SECRET_KEY}
+
+app:
+  cors:
+    allowed-origins: "${APP_CORS_ALLOWED_ORIGINS:*}"

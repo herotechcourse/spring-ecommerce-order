@@ -1,5 +1,4 @@
-# spring-ecommerce-product
-
+# spring-ecommerce-order
 ## Controller
 ### Admin
 #### AdminProductController
@@ -210,3 +209,46 @@
 ### Service
 - [x] MemberAuthServiceTest
 - [x] ProductServiceTest
+
+
+## Step 2-1 and Step 2-2
+### Feature list
+- [x] Stripe configuration
+  - [x] add  properties in application.properties - ``stripe.secret-key=``
+  - [x] add `@EnableConfigurationProperties(StripeProperties::class)` in `Application.kt`
+  - [x] add `StripeProperties` class with a `secretKey` field
+- [x] StripeClient
+- [x] dto
+  - [x] PlaceOrderRequest
+  - [x] PlaceOrderResponse
+  - [x] PaymentRequest
+  - [x] PaymentResponse
+  - [x] OptionQuantity
+- [x] model
+  - [x] Order
+    - [x] `user: User` - reference to the user  (`@ManyToOne`)
+    - [x] `stripeSessionId: String` - Stripe checkout session ID
+    - [x] `amount: Double` - total payment amount
+    - [x] `status: String` - order status (`PENDING`, `SUCCESS`, `FAILED`)
+    - [x] `items: MutableList<OrderItem>` - list of order items (`@OneToMany(mappedBy = "order", cascade = [ALL], orphanRemoval = true)`)
+    - [x] `createdAt: LocalDateTime` - order creation timestamp
+    - [x] `id: Long` - primary key 
+  - [x] OrderItem
+    - [x] `order: Order` - reference to the parent order (`@ManyToOne(fetch = LAZY)`)
+    - [x] `productOption: Option` - reference to the selected product option (`@ManyToOne(fetch = LAZY)`)
+    - [x] `quantity: Int` - number of items in this line (`@Column(nullable = false)`)
+    - [x] `id: Long` - primary key (`@Id`, `@GeneratedValue(strategy = IDENTITY)`)
+- [x] repository 
+  - [x] OrderRepository
+  - [x] OrderItemRepository
+- [x] service
+  - [x] OrderService
+- [x] controller
+  - [x] OrderController
+- [x] exception
+  - [x] PaymentException
+
+## Step 2-3
+- [x] Deployment script 
+- [x] Environment & secrets management (no secrets in repo; use env vars).
+- [x] Server CORS configuration.
