@@ -44,16 +44,20 @@
         - [x] `start.sh` to auto kill and start new application
         - [x] `_deploy.sh` to build and upload the build to remote instance, and execute `start.sh` in remote
     - [ ] handle security issue when interacting with the client API
-        - [x] resole CORS (Cross-Origin Resource Sharing)
+        - [x] resolve CORS (Cross-Origin Resource Sharing)
             - [x] Allow all origins
             - [x] Allow "simple" methods `GET`, `HEAD`, and `POST`
             - [x] Allow all headers
             - [x] set max age to 1800 seconds (30 minutes)
-        - [ ] login user
-        - [ ] login session 
-        - [ ] admin user
-        - [ ] admin control
-    - [ ] (optional) set up HTTPS
+        - [x] Authentication
+            - [x] use JWT for stateless auth
+            - [x] set validation of signature
+            - [x] set expiration
+            - [ ] ~~set rotating secret keys~~
+        - [x] Authorization
+            - [x] set validation for role-based access control
+            - [x] set validation for members only available to access the resource they reference
+
 
 ### Step 1
 
