@@ -1,4 +1,4 @@
-# spring-ecommerce-order 
+# spring-ecommerce-order
 
 
 ## Step 1.1 - Entity Mapping
@@ -13,7 +13,7 @@
 
 ### Features to Implement step 1.2
 
-- [x] Implement pagination for the product list. 
+- [x] Implement pagination for the product list.
 - [x] Implement pagination for the cart view.
 
 ## Step 1.3 - Product Option
@@ -32,7 +32,7 @@
 ### Features to Implement step 2.1
 
 -[x] Add StripeProperties bound to stripe.secret-key
--[x] Implement a StripeClient using Spring RestClient 
+-[x] Implement a StripeClient using Spring RestClient
 -[x] Implement Place Order application flow
 -[x] Add acceptance & service tests covering
 
@@ -47,7 +47,7 @@
 - [x] Payment amount
 
 
-## Step 2.3 - Deployment 
+## Step 2.3 - Deployment
 
 ### Features to Implement step 2.3
 
