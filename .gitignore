@@ -41,7 +41,6 @@ out/
 
 # --- Env & secrets ---
 .env
-.env.*
 *.key
 *.pem
 *.crt
