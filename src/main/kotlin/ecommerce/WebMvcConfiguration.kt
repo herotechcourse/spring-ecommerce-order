@@ -24,7 +24,6 @@ class WebMvcConfiguration(
         resolvers.add(loginMemberArgumentResolver)
     }
 
-    // TODO: assign 'allowedOrigins' to frontend address
     override fun addCorsMappings(registry: CorsRegistry) {
         registry.addMapping("/api/**")
             .allowedOrigins("*")
