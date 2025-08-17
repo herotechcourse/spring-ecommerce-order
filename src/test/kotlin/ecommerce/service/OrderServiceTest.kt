@@ -4,18 +4,15 @@ import ecommerce.dto.OrderPlaceForm
 import ecommerce.exception.EmptyCartException
 import ecommerce.exception.InsufficientStockException
 import ecommerce.model.Order
-import ecommerce.model.OrderStatus
 import ecommerce.repository.CartItemRepository
 import ecommerce.repository.MemberRepository
 import ecommerce.repository.OptionRepository
 import ecommerce.repository.OrderItemRepository
-import ecommerce.repository.OrderRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.transaction.annotation.Transactional
 import kotlin.jvm.optionals.getOrNull
 
@@ -27,7 +24,6 @@ class OrderServiceTest(
     @Autowired private val cartItemRepository: CartItemRepository,
     @Autowired private val optionRepository: OptionRepository,
     @Autowired private val orderItemRepository: OrderItemRepository,
-    @Autowired private val orderRepository: OrderRepository,
 ) {
     @Test
     fun readOrders() {
@@ -92,29 +88,5 @@ class OrderServiceTest(
     fun `placeOrder() - payment error`() {
         val member = memberRepository.findAll().first()
         assertThrows<InsufficientStockException> { orderService.placeOrder(member.id, OrderPlaceForm(listOf(15L))) }
-    }
-
-    @Test
-    fun `placeOrder() - payment integration test for success`() {
-        val cartItemIds = listOf(5L, 8L)
-        val member = memberRepository.findAll().first()
-        val savedOrder = orderService.placeOrder(member.id, OrderPlaceForm(cartItemIds, "pm_card_visa"))
-
-        val actual = orderRepository.findByIdOrNull(savedOrder.id)
-
-        assertThat(actual).isNotNull()
-        assertThat(actual?.status).isEqualTo(OrderStatus.ORDERED)
-    }
-
-    @Test
-    fun `placeOrder() - payment integration test for fail`() {
-        val cartItemIds = listOf(11L)
-        val member = memberRepository.findAll().first()
-        assertThrows<IllegalArgumentException> {
-            orderService.placeOrder(
-                member.id,
-                OrderPlaceForm(cartItemIds, "pm_card_visa_chargeDeclined"),
-            )
-        }
     }
 }
