@@ -20,12 +20,23 @@ interface OptionJpaRepository : JpaRepository<Option, Long> {
         set o.quantity = o.quantity - :qty
         where o.id = :optionId
           and o.quantity >= :qty
-    """,
+    """
     )
     fun decrementStockIfEnough(
         optionId: Long,
         qty: Int,
     ): Int
 
-    fun existsByProductId(productId: Long): Boolean
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query(
+        """
+        update Option o
+        set o.quantity = o.quantity + :qty
+        where o.id = :optionId
+    """
+    )
+    fun incrementStock(
+        optionId: Long,
+        qty: Int,
+    ): Int
 }
