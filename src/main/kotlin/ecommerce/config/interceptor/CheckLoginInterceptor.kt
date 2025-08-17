@@ -6,6 +6,7 @@ import ecommerce.exception.AuthorizationException
 import ecommerce.infrastructure.JwtTokenProvider
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
+import org.springframework.http.HttpMethod
 import org.springframework.stereotype.Component
 import org.springframework.web.method.HandlerMethod
 import org.springframework.web.servlet.HandlerInterceptor
@@ -17,6 +18,10 @@ class CheckLoginInterceptor(private val jwtTokenProvider: JwtTokenProvider) : Ha
         response: HttpServletResponse,
         handler: Any,
     ): Boolean {
+        if (request.method == HttpMethod.OPTIONS.name()) {
+            return true
+        }
+
         if (handler is HandlerMethod) {
             if (handler.hasMethodAnnotation(IgnoreCheckLogin::class.java) ||
                 handler.beanType.isAnnotationPresent(IgnoreCheckLogin::class.java)

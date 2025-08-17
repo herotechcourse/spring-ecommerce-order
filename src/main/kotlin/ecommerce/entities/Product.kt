@@ -7,7 +7,6 @@ import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
-import jakarta.persistence.JoinColumn
 import jakarta.persistence.OneToMany
 import jakarta.persistence.Table
 
@@ -25,8 +24,7 @@ class Product(
     var imageUrl: String,
     @OneToMany(mappedBy = "product", cascade = [CascadeType.ALL], orphanRemoval = true)
     val cartItems: Set<CartItem> = emptySet(),
-    @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true)
-    @JoinColumn(name = "product", nullable = false)
+    @OneToMany(mappedBy = "product", cascade = [CascadeType.ALL], orphanRemoval = true)
     private val _options: MutableList<Option> = mutableListOf(),
 ) {
     var options: List<Option>
