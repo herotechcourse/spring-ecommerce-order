@@ -36,15 +36,4 @@ class Option(
             "Quantity must be between 1 and 99,999,999."
         }
     }
-
-    operator fun plusAssign(amount: Int) {
-        require(amount > 0) { "Amount must be positive." }
-        quantity += amount
-    }
-
-    operator fun minusAssign(amount: Int) {
-        require(amount > 0) { "Amount must be positive." }
-        if (quantity - amount < 0) throw IllegalArgumentException("Not enough quantity.")
-        quantity -= amount
-    }
 }
