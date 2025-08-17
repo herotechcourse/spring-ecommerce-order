@@ -1,5 +1,6 @@
 package ecommerce.service
 
+import ecommerce.client.PaymentRequest
 import ecommerce.dto.OrderPlaceForm
 import ecommerce.dto.OrderResponse
 import ecommerce.exception.EmptyCartException
@@ -54,6 +55,7 @@ class OrderService(
         orderForm: OrderPlaceForm,
     ): Order {
         if (orderForm.cartItemIds.isEmpty()) throw EmptyCartException(MESSAGE_EMPTY_CART)
+        if (orderForm.paymentMethod.isEmpty()) throw EmptyCartException(MESSAGE_EMPTY_CART)
         val member =
             memberRepository.findByIdOrNull(memberId)
                 ?: throw NotFoundException(MESSAGE_ORDER_NOT_FOUND)
@@ -70,9 +72,15 @@ class OrderService(
             )
         order.status = OrderStatus.POST_PAYMENT
         member.addOrder(order)
+        val paymentRequest =
+            PaymentRequest(
+                amount = order.paymentAmount.toInt(),
+                currency = order.currency,
+                paymentMethod = orderForm.paymentMethod,
+            )
         val paymentResponse =
             try {
-                orderPaymentService.initiatePayment(order)
+                orderPaymentService.initiatePayment(paymentRequest)
             } catch (e: IllegalArgumentException) {
                 throw PaymentFailedException(e.message ?: "Payment failed")
             }
@@ -89,6 +97,7 @@ class OrderService(
 
     companion object {
         const val MESSAGE_EMPTY_CART = "No cart item provided in cart to order"
+        const val MESSAGE_PAYMENT_METHOD_REQUIRED = "Payment method required"
         const val MESSAGE_ORDER_NOT_FOUND = "Order not found"
     }
 }
