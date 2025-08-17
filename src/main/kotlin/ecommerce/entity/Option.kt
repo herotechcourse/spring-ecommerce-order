@@ -9,13 +9,17 @@ import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
+import jakarta.persistence.Version
 
 @Entity
 @Table(name = "product_option")
 class Option(
     name: String,
+
     @Column(nullable = false)
+    @Version
     var quantity: Int,
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0L,
@@ -33,9 +37,14 @@ class Option(
         }
     }
 
-    fun subtract(amount: Int) {
-        if (amount <= 0) throw IllegalArgumentException("Amount must be positive.")
-        if (quantity - amount < 0) throw IllegalStateException("Not enough quantity.")
+    operator fun plusAssign(amount: Int) {
+        require(amount > 0) { "Amount must be positive." }
+        quantity += amount
+    }
+
+    operator fun minusAssign(amount: Int) {
+        require(amount > 0) { "Amount must be positive." }
+        if (quantity - amount < 0) throw IllegalArgumentException("Not enough quantity.")
         quantity -= amount
     }
 }
