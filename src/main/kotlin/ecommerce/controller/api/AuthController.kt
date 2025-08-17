@@ -2,6 +2,7 @@ package ecommerce.controller.api
 
 import ecommerce.auth.AuthorizationExtractor
 import ecommerce.auth.BearerAuthorizationExtractor
+import ecommerce.config.Loggable
 import ecommerce.dto.AuthResponse
 import ecommerce.dto.LoginForm
 import ecommerce.dto.MemberResponse
@@ -25,7 +26,7 @@ import java.net.URI
 class AuthController(
     private val authService: AuthService,
     private val authorizationExtractor: AuthorizationExtractor<String> = BearerAuthorizationExtractor(),
-) {
+) : Loggable {
     @PostMapping("/register")
     fun registerMember(
         @RequestBody @Valid form: RegisterForm,
@@ -56,7 +57,7 @@ class AuthController(
     fun handleMemberEmailAlreadyExistsExceptionHandler(e: Exception): ResponseEntity<Map<String, Any>> {
         val error = mapOf("email" to e.message)
         val errorBody = mapOf("errors" to error)
-        println("MemberEmailAlreadyExistsException occurred: $errorBody")
+        logger.error("MemberEmailAlreadyExistsException occurred: $errorBody")
         return ResponseEntity.badRequest().body(errorBody)
     }
 }

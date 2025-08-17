@@ -1,5 +1,6 @@
 package ecommerce.controller.api
 
+import ecommerce.config.Loggable
 import ecommerce.dto.OrderItemResponse
 import ecommerce.dto.OrderPlaceForm
 import ecommerce.dto.OrderResponse
@@ -25,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/api/orders")
 class OrderController(
     private val orderService: OrderService,
-) {
+) : Loggable {
     @GetMapping
     fun getOrdersByMemberId(
         @LoginMember member: Member,
@@ -57,7 +58,7 @@ class OrderController(
     fun handleEmptyCartException(e: Exception): ResponseEntity<Map<String, Any>> {
         val error = mapOf("cart" to e.message)
         val errorBody = mapOf("errors" to error)
-        println("EmptyCartException occurred: $errorBody")
+        logger.error("EmptyCartException occurred: $errorBody")
         return ResponseEntity.badRequest().body(errorBody)
     }
 
@@ -65,7 +66,7 @@ class OrderController(
     fun handleInsufficientStockException(e: Exception): ResponseEntity<Map<String, Any>> {
         val error = mapOf("stock" to e.message)
         val errorBody = mapOf("errors" to error)
-        println("InsufficientStockException occurred: $errorBody")
+        logger.error("InsufficientStockException occurred: $errorBody")
         return ResponseEntity.badRequest().body(errorBody)
     }
 
@@ -73,7 +74,7 @@ class OrderController(
     fun handlePaymentFailedException(e: Exception): ResponseEntity<Map<String, Any>> {
         val error = mapOf("payment" to e.message)
         val errorBody = mapOf("errors" to error)
-        println("PaymentFailedException occurred: $errorBody")
+        logger.error("PaymentFailedException occurred: $errorBody")
         return ResponseEntity.status(HttpStatus.PAYMENT_REQUIRED).body(errorBody)
     }
 }

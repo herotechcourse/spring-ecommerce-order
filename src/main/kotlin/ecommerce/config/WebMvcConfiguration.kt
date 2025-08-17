@@ -1,4 +1,4 @@
-package ecommerce
+package ecommerce.config
 
 import ecommerce.service.AuthService
 import ecommerce.ui.CheckAdminInterceptor
