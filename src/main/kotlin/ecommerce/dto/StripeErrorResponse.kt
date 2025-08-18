@@ -15,7 +15,7 @@ data class StripeErrorDetail(
     val message: String?,
     val param: String?,
     val type: String?,
-    val adviceCode: String?, // or any other fields Stripe may send
+    val adviceCode: String?,
 )
 
 fun mapStringToStripeErrorResponse(errorBody: String): StripeErrorDto {
