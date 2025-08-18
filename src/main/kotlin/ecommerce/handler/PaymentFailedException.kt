@@ -1,3 +1,3 @@
 package ecommerce.handler
 
-class PaymentFailedException (message: String): RuntimeException(message)
+class PaymentFailedException(message: String) : RuntimeException(message)

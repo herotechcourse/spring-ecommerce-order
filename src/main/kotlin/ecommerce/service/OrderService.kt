@@ -1,11 +1,14 @@
 package ecommerce.service
 
-import com.stripe.exception.StripeException
-import ecommerce.handler.PaymentFailedException
-import ecommerce.handler.OrderCreationException
+import com.stripe.model.PaymentIntent
+import ecommerce.dto.CreateOrderResponse
+import ecommerce.dto.MemberResponse
 import ecommerce.entity.Order
 import ecommerce.entity.OrderItem
 import ecommerce.entity.Payment
+import ecommerce.enums.OrderAndPaymentStatus
+import ecommerce.handler.OrderCreationException
+import ecommerce.handler.PaymentFailedException
 import ecommerce.repository.CartItemRepositoryJpa
 import ecommerce.repository.CartRepositoryJpa
 import ecommerce.repository.MemberRepositoryJpa
@@ -25,15 +28,17 @@ class OrderService(
     private val paymentRepository: PaymentRepository,
     private val memberRepository: MemberRepositoryJpa,
     private val stripeClientService: StripeClientService,
+    private val cartService: CartService,
+    private val optionService: OptionService,
 ) {
     @Transactional
     fun createOrder(
         memberId: Long,
         productOptionId: Long,
-        amount: Int,
-    ) {
-
-        try {
+        quantity: Int,
+        paymentMethod: String,
+        currency: String,
+    ): CreateOrderResponse {
         val cart =
             cartRepository.findByMemberId(memberId)
                 ?: throw NoSuchElementException("Cart not found")
@@ -42,70 +47,125 @@ class OrderService(
             cartItemRepository.findByCartIdAndProductOptionId(cart.id!!, productOptionId)
                 ?: throw NoSuchElementException("Cart item not found")
 
-        val product =
-            cartItem.product
-                ?: throw IllegalStateException("Cart item product is null")
+        val product = cartItem.product
 
         val member =
             memberRepository.findById(memberId)
                 .orElseThrow { NoSuchElementException("Member not found") }
 
-        val totalPrice = product.price * amount.toDouble()
-        val amountInCents = (totalPrice * 100).toLong() // Stripe needs smallest currency unit
+        val totalPrice = product.price * quantity.toDouble()
+        val amountInCents = (totalPrice * 100).toLong() // Stripe requires cents
 
         val order =
-            Order(
-                member = member,
-                status = "PENDING",
-            )
-        orderRepository.save(order)
+            try {
+                orderRepository.save(
+                    Order(
+                        member = member,
+                        status = OrderAndPaymentStatus.PENDING,
+                    ),
+                )
+            } catch (e: Exception) {
+                throw OrderCreationException("Order creation failed: ${e.message}")
+            }
 
-        val orderItem =
-            OrderItem(
-                order = order,
-                product = product,
-                productOption = cartItem.productOption,
-                quantity = amount,
+        try {
+            orderItemRepository.save(
+                OrderItem(
+                    order = order,
+                    product = product,
+                    productOption = cartItem.productOption,
+                    quantity = quantity,
+                ),
             )
-        orderItemRepository.save(orderItem)
-
-        val paymentIntentId =
-            stripeClientService.createPaymentIntent(
-                amount = amountInCents,
-                currency = "usd",
-            )
-
-        val payment =
-            Payment(
-                order = order,
-                status = "PENDING",
-                stripePaymentIntentId = paymentIntentId.id,
-                amount = amountInCents,
-            )
-        paymentRepository.save(payment)
-
-        cart.cartItems.remove(cartItem)
-        cartRepository.save(cart)
-        } catch (e: StripeException) {
-            throw PaymentFailedException("Payment failed: ${e.message}")
         } catch (e: Exception) {
-            throw OrderCreationException("Order creation failed: ${e.message}")
+            throw OrderCreationException("Order item creation failed: ${e.message}")
         }
+
+        val paymentIntent: PaymentIntent =
+            try {
+                stripeClientService.createPaymentIntent(
+                    amountInCents,
+                    currency,
+                    paymentMethod,
+                )
+            } catch (e: Exception) {
+                throw PaymentFailedException("Payment failed: ${e.message}")
+            }
+
+        try {
+            paymentRepository.save(
+                Payment(
+                    order = order,
+                    status = OrderAndPaymentStatus.PENDING,
+                    stripePaymentIntentId = paymentIntent.id,
+                    amount = amountInCents,
+                ),
+            )
+        } catch (e: Exception) {
+            throw PaymentFailedException("Payment persistence failed: ${e.message}")
+        }
+
+        cartRepository.save(cart)
+
+        return CreateOrderResponse(
+            orderId = order.id!!,
+            paymentIntentId = paymentIntent.id,
+        )
     }
 
     @Transactional
-    fun markOrderAsPaid(paymentIntentId: String) {
-        val payment = paymentRepository.findByStripePaymentIntentId(paymentIntentId)
-            ?: throw NoSuchElementException("Payment not found for paymentIntentId $paymentIntentId")
+    fun cleanCartItemsForOrder(order: Order) {
+        val cart =
+            cartRepository.findByMemberId(order.member!!.id!!)
+                ?: throw NoSuchElementException("Cart not found")
 
-        payment.status = "PAID"
-        paymentRepository.save(payment)
+        val orderItemProductOptions = order.orderItems.mapNotNull { it.productOption?.id }.toSet()
+        cart.cartItems.removeIf { it.productOption.id in orderItemProductOptions }
 
-        val order = payment.order ?: throw IllegalStateException("Order for payment is null")
+        cartRepository.save(cart)
+    }
 
-        if(payment.status == "PAID") {
-            order.status = "PAID"
+    @Transactional
+    fun processPayment(
+        orderId: Long,
+        member: MemberResponse,
+    ): String {
+        try {
+            val order =
+                orderRepository.findByIdAndMemberId(orderId, member.id)
+
+            if (order == null) {
+                throw NoSuchElementException("Order not found")
+            }
+
+            val payment = order.payment
+
+            if (payment == null || payment.stripePaymentIntentId == null) {
+                throw NoSuchElementException("Payment not found")
+            }
+
+            if (payment.status == OrderAndPaymentStatus.PAID) {
+                throw PaymentFailedException("Payment already made, status = ${payment.status}")
+            }
+
+            stripeClientService.confirmPaymentIntent(payment.stripePaymentIntentId)
+
+            payment.status = OrderAndPaymentStatus.PAID
+            paymentRepository.save(payment)
+
+            order.status = OrderAndPaymentStatus.PAID
+            orderRepository.save(order)
+
+            order.orderItems.forEach { orderItem ->
+                val productOption = orderItem.productOption ?: return@forEach
+                optionService.decreaseOptionQuantity(productOption.id!!, orderItem.quantity)
+            }
+
+            cleanCartItemsForOrder(order)
+
+            return "Payment successful, order ${order.id} marked as PAID"
+        } catch (e: Exception) {
+            throw PaymentFailedException("Payment processing failed: ${e.message}")
         }
-        orderRepository.save(order)
     }
 }
