@@ -18,6 +18,10 @@ class AuthInterceptor(
         response: HttpServletResponse,
         handler: Any,
     ): Boolean {
+        if (request.method.equals("OPTIONS", ignoreCase = true)) {
+            return true
+        }
+
         val token = authExtractor.extract(request)
         if (token.isEmpty()) {
             response.status = HttpStatus.UNAUTHORIZED.value()
@@ -29,6 +33,7 @@ class AuthInterceptor(
         }
         val email = jwtTokenProvider.getPayload(token)
         request.setAttribute("email", email)
+
         return true
     }
 }
