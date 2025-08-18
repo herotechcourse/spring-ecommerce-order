@@ -41,7 +41,7 @@ class OptionEntity(
         }
     }
 
-    fun decreaseQuantity(amount: Long) {
+    fun decreaseQuantity(amount: Int) {
         require(amount > 0) { "Amount must be positive" }
         check(quantity >= amount) { "Insufficient stock for option id=$id" }
         quantity -= amount

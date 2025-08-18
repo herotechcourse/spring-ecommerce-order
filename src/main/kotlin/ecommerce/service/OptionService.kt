@@ -34,11 +34,12 @@ class OptionService(
 
     fun decreaseOptionQuantity(
         optionId: Long,
-        amount: Long,
+        amount: Int,
     ) {
         val option =
             optionRepositoryJpa.findByIdOrNull(optionId)
                 ?: throw NoSuchElementException("Option not found id=$optionId")
         option.decreaseQuantity(amount)
+        optionRepositoryJpa.save(option)
     }
 }
