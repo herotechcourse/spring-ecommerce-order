@@ -43,13 +43,16 @@ class Cart(
         require(option.isAvailable(quantity)) { "Item not in stock" }
         val existingItem = items.find { it.option.id == option.id }
 
-        return existingItem?.apply{
+        return existingItem?.apply {
             existingItem.quantity += quantity
             existingItem.updatedAt = LocalDateTime.now()
         } ?: createNewCartItem(option, quantity)
     }
 
-    private fun createNewCartItem(option: Option, quantity: Int): CartItem {
+    private fun createNewCartItem(
+        option: Option,
+        quantity: Int,
+    ): CartItem {
         return CartItem(option = option, cart = this, quantity = quantity).also {
             items.add(it)
         }
