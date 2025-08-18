@@ -14,12 +14,14 @@ import org.mockito.Mockito.`when`
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.verify
 import org.springframework.http.ResponseEntity
+import org.springframework.test.context.ActiveProfiles
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestClientResponseException
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 @Suppress("UNCHECKED_CAST")
+@ActiveProfiles("test")
 class StripeClientTest {
     @Mock
     private val stripeProperties = StripeProperties(secretKey = "sk_test_123")

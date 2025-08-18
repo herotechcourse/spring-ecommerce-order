@@ -1,7 +1,6 @@
 package ecommerce.controller
 
 import ecommerce.DatabaseFixture
-import ecommerce.dto.CartItemRequest
 import ecommerce.dto.TokenRequest
 import ecommerce.model.Cart
 import ecommerce.model.CartItem
@@ -26,8 +25,10 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.server.LocalServerPort
 import org.springframework.http.HttpStatus
+import org.springframework.test.context.ActiveProfiles
 import java.time.LocalDateTime
 
+@ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class StatisticsE2ETest() {
     @Autowired
@@ -140,19 +141,6 @@ class StatisticsE2ETest() {
                 .extract()
         val token = loginResponse.body().jsonPath().getString("token")
         return token
-    }
-
-    private fun addProductToCart(
-        cartRequest: CartItemRequest,
-        token: String,
-    ) {
-        RestAssured
-            .given()
-            .baseUri(baseUrl)
-            .header("Authorization", "Bearer $token")
-            .body(cartRequest).contentType(ContentType.JSON)
-            .`when`()
-            .post("/api/cart")
     }
 
     private fun getStatistics(

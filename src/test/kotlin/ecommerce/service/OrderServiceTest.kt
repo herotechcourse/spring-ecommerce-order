@@ -27,10 +27,12 @@ import org.mockito.Mockito.`when`
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.verify
+import org.springframework.test.context.ActiveProfiles
 import java.time.LocalDateTime
 import java.util.Optional
 import kotlin.test.assertEquals
 
+@ActiveProfiles("test")
 @ExtendWith(MockitoExtension::class)
 class OrderServiceTest {
     private lateinit var orderService: OrderService
@@ -142,10 +144,9 @@ class OrderServiceTest {
             )
         `when`(optionRepository.findById(1L)).thenReturn(Optional.of(option))
 
-        val ex =
-            assertThrows<RuntimeException> {
-                orderService.placeOrder(req, member)
-            }
+        assertThrows<RuntimeException> {
+            orderService.placeOrder(req, member)
+        }
         assertEquals(OrderStatus.FAILED, savedOrder.status)
     }
 

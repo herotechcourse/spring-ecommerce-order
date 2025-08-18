@@ -1,7 +1,6 @@
 package ecommerce.controller
 
 import ecommerce.annotation.LoginMemberArgumentResolver
-import ecommerce.config.AuthInterceptor
 import ecommerce.config.WebMvcConfiguration
 import ecommerce.dto.CartItemRequest
 import ecommerce.dto.RegisteredMember
@@ -13,7 +12,6 @@ import ecommerce.model.CartItem
 import ecommerce.model.Member
 import ecommerce.model.Option
 import ecommerce.model.Product
-import ecommerce.service.AuthService
 import ecommerce.service.CartService
 import ecommerce.service.mapper.CartItemMapper
 import org.junit.jupiter.api.BeforeEach
@@ -33,6 +31,7 @@ import org.springframework.context.annotation.Import
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.http.MediaType
+import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.delete
@@ -63,6 +62,7 @@ class TestWebConfig : WebMvcConfigurer {
     }
 }
 
+@ActiveProfiles("test")
 @WebMvcTest(
     controllers = [CartController::class],
     excludeFilters = [
@@ -79,23 +79,14 @@ class CartControllerTest
         private val mockMvc: MockMvc,
     ) {
         @MockitoBean
-        private lateinit var authorizationExtractor: AuthorizationExtractor
-
-        @MockitoBean
-        private lateinit var authInterceptor: AuthInterceptor
-
-        @MockitoBean
         private lateinit var cartService: CartService
-
-        @MockitoBean
-        private lateinit var authService: AuthService
 
         @Autowired
         private lateinit var loginMemberArgumentResolver: LoginMemberArgumentResolver
 
         @BeforeEach
         fun setup() {
-            val mockCart = mock(Cart::class.java)
+            mock(Cart::class.java)
             whenever(loginMemberArgumentResolver.supportsParameter(any())).thenReturn(true)
             whenever(loginMemberArgumentResolver.resolveArgument(any(), any(), any(), any()))
                 .thenReturn(
