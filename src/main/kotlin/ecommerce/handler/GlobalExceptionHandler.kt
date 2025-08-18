@@ -15,13 +15,6 @@ data class ValidationErrorResponse(val errors: List<ValidationError>)
 class GlobalExceptionHandler {
     private val logger = LoggerFactory.getLogger(GlobalExceptionHandler::class.java)
 
-    @ExceptionHandler(NoSuchElementException::class)
-    fun handleNoSuchElementException(e: NoSuchElementException): ResponseEntity<Void> {
-        logger.warn("Resource not found: ${e.message}", e)
-
-        return ResponseEntity.notFound().build()
-    }
-
     @ExceptionHandler(MethodArgumentNotValidException::class)
     fun handleValidationException(ex: MethodArgumentNotValidException): ResponseEntity<ValidationErrorResponse> {
         val errors =
@@ -70,7 +63,8 @@ class GlobalExceptionHandler {
 
     @ExceptionHandler(NoSuchElementException::class)
     fun handleNotFound(ex: NoSuchElementException): ResponseEntity<Map<String, String>> {
-        val errorResponse = mapOf("error" to ex.message.orEmpty())
+        logger.warn("Resource not found: ${ex.message}", ex)
+        val errorResponse = mapOf("error" to (ex.message ?: "Resource not found"))
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse)
     }
 
