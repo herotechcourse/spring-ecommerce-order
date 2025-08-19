@@ -142,7 +142,7 @@ It handles product stock updates, cart cleanup, payment confirmation, robust err
     - 4242424242424242 – Valid Visa Card
     - 5555555555554444 – Valid Master Card~~
 - -> "When writing test code, use a PaymentMethod such as pm_card_visa instead of a card number. We don’t recommend using card numbers directly in API calls or server-side code, even in testing environments. If you do use them, your code might not be PCI-compliant when you go live. "
-- [ ] test with payment methods provided by the [Stripe official documentation](https://docs.stripe.com/testing?testing-method=payment-methods#visa)
+- [x] test with payment methods provided by the [Stripe official documentation](https://docs.stripe.com/testing?testing-method=payment-methods#visa)
   - pm_card_visa
   - pm_card_mastercard
   - pm_card_amex 
@@ -171,9 +171,9 @@ It handles product stock updates, cart cleanup, payment confirmation, robust err
 ## Step 2.2 - Orders Retrieval
 ### Features
 1. Orders
-- [ ] Endpoint: `GET /orders`
+- [x] Endpoint: `GET /orders`
 - [ ] optional: add pagination
-- [ ] Each order record should include:
+- [x] Each order record should include:
   - [x] Order Date & Time (when payment was completed)
   - [x] Order Status (e.g., PENDING, PAID, FAILED, CANCELLED)
   - [x] Purchased Items (product names, options, quantities)
@@ -201,25 +201,24 @@ It handles product stock updates, cart cleanup, payment confirmation, robust err
 ## Step 2.3 - Deployment
 You must deploy your existing service and ensure it can interact with the client.
 ### Features
-- [ ] Write a deployment script to automate the deployment process. (`deploy.sh`)
+- [x] Write a deployment script to automate the deployment process. (`deploy.sh`)
   - Pull latest code from repository. 
   - Build project. 
   - Run database migrations (if any). 
   - Restart backend service.
-- [ ] Handle security issues when interacting with the client API.
-  - [ ] For example, resolve issues caused when the server and client have different Origin values.
+- [x] Handle security issues when interacting with the client API.
+  - [x] For example, resolve issues caused when the server and client have different Origin values.
 - [ ] HTTPS is optional
-- [ ] Cors Configuration #applyPermitDefaultValues()
-  - [ ] Allow all origins.
-  - [ ] Allow “simple” methods GET, HEAD and POST.
-  - [ ] Allow all headers.
-  - [ ] Set max age to 1800 seconds (30 minutes).
-- [ ] Test with MockMVC
-  - [ ] Test client → server calls in local & production.
-  - [ ] Confirm no CORS errors in browser console.
+- [x] Cors Configuration #applyPermitDefaultValues()
+  - [x] Allow all origins.
+  - [x] Allow “simple” methods GET, HEAD and POST.
+  - [x] Allow all headers.
+  - [x] Set max age to 1800 seconds (30 minutes).
+- [x] Test with MockMVC
+  - [x] Test client → server calls in local & production.
+  - [x] Confirm no CORS errors in browser console.
 
 ## Action Plan for Step 2
---- Saturday ---
 1. [x] Design Order domain & DTOs (Order, OrderItem, enums, payment metadata).
 2. [x] Add repositories (or entities).
 3. [x] Add Stripe config + SDK dependency. (Use test/sandbox key in application.properties, never commit it.) Stripe Docs
@@ -227,11 +226,9 @@ You must deploy your existing service and ensure it can interact with the client
 5. [x] Implement OrderService.placeOrder() orchestration: validate stock, create PENDING order, call Stripe, finalize (decrement stock + cart cleanup) on success. Use DB locking & transactions when changing stock.
 6. [x] Implement error mapping & friendly messages for Stripe decline codes (expired_card, insufficient_funds, incorrect_cvc, card_declined, etc.). Stripe Docs+1
 7. Add webhook endpoint (/webhooks/stripe) to process payment_intent.succeeded / fallback reconciliation (recommended). Stripe Docs
---- Sunday ---
-8. Add controller endpoints: POST /orders/place and GET /orders (with pagination).
-9. Add tests: unit tests (mock Stripe), integration tests (Stripe test keys or WireMock), MockMvc tests for controllers.
---- Monday ---
-10. Deploy: script (deploy.sh), run migrations, restart service, test client-server flows (CORS config).
+8. [x] Add controller endpoints: POST /orders/place and GET /orders (with pagination).
+9. [x] Add tests: unit tests (mock Stripe), integration tests (Stripe test keys or WireMock), MockMvc tests for controllers.
+10. [x] Deploy: script (deploy.sh), run migrations, restart service, test client-server flows (CORS config).
 
 ## Considerations
 
@@ -239,6 +236,8 @@ You must deploy your existing service and ensure it can interact with the client
 - [ ] change Double to BigDecimal inside the Entity (Product/price)
 - [x] decide on where and how to use Models
     - Entity == Model
-- [x] dont use Cascade.All but Persist, Merge etc.
+- [x] don't use Cascade.All but Persist, Merge etc.
 - [ ] move product-option mapping to the constructor
 - [ ] effective test: Create InMemory fake repos -> service uses the fake repos
+- [ ] add HTTPS
+- [ ] add webhook endpoint (/webhooks/stripe)
