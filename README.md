@@ -1,7 +1,5 @@
 # Spring Ecommerce Order
 
----
-
 ## Step 1-1 - Entity Mapping
 
 Goal: Transform Repository and entities using Spring Data JPA.
@@ -85,8 +83,6 @@ Design and implement the feature considering the relationship between the Produc
 #### Test
 - [x] test Option
 
-----
-
 ## Step 2-1 - External API
 Goal: Implement the "Place Order" feature using Stripe Payment Integration. </br>
 This feature allows users to place orders with online payment processing via **Stripe's Payment Intent API** (sandbox mode).
@@ -129,10 +125,6 @@ It handles product stock updates, cart cleanup, payment confirmation, robust err
   - [x] message based on Stripe's codes
     - [x] 4xx throws 400 BadRequestException()
     - [x] 5xx throws 503 ExternalServiceException()
-    - ~~_Expired session_ → "Your payment session has expired. Please try again."
-    - _Invalid payment method_ → "The payment method is invalid. Please check your card details."
-    - _Insufficient balance_ → "Insufficient funds. Please use another card."
-    - Other failures → "Payment could not be processed. Please try again."~~
 ~~- [ ] Test with test cards provided in [Stripe official document](https://docs.stripe.com/testing?testing-method=card-numbers#declined-payments)
     - 4000000000000069 – Expired card decline
     - 4000 0000 0000 9995 – Insufficient funds
@@ -202,10 +194,6 @@ It handles product stock updates, cart cleanup, payment confirmation, robust err
 You must deploy your existing service and ensure it can interact with the client.
 ### Features
 - [x] Write a deployment script to automate the deployment process. (`deploy.sh`)
-  - Pull latest code from repository. 
-  - Build project. 
-  - Run database migrations (if any). 
-  - Restart backend service.
 - [x] Handle security issues when interacting with the client API.
   - [x] For example, resolve issues caused when the server and client have different Origin values.
 - [ ] HTTPS is optional
@@ -229,6 +217,7 @@ You must deploy your existing service and ensure it can interact with the client
 8. [x] Add controller endpoints: POST /orders/place and GET /orders (with pagination).
 9. [x] Add tests: unit tests (mock Stripe), integration tests (Stripe test keys or WireMock), MockMvc tests for controllers.
 10. [x] Deploy: script (deploy.sh), run migrations, restart service, test client-server flows (CORS config).
+
 
 ## Considerations
 
