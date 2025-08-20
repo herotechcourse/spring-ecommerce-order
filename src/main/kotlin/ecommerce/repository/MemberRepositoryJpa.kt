@@ -1,4 +1,5 @@
 package ecommerce.repository
+
 import ecommerce.entity.Member
 import org.springframework.data.jpa.repository.JpaRepository
 

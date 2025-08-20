@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import ecommerce.dto.CartRequest
 import ecommerce.dto.MemberResponse
 import ecommerce.entity.Cart
+import ecommerce.enums.UserRole
 import ecommerce.infrastructure.JWTProvider
-import ecommerce.model.UserRole
 import ecommerce.resolver.LoginMemberArgumentResolver
 import ecommerce.service.AuthService
 import ecommerce.service.CartService
@@ -53,7 +53,7 @@ class CartControllerTest {
     private val token = "mocked-jwt-token"
     private val memberResponse =
         MemberResponse(id = 1L, email = "user@example.com", name = "John Doe", role = UserRole.USER.name)
-    private val cartRequest = CartRequest(productId = 100L)
+    private val cartRequest = CartRequest(productOptionId = 100L)
 
     @BeforeEach
     fun setup() {
@@ -90,7 +90,7 @@ class CartControllerTest {
         )
             .andExpect(status().isCreated)
 
-        verify(cartService).addToCart(memberResponse.id, cartRequest.productId)
+        verify(cartService).addToCart(memberResponse.id, cartRequest.productOptionId, quantity = 1)
     }
 
     @Test
