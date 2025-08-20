@@ -40,6 +40,7 @@ class OptionService(
             optionRepositoryJpa.findByIdOrNull(optionId)
                 ?: throw NoSuchElementException("Option not found id=$optionId")
         option.decreaseQuantity(amount)
+
         optionRepositoryJpa.save(option)
     }
 }

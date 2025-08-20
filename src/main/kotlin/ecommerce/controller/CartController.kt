@@ -42,7 +42,6 @@ class CartController(
         @LoginMember member: MemberResponse,
     ): ResponseEntity<Void> {
         cartService.removeFromCart(member.id, request.productOptionId)
-
         return ResponseEntity.noContent().build()
     }
 

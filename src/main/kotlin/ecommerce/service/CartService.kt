@@ -69,6 +69,7 @@ class CartService(
 
     fun removeFromCart(
         memberId: Long,
+
         productOptionId: Long,
     ) {
         return cartRepository.removeByOptionId(memberId, productOptionId)
