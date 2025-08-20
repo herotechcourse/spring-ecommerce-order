@@ -48,16 +48,16 @@
 
 ## Order -> `Step 2-2`
 - [x] Order date and time
-- [ ] Order status
-- [ ] Purchased items
-- [ ] Checkout session Id (issued by stripe)
+- [x] Order status
+- [x] Purchased items
+- [x] Checkout session Id (issued by stripe)
 - [x] Payment amount
 
 ## Deployment -> `Step 2-3`
-- [ ] Write a deployment script to automate the deployment process
-- [ ] Handle security issues when interacting with the client API
-  - [ ] Resolve issues caused when the server and client have different Origin values
-- [ ] HTTPS is optional, but you should discuss with your team whether to apply it
+- [x] Write a deployment script to automate the deployment process
+- [x] Handle security issues when interacting with the client API
+  - [x] Resolve issues caused when the server and client have different Origin values
+- [x] HTTPS is optional, but you should discuss with your team whether to apply it
 
 # spring-ecommerce-product (Previously Merged PR)
 
