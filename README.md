@@ -11,7 +11,8 @@
             - Configure **IntelliJ Run Configuration** to load variables from `.env` or manually set them.
     - [x] add `StripeProperties` with `@ConfigurationProperties` for stripe to read API key from application properties
     - [x] apply `@EnableConfigurationProperties` with `StripeProperties` on `Application`
-2. Implement a client `StripeClient` to enable applications to communicate with external API, **Stripe Payment Create API**
+2. Implement a client `StripeClient` to enable applications to communicate with external API, **Stripe Payment Create
+   API**
     - [x] has `@Component` annotation to be managed by framework
     - [x] takes an input property `StripeProperties` to read API key
     - [x] has a property `RestClient` to perform HTTP request to communicate with the Stripe API
@@ -26,7 +27,7 @@
 4. Implement business logic for payment processing - `@Transactional`
     - [x] subtract order quantity from `option` quantity, when the order processed with success
     - [x] if the ordered product exists as a `CartItem` it should be removed from table and transferred to `Orders`
-    - [x] **MUST** handle the error safely, when the payment approval API call fails
+    - [ ] **MUST** handle the error safely, when the payment approval API call fails
         - [ ] inform to the user cleary for the reason of failure of payment
         - [ ] display a proper error message why the payment failed
             - when the order failure due to payment rejection
@@ -57,7 +58,6 @@
         - [x] Authorization
             - [x] set validation for role-based access control
             - [x] set validation for members only available to access the resource they reference
-
 
 ### Step 1
 
@@ -94,3 +94,15 @@
     - DTO
         - [x] implement `ProductResponse` to organize product response with pagination
         - [x] implement `OptionResponse` to organize options response for a product
+
+---
+
+### TODO
+
+Step 2.4 - Implement business logic for payment processing - `@Transactional`
+
+- [ ] **MUST** handle the error safely, when the payment approval API call fails
+    - [ ] inform to the user cleary for the reason of failure of payment
+    - [ ] display a proper error message why the payment failed
+        - when the order failure due to payment rejection
+        - e.g., expired session, invalid payment method, insufficient balance, etc.
