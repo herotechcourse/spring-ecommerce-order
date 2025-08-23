@@ -34,8 +34,7 @@
 - [x] Order domain model:
   - [x] Order (PENDING/PAID/FAILED).
   - [x] OrderItem.
-- [ ] Place order endpoint.
-- [ ] Transaction flow: PENDING order → call payment → on success mark PAID and keep stock; on failure mark FAILED and restore stock.
-- [ ] Cart cleanup on success.
-- [ ] User-facing error messages.
-- [ ] Prevent double charges/stock changes. 
+- [x] Place order endpoint.
+- [x] Transaction flow: PENDING order → call payment → on success mark PAID and keep stock; on failure mark FAILED and restore stock.
+- [x] Cart cleanup on success.
+- [x] User-facing error messages.
