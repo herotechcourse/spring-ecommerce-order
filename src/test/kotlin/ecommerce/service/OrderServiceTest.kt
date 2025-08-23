@@ -83,7 +83,6 @@ class OrderServiceTest {
                 ),
             )
         val cart = cartRepository.save(CartEntity(memberId = member.id!!))
-//        member.cart = cart
         memberRepository.save(member)
 
         val option = OptionEntity(name = "defaultOption", quantity = 10)
@@ -240,7 +239,7 @@ class OrderServiceTest {
                 role = "USER",
             )
 
-        val result = orderService.processPayment(order.id!!, memberResponse)
+        val result = orderService.confirmPayment(order.id!!, memberResponse)
 
         assertTrue(result.contains("Payment successful"))
         val updatedOrder = orderRepository.findById(order.id!!).get()
@@ -257,11 +256,13 @@ class OrderServiceTest {
                 name = "John",
                 role = "USER",
             )
+
+        // Change from PaymentFailedException to NoSuchElementException
         val exception =
-            assertThrows<PaymentFailedException> {
-                orderService.processPayment(999, memberResponse)
+            assertThrows<NoSuchElementException> {
+                orderService.confirmPayment(999, memberResponse)
             }
-        assertTrue(exception.message!!.contains("Payment processing failed"))
+        assertTrue(exception.message!!.contains("Order not found"))
     }
 
     @Test
@@ -284,12 +285,13 @@ class OrderServiceTest {
                 role = "USER",
             )
 
+        // Change from PaymentFailedException to NoSuchElementException
         val exception =
-            assertThrows<PaymentFailedException> {
-                orderService.processPayment(order.id!!, memberResponse)
+            assertThrows<NoSuchElementException> {
+                orderService.confirmPayment(order.id!!, memberResponse)
             }
 
-        assertTrue(exception.message!!.contains("Payment processing failed"))
+        assertTrue(exception.message!!.contains("Payment not found"))
     }
 
     @Test
@@ -320,7 +322,7 @@ class OrderServiceTest {
 
         val exception =
             assertThrows<PaymentFailedException> {
-                orderService.processPayment(order.id!!, memberResponse)
+                orderService.confirmPayment(order.id!!, memberResponse)
             }
 
         assertTrue(exception.message!!.contains("Payment already made"))
@@ -362,7 +364,7 @@ class OrderServiceTest {
 
         val exception =
             assertThrows<PaymentFailedException> {
-                orderService.processPayment(order.id!!, memberResponse)
+                orderService.confirmPayment(order.id!!, memberResponse)
             }
 
         assertTrue(exception.message!!.contains("Payment processing failed"))

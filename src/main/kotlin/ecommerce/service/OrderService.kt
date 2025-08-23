@@ -16,6 +16,7 @@ import ecommerce.repository.OrderItemRepository
 import ecommerce.repository.OrderRepository
 import ecommerce.repository.PaymentRepository
 import ecommerce.service.payment.StripeClientService
+import org.springframework.context.ApplicationContext
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -28,9 +29,13 @@ class OrderService(
     private val paymentRepository: PaymentRepository,
     private val memberRepository: MemberRepositoryJpa,
     private val stripeClientService: StripeClientService,
-    private val cartService: CartService,
     private val optionService: OptionService,
+    private val applicationContext: ApplicationContext,
 ) {
+    // Get proxy instance for transactional methods
+    private val self: OrderService
+        get() = applicationContext.getBean(OrderService::class.java)
+
     @Transactional
     fun createOrder(
         memberId: Long,
@@ -126,46 +131,97 @@ class OrderService(
     }
 
     @Transactional
+    fun preparePaymentProcessing(
+        orderId: Long,
+        member: MemberResponse,
+    ): String {
+        val order =
+            orderRepository.findByIdAndMemberId(orderId, member.id)
+                ?: throw NoSuchElementException("Order not found")
+
+        val payment =
+            order.payment
+                ?: throw NoSuchElementException("Payment not found")
+
+        if (payment.stripePaymentIntentId == null) {
+            throw NoSuchElementException("Stripe payment intent not found")
+        }
+
+        if (payment.status == OrderAndPaymentStatus.PAID) {
+            throw PaymentFailedException("Payment already made, status = ${payment.status}")
+        }
+
+        payment.status = OrderAndPaymentStatus.PROCESSING
+        paymentRepository.save(payment)
+        order.status = OrderAndPaymentStatus.PROCESSING
+        orderRepository.save(order)
+
+        return payment.stripePaymentIntentId
+    }
+
+    // This method handles the external call and final confirmation (NOT transactional)
+    fun confirmPayment(
+        orderId: Long,
+        member: MemberResponse,
+    ): String {
+        // self call transactional methods through proxy
+        val stripePaymentIntentId = self.preparePaymentProcessing(orderId, member)
+
+        return try {
+            stripeClientService.confirmPaymentIntent(stripePaymentIntentId)
+            self.completeSuccessfulPayment(stripePaymentIntentId)
+            "Payment successful, order $orderId marked as PAID"
+        } catch (e: Exception) {
+            self.markPaymentAsFailed(stripePaymentIntentId, e.message ?: "Unknown error")
+            throw PaymentFailedException("Payment processing failed: ${e.message}")
+        }
+    }
+
+    @Transactional
+    fun completeSuccessfulPayment(stripePaymentIntentId: String) {
+        val payment =
+            paymentRepository.findByStripePaymentIntentId(stripePaymentIntentId)
+                ?: throw NoSuchElementException("Payment not found")
+
+        payment.status = OrderAndPaymentStatus.PAID
+        paymentRepository.save(payment)
+
+        val order = payment.order ?: throw IllegalStateException("Order not found for payment $stripePaymentIntentId")
+
+        order.status = OrderAndPaymentStatus.PAID
+        orderRepository.save(order)
+
+        // Update inventory - use safe calls and null checks
+        order.orderItems.forEach { orderItem ->
+            val productOption = orderItem.productOption
+            if (productOption != null && productOption.id != null) {
+                optionService.decreaseOptionQuantity(productOption.id, orderItem.quantity)
+            }
+        }
+
+        cleanCartItemsForOrder(order)
+    }
+
+    @Transactional
+    fun markPaymentAsFailed(
+        stripePaymentIntentId: String,
+        errorMessage: String,
+    ) {
+        val payment = paymentRepository.findByStripePaymentIntentId(stripePaymentIntentId)
+        payment?.status = OrderAndPaymentStatus.FAILED
+        payment?.let { paymentRepository.save(it) }
+
+        val order = payment?.order
+        order?.status = OrderAndPaymentStatus.FAILED
+        order?.let { orderRepository.save(it) }
+    }
+
+    @Transactional
+    @Deprecated("Use confirmPayment instead to avoid transaction issues")
     fun processPayment(
         orderId: Long,
         member: MemberResponse,
     ): String {
-        try {
-            val order =
-                orderRepository.findByIdAndMemberId(orderId, member.id)
-
-            if (order == null) {
-                throw NoSuchElementException("Order not found")
-            }
-
-            val payment = order.payment
-
-            if (payment == null || payment.stripePaymentIntentId == null) {
-                throw NoSuchElementException("Payment not found")
-            }
-
-            if (payment.status == OrderAndPaymentStatus.PAID) {
-                throw PaymentFailedException("Payment already made, status = ${payment.status}")
-            }
-
-            stripeClientService.confirmPaymentIntent(payment.stripePaymentIntentId)
-
-            payment.status = OrderAndPaymentStatus.PAID
-            paymentRepository.save(payment)
-
-            order.status = OrderAndPaymentStatus.PAID
-            orderRepository.save(order)
-
-            order.orderItems.forEach { orderItem ->
-                val productOption = orderItem.productOption ?: return@forEach
-                optionService.decreaseOptionQuantity(productOption.id!!, orderItem.quantity)
-            }
-
-            cleanCartItemsForOrder(order)
-
-            return "Payment successful, order ${order.id} marked as PAID"
-        } catch (e: Exception) {
-            throw PaymentFailedException("Payment processing failed: ${e.message}")
-        }
+        return confirmPayment(orderId, member)
     }
 }
