@@ -1,6 +1,5 @@
 package ecommerce.service.payment
 
-import com.stripe.model.PaymentIntent
 import ecommerce.config.StripeProperties
 import org.springframework.stereotype.Service
 
@@ -12,15 +11,11 @@ class StripeClientService(
         amount: Long,
         currency: String,
         paymentMethod: String,
-    ): PaymentIntent {
+    ): String {
         return StripeRestClient(stripeProperties).createPaymentIntent(amount, currency, paymentMethod)
     }
 
-    fun confirmPaymentIntent(paymentIntentId: String): PaymentIntent {
+    fun confirmPaymentIntent(paymentIntentId: String): String {
         return StripeRestClient(stripeProperties).confirmPaymentIntent(paymentIntentId)
-    }
-
-    fun retrievePaymentIntent(paymentIntentId: String): PaymentIntent {
-        return StripeRestClient(stripeProperties).retrievePaymentIntent(paymentIntentId)
     }
 }

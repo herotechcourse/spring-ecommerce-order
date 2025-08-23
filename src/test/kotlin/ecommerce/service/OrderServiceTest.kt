@@ -1,6 +1,5 @@
 package ecommerce.service
 
-import com.stripe.model.PaymentIntent
 import ecommerce.dto.MemberResponse
 import ecommerce.entity.CartEntity
 import ecommerce.entity.CartItemEntity
@@ -22,11 +21,12 @@ import ecommerce.service.payment.StripeClientService
 import jakarta.transaction.Transactional
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.mockito.Mockito.doNothing
 import org.mockito.Mockito.mock
 import org.mockito.kotlin.doThrow
+import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
@@ -71,6 +71,11 @@ class OrderServiceTest {
         fun stripeClientService(): StripeClientService = mock(StripeClientService::class.java)
     }
 
+    @BeforeEach
+    fun resetMocks() {
+        reset(stripeClientService)
+    }
+
     @Test
     fun `createOrder - happy path (integration)`() {
         val member =
@@ -101,22 +106,20 @@ class OrderServiceTest {
         cart.cartItems.add(cartItem)
         cartRepository.save(cart)
 
-        val paymentIntent =
-            mock(PaymentIntent::class.java).apply {
-                whenever(id).thenReturn("pi_123")
-            }
+        val paymentIntentId = "pi_123"
+
         whenever(stripeClientService.createPaymentIntent(299L, "usd", "pm_card_visa"))
-            .thenReturn(paymentIntent)
+            .thenReturn(paymentIntentId)
 
         val response = orderService.createOrder(member.id!!, option.id!!, 1, "pm_card_visa", "usd")
 
         // ✅ verify persistence
         val savedOrder = orderRepository.findById(response.orderId).get()
         assertEquals(member.id, savedOrder.member!!.id)
-        assertEquals("pi_123", response.paymentIntentId)
+        assertEquals(paymentIntentId, response.paymentIntentId)
 
         val savedPayment = paymentRepository.findAll().first()
-        assertEquals("pi_123", savedPayment.stripePaymentIntentId)
+        assertEquals(paymentIntentId, savedPayment.stripePaymentIntentId)
         assertEquals(299L, savedPayment.amount)
     }
 
@@ -228,8 +231,7 @@ class OrderServiceTest {
         order.payment = payment
         orderRepository.save(order)
 
-        // Mock Stripe confirm
-        doNothing().whenever(stripeClientService).confirmPaymentIntent("pi_123")
+        whenever(stripeClientService.confirmPaymentIntent("pi_123")).thenReturn("pi_123")
 
         val memberResponse =
             MemberResponse(

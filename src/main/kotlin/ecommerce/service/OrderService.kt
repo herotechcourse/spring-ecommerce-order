@@ -1,6 +1,5 @@
 package ecommerce.service
 
-import com.stripe.model.PaymentIntent
 import ecommerce.dto.CreateOrderResponse
 import ecommerce.dto.MemberResponse
 import ecommerce.entity.Order
@@ -86,7 +85,7 @@ class OrderService(
             throw OrderCreationException("Order item creation failed: ${e.message}")
         }
 
-        val paymentIntent: PaymentIntent =
+        val paymentIntentId =
             try {
                 stripeClientService.createPaymentIntent(
                     amountInCents,
@@ -102,7 +101,7 @@ class OrderService(
                 Payment(
                     order = order,
                     status = OrderAndPaymentStatus.PENDING,
-                    stripePaymentIntentId = paymentIntent.id,
+                    stripePaymentIntentId = paymentIntentId,
                     amount = amountInCents,
                 ),
             )
@@ -114,7 +113,7 @@ class OrderService(
 
         return CreateOrderResponse(
             orderId = order.id!!,
-            paymentIntentId = paymentIntent.id,
+            paymentIntentId = paymentIntentId,
         )
     }
 

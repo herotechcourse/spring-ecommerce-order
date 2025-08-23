@@ -1,8 +1,7 @@
 package ecommerce.service.payment
 
-import com.stripe.model.PaymentIntent
+import com.fasterxml.jackson.databind.ObjectMapper
 import ecommerce.config.StripeProperties
-import org.springframework.http.HttpStatusCode
 import org.springframework.http.client.SimpleClientHttpRequestFactory
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
@@ -34,52 +33,49 @@ class StripeRestClient(
         amount: Long,
         currency: String,
         paymentMethod: String,
-    ): PaymentIntent {
-        val params =
-            mapOf(
-                "amount" to amount.toString(),
-                "currency" to currency.lowercase(getDefault()),
-                "payment_method_types[]" to paymentMethod,
-                "confirm" to "true",
-            )
+    ): String {
+        val body =
+            listOf(
+                "amount=$amount",
+                "currency=${currency.lowercase(getDefault())}",
+                "payment_method=$paymentMethod",
+                "automatic_payment_methods[enabled]=true",
+                "automatic_payment_methods[allow_redirects]=never",
+            ).joinToString("&")
 
-        return restClient.post()
-            .uri("/payment_intents")
-            .body(params)
-            .retrieve()
-            .onStatus(HttpStatusCode::isError) { request, response ->
-                val errorBody = response.body as String
-                throw StripeApiException(
-                    "Stripe API error: ${response.statusCode} - $errorBody",
-                    response.statusCode.value(),
-                )
-            }
-            .body(PaymentIntent::class.java)
-            ?: throw StripeApiException("Stripe API returned null response", 500)
+        return try {
+            val response =
+                restClient.post()
+                    .uri("/payment_intents")
+                    .body(body)
+                    .retrieve()
+                    .toEntity(String::class.java)
+
+            val mapper = ObjectMapper()
+            val jsonNode = mapper.readTree(response.body)
+            val id = jsonNode["id"].asText()
+
+            id
+        } catch (e: Exception) {
+            throw IllegalArgumentException("Stripe error: ${e.message}")
+        }
     }
 
-    fun confirmPaymentIntent(paymentIntentId: String): PaymentIntent {
-        return restClient.post()
-            .uri("/payment_intents/$paymentIntentId/confirm")
-            .retrieve()
-            .onStatus(HttpStatusCode::isError) { request, response ->
-                val errorBody = response.body as String
-                throw StripeApiException(
-                    "Stripe confirmation error: ${response.statusCode} - $errorBody",
-                    response.statusCode.value(),
-                )
-            }
-            .body(PaymentIntent::class.java)
-            ?: throw StripeApiException("Stripe API returned null response", 500)
-    }
+    fun confirmPaymentIntent(paymentIntentId: String): String {
+        return try {
+            val response =
+                restClient.post()
+                    .uri("/payment_intents/$paymentIntentId/confirm")
+                    .retrieve()
+                    .toEntity(String::class.java)
 
-    fun retrievePaymentIntent(paymentIntentId: String): PaymentIntent {
-        return restClient.get()
-            .uri("/payment_intents/$paymentIntentId")
-            .retrieve()
-            .body(PaymentIntent::class.java)
-            ?: throw StripeApiException("Payment intent not found", 404)
+            val mapper = ObjectMapper()
+            val jsonNode = mapper.readTree(response.body)
+            val id = jsonNode["id"].asText()
+
+            id
+        } catch (e: Exception) {
+            throw IllegalArgumentException("Stripe error: ${e.message}")
+        }
     }
 }
-
-class StripeApiException(message: String, val statusCode: Int) : RuntimeException(message)
