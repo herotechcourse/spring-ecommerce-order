@@ -78,10 +78,10 @@ class CartService(
     }
 
     @Transactional
-    fun clearCart(member: Member) {
+    fun clearCart(memberId: Long) {
         val cart =
-            cartRepository.findByMemberId(member.id)
-                ?: throw NoSuchElementException("Cart for member ${member.id} not found")
+            cartRepository.findByMemberId(memberId)
+                ?: throw NoSuchElementException("Cart for member $memberId not found")
 
         cart.clear()
     }

@@ -58,7 +58,7 @@ class CartServiceIntegrationTest {
         val updatedItems = cartService.getCartItems(member.id)
         assertEquals(1, updatedItems.first().quantity)
 
-        cartService.clearCart(member)
+        cartService.clearCart(member.id)
         val cart = cartRepository.findByMemberId(member.id)
         assertNotNull(cart)
         assertTrue(cart.items.isEmpty())
