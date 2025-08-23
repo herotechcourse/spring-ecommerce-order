@@ -106,7 +106,7 @@ class CartServiceUnitTest {
         cart.add(option, 1)
         `when`(cartRepository.findByMemberId(1L)).thenReturn(cart)
 
-        cartService.clearCart(member)
+        cartService.clearCart(member.id)
 
         assertTrue(cart.items.isEmpty())
     }
