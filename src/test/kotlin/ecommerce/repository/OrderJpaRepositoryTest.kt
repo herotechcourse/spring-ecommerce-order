@@ -72,22 +72,24 @@ class OrderJpaRepositoryTest {
     }
 
     private fun order(): Order {
-        val options = listOf(
-            Option("1", 1, id = OPTION_ID),
-        )
+        val options =
+            listOf(
+                Option("1", 1, id = OPTION_ID),
+            )
         val product = Product("product", 7, "http://t.org", options, id = PRODUCT_ID)
         val member = memberRepo.save(Member("u@u", "pw"))
         return Order(member).let {
-            it.items += options.map { option ->
-                OrderItem(
-                    it,
-                    PRODUCT_ID,
-                    OPTION_ID,
-                    product.name,
-                    product.price,
-                    1,
-                )
-            }
+            it.items +=
+                options.map { option ->
+                    OrderItem(
+                        it,
+                        PRODUCT_ID,
+                        OPTION_ID,
+                        product.name,
+                        product.price,
+                        1,
+                    )
+                }
             it
         }
     }

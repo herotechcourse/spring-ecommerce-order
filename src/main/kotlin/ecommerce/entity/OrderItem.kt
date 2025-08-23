@@ -17,28 +17,20 @@ class OrderItem(
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "order_id", nullable = false)
     val order: Order,
-
     @Column(nullable = false)
     val productId: Long,
-
     @Column(nullable = false)
     val optionId: Long,
-
     @Column(nullable = false)
     val productNameSnapshot: ProductName,
-
     @Column(nullable = false)
     val priceSnapshot: Int,
-
     @Column(nullable = false)
     val quantity: Int,
-
     @Column(nullable = false)
     val subtotal: Int = priceSnapshot * quantity,
-
     @Column(nullable = false)
     val createdAt: LocalDateTime = LocalDateTime.now(),
-
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
 )
