@@ -1,38 +1,26 @@
 package ecommerce.service.payment
 
 import com.stripe.model.PaymentIntent
-import com.stripe.param.PaymentIntentCreateParams
-import org.springframework.stereotype.Component
+import ecommerce.config.StripeProperties
+import org.springframework.stereotype.Service
 
-@Component
-class StripeClientService {
+@Service
+class StripeClientService(
+    private val stripeProperties: StripeProperties,
+) {
     fun createPaymentIntent(
         amount: Long,
         currency: String,
         paymentMethod: String,
     ): PaymentIntent {
-        val params =
-            PaymentIntentCreateParams.builder()
-                .setAmount(amount)
-                .setCurrency(currency)
-                .setPaymentMethod(paymentMethod)
-                .setAutomaticPaymentMethods(
-                    PaymentIntentCreateParams.AutomaticPaymentMethods.builder()
-                        .setEnabled(true)
-                        .setAllowRedirects(PaymentIntentCreateParams.AutomaticPaymentMethods.AllowRedirects.NEVER)
-                        .build(),
-                )
-                .build()
-
-        return PaymentIntent.create(params)
+        return StripeRestClient(stripeProperties).createPaymentIntent(amount, currency, paymentMethod)
     }
 
-    fun retrievePaymentIntent(id: String): PaymentIntent {
-        return PaymentIntent.retrieve(id)
+    fun confirmPaymentIntent(paymentIntentId: String): PaymentIntent {
+        return StripeRestClient(stripeProperties).confirmPaymentIntent(paymentIntentId)
     }
 
-    fun confirmPaymentIntent(id: String) {
-        val paymentIntent = retrievePaymentIntent(id)
-        paymentIntent.confirm()
+    fun retrievePaymentIntent(paymentIntentId: String): PaymentIntent {
+        return StripeRestClient(stripeProperties).retrievePaymentIntent(paymentIntentId)
     }
 }
