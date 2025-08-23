@@ -11,7 +11,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
 
 @DataJpaTest
 class OptionJpaRepositoryTest {
-
     @Autowired
     private lateinit var entityManager: TestEntityManager
 
@@ -24,12 +23,13 @@ class OptionJpaRepositoryTest {
     @BeforeEach
     fun setUp() {
         option = Option(name = "Large", quantity = 50)
-        product = Product(
-            name = "T-Shirt",
-            price = 2500,
-            imageUrl = "https://example.com/image.jpg",
-            options = listOf(option)
-        )
+        product =
+            Product(
+                name = "T-Shirt",
+                price = 2500,
+                imageUrl = "https://example.com/image.jpg",
+                options = listOf(option),
+            )
 
         entityManager.persist(product)
         entityManager.flush()

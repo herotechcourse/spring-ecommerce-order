@@ -16,7 +16,6 @@ import java.util.Optional
 
 @ExtendWith(MockKExtension::class)
 class OptionServiceTest {
-
     @MockK
     private lateinit var optionRepo: OptionJpaRepository
 
@@ -25,7 +24,6 @@ class OptionServiceTest {
 
     private val optionId = 1L
     private val quantity = 10
-
 
     @Test
     fun `decreaseQuantity should succeed when stock is sufficient`() {

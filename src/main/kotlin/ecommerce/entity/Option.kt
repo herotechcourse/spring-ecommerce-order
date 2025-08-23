@@ -15,11 +15,9 @@ import jakarta.persistence.Version
 @Table(name = "product_option")
 class Option(
     name: String,
-
     @Column(nullable = false)
     @Version
     var quantity: Int,
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0L,

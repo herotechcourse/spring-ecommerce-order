@@ -6,10 +6,13 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 class OptionService(
-    private val optionRepo: OptionJpaRepository
+    private val optionRepo: OptionJpaRepository,
 ) {
     @Transactional
-    fun decreaseQuantity(id: Long, quantity: Int) {
+    fun decreaseQuantity(
+        id: Long,
+        quantity: Int,
+    ) {
         require(quantity > 0) { "Quantity to decrease must be positive." }
 
         val updatedRows = optionRepo.decrementStockIfEnough(id, quantity)
@@ -21,7 +24,10 @@ class OptionService(
     }
 
     @Transactional
-    fun increaseQuantity(id: Long, quantity: Int) {
+    fun increaseQuantity(
+        id: Long,
+        quantity: Int,
+    ) {
         require(quantity > 0) { "Quantity to increase must be positive." }
 
         val updatedRows = optionRepo.incrementStock(id, quantity)
