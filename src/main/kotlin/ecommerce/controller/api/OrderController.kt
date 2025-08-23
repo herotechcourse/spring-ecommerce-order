@@ -58,7 +58,7 @@ class OrderController(
     fun handleEmptyCartException(e: Exception): ResponseEntity<Map<String, Any>> {
         val error = mapOf("cart" to e.message)
         val errorBody = mapOf("errors" to error)
-        logger.error("EmptyCartException occurred: $errorBody")
+        logger.warn("EmptyCartException occurred: $errorBody")
         return ResponseEntity.badRequest().body(errorBody)
     }
 
@@ -66,7 +66,7 @@ class OrderController(
     fun handleInsufficientStockException(e: Exception): ResponseEntity<Map<String, Any>> {
         val error = mapOf("stock" to e.message)
         val errorBody = mapOf("errors" to error)
-        logger.error("InsufficientStockException occurred: $errorBody")
+        logger.warn("InsufficientStockException occurred: $errorBody")
         return ResponseEntity.badRequest().body(errorBody)
     }
 
@@ -74,7 +74,7 @@ class OrderController(
     fun handlePaymentFailedException(e: Exception): ResponseEntity<Map<String, Any>> {
         val error = mapOf("payment" to e.message)
         val errorBody = mapOf("errors" to error)
-        logger.error("PaymentFailedException occurred: $errorBody")
+        logger.warn("PaymentFailedException occurred: $errorBody")
         return ResponseEntity.status(HttpStatus.PAYMENT_REQUIRED).body(errorBody)
     }
 }

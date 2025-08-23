@@ -91,7 +91,7 @@ class ProductController(private val productService: ProductService) : Loggable {
     fun handleProductNameAlreadyExistsExceptionHandler(e: Exception): ResponseEntity<Map<String, Any>> {
         val error = mapOf("name" to e.message)
         val errorBody = mapOf("errors" to error)
-        logger.error("ProductNameAlreadyExistsException occurred: $errorBody")
+        logger.warn("ProductNameAlreadyExistsException occurred: $errorBody")
         return ResponseEntity.badRequest().body(errorBody)
     }
 }

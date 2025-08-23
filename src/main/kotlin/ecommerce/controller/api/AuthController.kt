@@ -57,7 +57,7 @@ class AuthController(
     fun handleMemberEmailAlreadyExistsExceptionHandler(e: Exception): ResponseEntity<Map<String, Any>> {
         val error = mapOf("email" to e.message)
         val errorBody = mapOf("errors" to error)
-        logger.error("MemberEmailAlreadyExistsException occurred: $errorBody")
+        logger.warn("MemberEmailAlreadyExistsException occurred: $errorBody")
         return ResponseEntity.badRequest().body(errorBody)
     }
 }

@@ -31,7 +31,7 @@ class GlobalExceptionHandler : Loggable {
 
     @ExceptionHandler(NotFoundException::class)
     fun handleNotFoundException(e: NotFoundException): ResponseEntity<Void> {
-        logger.error("NotFoundException occurred: " + e.message)
+        logger.warn("NotFoundException occurred: " + e.message)
         return ResponseEntity.notFound().build()
     }
 
@@ -42,7 +42,7 @@ class GlobalExceptionHandler : Loggable {
                 error.field to (error.defaultMessage ?: "Invalid value")
             }
         val errorBody = mapOf("errors" to errors)
-        logger.error("MethodArgumentNotValidException occurred: $errorBody")
+        logger.warn("MethodArgumentNotValidException occurred: $errorBody")
         return ResponseEntity.badRequest().body(errorBody)
     }
 
@@ -74,13 +74,13 @@ class GlobalExceptionHandler : Loggable {
     fun handleAuthorizationException(e: AuthorizationException): ResponseEntity<Map<String, Any>> {
         val error = mapOf("authorization" to e.message)
         val errorBody = mapOf("errors" to error)
-        logger.error("AuthorizationException occurred: $errorBody")
+        logger.warn("AuthorizationException occurred: $errorBody")
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
     }
 
     @ExceptionHandler(JwtException::class)
     fun handleJwtException(e: JwtException): ResponseEntity<Void> {
-        logger.error("JwtException occurred: " + e.message)
+        logger.warn("JwtException occurred: " + e.message)
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
     }
 }
