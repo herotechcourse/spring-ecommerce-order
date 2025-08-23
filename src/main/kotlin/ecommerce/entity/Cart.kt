@@ -8,8 +8,8 @@ import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
-import jakarta.persistence.ManyToOne
 import jakarta.persistence.OneToMany
+import jakarta.persistence.OneToOne
 import jakarta.persistence.Table
 import jakarta.persistence.UniqueConstraint
 import java.time.LocalDateTime
@@ -17,7 +17,7 @@ import java.time.LocalDateTime
 @Entity
 @Table(name = "carts", uniqueConstraints = [UniqueConstraint(columnNames = ["member_id"])])
 class Cart(
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "member_id", nullable = false)
     val member: Member,
     @OneToMany(mappedBy = "cart", cascade = [CascadeType.ALL], orphanRemoval = true)
@@ -56,6 +56,11 @@ class Cart(
         } else {
             existing.quantity -= quantity
         }
+        updatedAt = LocalDateTime.now()
+    }
+
+    fun clear() {
+        items.clear()
         updatedAt = LocalDateTime.now()
     }
 }
