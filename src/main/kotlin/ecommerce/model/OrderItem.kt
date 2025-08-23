@@ -1,6 +1,6 @@
 package ecommerce.model
 
-import ecommerce.dto.CartItemResponse
+import ecommerce.dto.OrderItemResponse
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
@@ -12,8 +12,8 @@ import jakarta.persistence.Table
 import java.time.LocalDateTime
 
 @Entity
-@Table(name = "cart_items")
-class CartItem(
+@Table(name = "order_items")
+class OrderItem(
     @ManyToOne
     @JoinColumn(name = "member_id", nullable = false)
     var member: Member,
@@ -27,21 +27,29 @@ class CartItem(
     var quantity: Int = 1,
     @Column(nullable = false)
     val createdAt: LocalDateTime = LocalDateTime.now(),
+    @Column(nullable = false)
+    val updatedAt: LocalDateTime = LocalDateTime.now(),
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0L,
 ) {
-    fun changeQuantity(quantity: Int) {
-        this.quantity += quantity
-    }
-
     companion object {
-        fun to(cartItem: CartItem): CartItemResponse {
-            return CartItemResponse(
-                itemId = cartItem.id,
-                productName = cartItem.product.name,
-                optionName = cartItem.option.name,
-                quantity = cartItem.quantity,
-                createdAt = cartItem.createdAt,
+        fun from(cartItem: CartItem): OrderItem {
+            return OrderItem(
+                cartItem.member,
+                cartItem.product,
+                cartItem.option,
+                cartItem.quantity,
+            )
+        }
+
+        fun to(orderItem: OrderItem): OrderItemResponse {
+            return OrderItemResponse(
+                itemId = orderItem.id,
+                productName = orderItem.product.name,
+                optionName = orderItem.option.name,
+                quantity = orderItem.quantity,
+                createdAt = orderItem.createdAt,
+                updatedAt = orderItem.updatedAt,
             )
         }
     }

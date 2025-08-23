@@ -11,6 +11,7 @@ import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
+import jakarta.persistence.OneToMany
 import jakarta.persistence.OneToOne
 import jakarta.persistence.Table
 
@@ -25,9 +26,15 @@ class Member(
     @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST])
     @JoinColumn
     var cart: Cart = Cart(),
+    @OneToMany(cascade = [CascadeType.PERSIST])
+    var orders: List<Order> = emptyList(),
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0L,
 ) {
+    fun addOrder(order: Order) {
+        this.orders = orders.plus(order)
+    }
+
     companion object {
         fun toEntity(
             member: Member,

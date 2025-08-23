@@ -1,0 +1,92 @@
+package ecommerce.service
+
+import ecommerce.dto.OrderPlaceForm
+import ecommerce.exception.EmptyCartException
+import ecommerce.exception.InsufficientStockException
+import ecommerce.model.Order
+import ecommerce.repository.CartItemRepository
+import ecommerce.repository.MemberRepository
+import ecommerce.repository.OptionRepository
+import ecommerce.repository.OrderItemRepository
+import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.transaction.annotation.Transactional
+import kotlin.jvm.optionals.getOrNull
+
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@Transactional
+class OrderServiceTest(
+    @Autowired private val orderService: OrderService,
+    @Autowired private val memberRepository: MemberRepository,
+    @Autowired private val cartItemRepository: CartItemRepository,
+    @Autowired private val optionRepository: OptionRepository,
+    @Autowired private val orderItemRepository: OrderItemRepository,
+) {
+    @Test
+    fun readOrders() {
+        val member = memberRepository.findAll().first()
+        val existingOrder = orderItemRepository.findAllByMember(member)
+
+        val cartItemIds1 = listOf(1L)
+        val cartItemIds2 = listOf(12L)
+
+        orderService.placeOrder(member.id, OrderPlaceForm(cartItemIds1))
+        orderService.placeOrder(member.id, OrderPlaceForm(cartItemIds2))
+
+        val orders = orderService.readOrders(member.id)
+
+        assertThat(orders.size - existingOrder.size).isEqualTo(2)
+    }
+
+    @Test
+    fun readOrder() {
+        val member = memberRepository.findAll().first()
+        val cartItemId = 1L
+        val savedOrder: Order = orderService.placeOrder(member.id, OrderPlaceForm(listOf(cartItemId)))
+
+        val order = orderService.readOrder(savedOrder.id, member.id)
+
+        assertThat(order).isNotNull()
+        assertThat(order.orderItems).hasSize(1)
+    }
+
+    @Test
+    fun `placeOrder() - return order when order processed well`() {
+        val member = memberRepository.findAll().first()
+        val cartItemId = 12L
+        val cartItem = cartItemRepository.findById(cartItemId).get()
+        val optionQuantityPre = cartItem.option.quantity
+
+        val savedOrder: Order = orderService.placeOrder(member.id, OrderPlaceForm(listOf(cartItemId)))
+
+        val savedOrderItem = savedOrder.orderItems.first()
+        val optionId = savedOrderItem.option.id
+        val option = optionRepository.findById(optionId).get()
+        val optionQuantityPost = option.quantity
+
+        assertThat(savedOrder.id).isNotNull()
+        assertThat(cartItemRepository.findById(cartItemId).getOrNull()).isNull()
+        assertThat(optionQuantityPre - savedOrderItem.quantity).isEqualTo(optionQuantityPost)
+    }
+
+    @Test
+    fun `placeOrder() - throw exception when cart is empty`() {
+        val member = memberRepository.findAll().first()
+        assertThrows<EmptyCartException> { orderService.placeOrder(member.id, OrderPlaceForm(listOf())) }
+    }
+
+    @Test
+    fun `placeOrder() - throw exception when the stock is insufficient`() {
+        val member = memberRepository.findAll().first()
+        assertThrows<InsufficientStockException> { orderService.placeOrder(member.id, OrderPlaceForm(listOf(15L))) }
+    }
+
+    @Test
+    fun `placeOrder() - payment error`() {
+        val member = memberRepository.findAll().first()
+        assertThrows<InsufficientStockException> { orderService.placeOrder(member.id, OrderPlaceForm(listOf(15L))) }
+    }
+}

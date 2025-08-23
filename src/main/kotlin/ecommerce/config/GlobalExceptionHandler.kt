@@ -1,4 +1,4 @@
-package ecommerce
+package ecommerce.config
 
 import ecommerce.exception.AuthorizationException
 import ecommerce.exception.InternalServerErrorException
@@ -12,12 +12,12 @@ import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 
 @ControllerAdvice
-class GlobalExceptionHandler {
+class GlobalExceptionHandler : Loggable {
     @ExceptionHandler(Exception::class)
     fun handleGeneric(e: Exception): ResponseEntity<Void> {
         val error = mapOf("error" to e.message)
         val errorBody = mapOf("errors" to error)
-        println("Unexpected Exception occurred: $errorBody")
+        logger.error("Unexpected Exception occurred: $errorBody")
         return ResponseEntity.internalServerError().build()
     }
 
@@ -25,13 +25,13 @@ class GlobalExceptionHandler {
     fun handleRuntimeException(e: RuntimeException): ResponseEntity<Map<String, Any>> {
         val error = mapOf("error" to e.message)
         val errorBody = mapOf("errors" to error)
-        println("RuntimeException occurred: $errorBody")
+        logger.error("RuntimeException occurred: $errorBody")
         return ResponseEntity.internalServerError().build()
     }
 
     @ExceptionHandler(NotFoundException::class)
     fun handleNotFoundException(e: NotFoundException): ResponseEntity<Void> {
-        println("NotFoundException occurred: " + e.message)
+        logger.warn("NotFoundException occurred: " + e.message)
         return ResponseEntity.notFound().build()
     }
 
@@ -42,31 +42,31 @@ class GlobalExceptionHandler {
                 error.field to (error.defaultMessage ?: "Invalid value")
             }
         val errorBody = mapOf("errors" to errors)
-        println("MethodArgumentNotValidException occurred: $errorBody")
+        logger.warn("MethodArgumentNotValidException occurred: $errorBody")
         return ResponseEntity.badRequest().body(errorBody)
     }
 
     @ExceptionHandler(InternalServerErrorException::class)
     fun handleInternalServerErrorException(e: InternalServerErrorException): ResponseEntity<Void> {
-        println("InternalServerErrorException occurred: " + e.message)
+        logger.error("InternalServerErrorException occurred: " + e.message)
         return ResponseEntity.internalServerError().build()
     }
 
     @ExceptionHandler(DataAccessException::class)
     fun handleDataAccessException(e: Exception): ResponseEntity<Void> {
-        println("DataAccessException occurred: " + e.message)
+        logger.error("DataAccessException occurred: " + e.message)
         return ResponseEntity.internalServerError().build()
     }
 
     @ExceptionHandler(IllegalStateException::class)
     fun handlerIllegalStateException(e: Exception): ResponseEntity<Void> {
-        println("IllegalStateException occurred: " + e.message)
+        logger.error("IllegalStateException occurred: " + e.message)
         return ResponseEntity.internalServerError().build()
     }
 
     @ExceptionHandler(IllegalArgumentException::class)
     fun handlerIllegalArgumentException(e: Exception): ResponseEntity<Void> {
-        println("IllegalArgumentException occurred: " + e.message)
+        logger.error("IllegalArgumentException occurred: " + e.message)
         return ResponseEntity.internalServerError().build()
     }
 
@@ -74,13 +74,13 @@ class GlobalExceptionHandler {
     fun handleAuthorizationException(e: AuthorizationException): ResponseEntity<Map<String, Any>> {
         val error = mapOf("authorization" to e.message)
         val errorBody = mapOf("errors" to error)
-        println("AuthorizationException occurred: $errorBody")
+        logger.warn("AuthorizationException occurred: $errorBody")
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
     }
 
     @ExceptionHandler(JwtException::class)
     fun handleJwtException(e: JwtException): ResponseEntity<Void> {
-        println("JwtException occurred: " + e.message)
+        logger.warn("JwtException occurred: " + e.message)
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
     }
 }
