@@ -26,11 +26,11 @@ class OrderController(private val orderService: OrderService) {
     }
 
     @PostMapping("/{id}/process-payment")
-    fun processPayment(
+    fun confirmPayment(
         @PathVariable id: Long,
         @LoginMember member: MemberResponse,
     ): ResponseEntity<String> {
-        orderService.processPayment(id, member)
+        orderService.confirmPayment(id, member)
         return ResponseEntity.ok("Payment successfully fulfilled")
     }
 }

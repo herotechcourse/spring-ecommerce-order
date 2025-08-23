@@ -215,13 +215,4 @@ class OrderService(
         order?.status = OrderAndPaymentStatus.FAILED
         order?.let { orderRepository.save(it) }
     }
-
-    @Transactional
-    @Deprecated("Use confirmPayment instead to avoid transaction issues")
-    fun processPayment(
-        orderId: Long,
-        member: MemberResponse,
-    ): String {
-        return confirmPayment(orderId, member)
-    }
 }
