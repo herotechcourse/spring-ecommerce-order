@@ -1,13 +1,10 @@
 package ecommerce.dto
 
 import jakarta.validation.constraints.NotNull
-import jakarta.validation.constraints.Positive
 
 data class PlaceOrderRequest(
     @field:NotNull
-    @field:Positive
-    val cartId: Long,
-
+    val orderItems: List<OrderItemRequest>,
     @field:NotNull
-    val paymentData: PaymentRequest,
+    val paymentRequest: PaymentRequest,
 )

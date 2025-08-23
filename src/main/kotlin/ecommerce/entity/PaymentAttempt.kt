@@ -20,26 +20,19 @@ class PaymentAttempt(
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "order_id", nullable = false)
     val order: Order,
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     var status: PaymentAttemptStatus = PaymentAttemptStatus.PENDING,
-
     @Column(name = "external_id")
     var externalId: String? = null,
-
     @Column
     var failureCode: String? = null,
-
     @Column(length = 2048)
     var failureMessage: String? = null,
-
     @Column(nullable = false)
     val provider: String = "stripe",
-
     @Column(nullable = false)
     val createdAt: LocalDateTime = LocalDateTime.now(),
-
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
 )

@@ -26,7 +26,7 @@ class OrderItem(
     @Column(nullable = false)
     val priceSnapshot: Int,
     @Column(nullable = false)
-    val quantity: Int,
+    var quantity: Int,
     @Column(nullable = false)
     val subtotal: Int = priceSnapshot * quantity,
     @Column(nullable = false)

@@ -31,6 +31,6 @@ class LoginMemberArgumentResolver(
                 ?: throw UnauthorizedException()
 
         val member = memberService.findByToken(token) ?: throw UnauthorizedException()
-        return AuthenticatedMember.from(member)
+        return AuthenticatedMember(member.role, member.id)
     }
 }

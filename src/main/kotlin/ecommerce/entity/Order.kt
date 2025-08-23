@@ -22,20 +22,15 @@ class Order(
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "member_id", nullable = false)
     val member: Member,
-
     @Column(nullable = false)
-    var totalAmount: Double = 0.0,
-
+    var totalAmount: Int = 0,
     @Column(nullable = false)
     val createdAt: LocalDateTime = LocalDateTime.now(),
-
     @Column(nullable = false)
     var updatedAt: LocalDateTime = LocalDateTime.now(),
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     var status: OrderStatus = OrderStatus.PENDING,
-
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
 ) {
