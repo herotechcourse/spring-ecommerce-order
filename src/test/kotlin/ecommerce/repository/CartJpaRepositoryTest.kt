@@ -2,75 +2,74 @@ package ecommerce.repository
 
 import ecommerce.entity.Cart
 import ecommerce.entity.Member
-import ecommerce.entity.Option
-import ecommerce.entity.Product
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
 import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Pageable
+import java.util.UUID
 
 @DataJpaTest
-class CartJpaRepositoryTest
+class CartJpaRepositoryTest {
     @Autowired
-    constructor(
-        val cartRepository: CartJpaRepository,
-        val productRepository: ProductJpaRepository,
-        val memberRepository: MemberJpaRepository,
-    ) {
-        private lateinit var member: Member
-        private lateinit var product: Product
-        private lateinit var cartSaved: Cart
+    private lateinit var entityManager: TestEntityManager
 
-        @BeforeEach
-        fun setup() {
-            member =
-                memberRepository.save(
-                    Member(name = "Alice", email = "alice@example.com", password = "pw"),
-                )
+    @Autowired
+    private lateinit var cartJpaRepository: CartJpaRepository
 
-            val baseProduct =
-                Product(
-                    name = "Widget",
-                    price = 9,
-                    imageUrl = "http://image.com/widget.png",
-                    options =
-                        listOf(
-                            Option(
-                                name = "Standard",
-                                quantity = 1,
-                            ),
-                        ),
-                )
+    @Test
+    fun `findByMemberId returns cart when exists`() {
+        val (member, cart) = persistMemberWithCart()
 
-            product = productRepository.save(baseProduct)
+        val found = cartJpaRepository.findByMemberId(member.id)
 
-            val cart = Cart(member)
-            cart.add(product.options.first(), 1)
-            cartSaved = cartRepository.save(cart)
-        }
-
-        @Test
-        fun `findByMemberId should return items for given member`() {
-            val items = cartRepository.findByMemberId(member.id)
-            assertThat(items).hasSize(1)
-            assertThat(items[0].member.id).isEqualTo(member.id)
-        }
-
-        @Test
-        fun `findByMemberIdAndId should return the cart for given member and id`() {
-            val found = cartRepository.findByMemberIdAndId(member.id, cartSaved.id)
-            assertThat(found).isNotNull
-            assertThat(found!!.id).isEqualTo(cartSaved.id)
-            assertThat(found.member.id).isEqualTo(member.id)
-        }
-
-        @Test
-        fun `findByMemberId with pageable should return a page`() {
-            val page = cartRepository.findByMemberId(member.id, PageRequest.of(0, 10))
-            assertThat(page.totalElements).isEqualTo(1)
-            assertThat(page.content).hasSize(1)
-            assertThat(page.content[0].id).isEqualTo(cartSaved.id)
-        }
+        assertThat(found).isNotNull
+        assertThat(found!!.id).isEqualTo(cart.id)
+        assertThat(found.member.id).isEqualTo(member.id)
     }
+
+    @Test
+    fun `findByMemberId returns null when cart missing for member`() {
+        val member = Member(email = "no-cart-${UUID.randomUUID()}@example.com", password = "pwd")
+        entityManager.persist(member)
+        entityManager.flush()
+
+        val found = cartJpaRepository.findByMemberId(member.id)
+
+        assertThat(found).isNull()
+    }
+
+    @Test
+    fun `findByMemberId pageable returns single element page when cart exists`() {
+        val (_, cartA) = persistMemberWithCart("a-${UUID.randomUUID()}@example.com")
+        val (memberB, cartB) = persistMemberWithCart("b-${UUID.randomUUID()}@example.com")
+        val (_, cartC) = persistMemberWithCart("c-${UUID.randomUUID()}@example.com")
+
+        val pageable: Pageable = PageRequest.of(0, 10)
+        val page = cartJpaRepository.findByMemberId(memberB.id, pageable)
+
+        assertThat(page.totalElements).isEqualTo(1L)
+        assertThat(page.content).hasSize(1)
+        assertThat(page.content[0].id).isEqualTo(cartB.id)
+    }
+
+    @Test
+    fun `findByMemberId pageable returns empty page when not found`() {
+        val pageable: Pageable = PageRequest.of(0, 5)
+        val page = cartJpaRepository.findByMemberId(-9999L, pageable)
+
+        assertThat(page.totalElements).isEqualTo(0L)
+        assertThat(page.content).isEmpty()
+    }
+
+    private fun persistMemberWithCart(email: String = "user-${UUID.randomUUID()}@example.com"): Pair<Member, Cart> {
+        val member = Member(email = email, password = "password")
+        entityManager.persist(member)
+        val cart = Cart(member = member)
+        entityManager.persist(cart)
+        entityManager.flush()
+        return Pair(member, cart)
+    }
+}
