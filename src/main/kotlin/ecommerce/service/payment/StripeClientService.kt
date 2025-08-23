@@ -2,9 +2,9 @@ package ecommerce.service.payment
 
 import com.stripe.model.PaymentIntent
 import com.stripe.param.PaymentIntentCreateParams
-import org.springframework.stereotype.Service
+import org.springframework.stereotype.Component
 
-@Service
+@Component
 class StripeClientService {
     fun createPaymentIntent(
         amount: Long,
