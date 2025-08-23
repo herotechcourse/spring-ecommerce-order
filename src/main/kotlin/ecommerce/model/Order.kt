@@ -31,7 +31,7 @@ class Order(
     @Column(nullable = false)
     var paymentAmount: Double = 0.0,
     @Column(nullable = false)
-    var currency: String = "USD",
+    var currency: String,
     @Column
     var paymentMethod: String? = null,
     @Column
@@ -40,7 +40,13 @@ class Order(
     val id: Long = 0L,
 ) {
     init {
+        require(validateCurrency(currency)) { "Currency not in order" }
         this.paymentAmount += totalAmount()
+    }
+
+    private fun validateCurrency(currencyName: String): Boolean {
+        val currencyNames = OrderCurrency.entries.map { it.name }
+        return currencyNames.contains(currencyName)
     }
 
     fun addItem(item: OrderItem) {
