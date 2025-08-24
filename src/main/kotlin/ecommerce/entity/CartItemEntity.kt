@@ -28,7 +28,6 @@ class CartItemEntity() {
     @JoinColumn(name = "product_id", nullable = false)
     lateinit var product: ProductEntity
 
-
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "product_option_id", nullable = false)
     lateinit var productOption: OptionEntity
