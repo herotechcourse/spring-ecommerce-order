@@ -6,8 +6,9 @@ import ecommerce.entity.Order
 import ecommerce.entity.OrderItem
 import ecommerce.entity.Payment
 import ecommerce.enums.OrderAndPaymentStatus
-import ecommerce.handler.OrderCreationException
 import ecommerce.handler.PaymentFailedException
+import ecommerce.handler.StripeConnectionException
+import ecommerce.handler.StripePaymentFailedException
 import ecommerce.repository.CartItemRepositoryJpa
 import ecommerce.repository.CartRepositoryJpa
 import ecommerce.repository.MemberRepositoryJpa
@@ -61,29 +62,21 @@ class OrderService(
         val amountInCents = (totalPrice * 100).toLong() // Stripe requires cents
 
         val order =
-            try {
-                orderRepository.save(
-                    Order(
-                        member = member,
-                        status = OrderAndPaymentStatus.PENDING,
-                    ),
-                )
-            } catch (e: Exception) {
-                throw OrderCreationException("Order creation failed: ${e.message}")
-            }
-
-        try {
-            orderItemRepository.save(
-                OrderItem(
-                    order = order,
-                    product = product,
-                    productOption = cartItem.productOption,
-                    quantity = quantity,
+            orderRepository.save(
+                Order(
+                    member = member,
+                    status = OrderAndPaymentStatus.PENDING,
                 ),
             )
-        } catch (e: Exception) {
-            throw OrderCreationException("Order item creation failed: ${e.message}")
-        }
+
+        orderItemRepository.save(
+            OrderItem(
+                order = order,
+                product = product,
+                productOption = cartItem.productOption,
+                quantity = quantity,
+            ),
+        )
 
         val paymentIntentId =
             try {
@@ -92,22 +85,20 @@ class OrderService(
                     currency,
                     paymentMethod,
                 )
-            } catch (e: Exception) {
+            } catch (e: StripePaymentFailedException) {
                 throw PaymentFailedException("Payment failed: ${e.message}")
+            } catch (e: StripeConnectionException) {
+                throw PaymentFailedException("Payment connection failed: ${e.message}")
             }
 
-        try {
-            paymentRepository.save(
-                Payment(
-                    order = order,
-                    status = OrderAndPaymentStatus.PENDING,
-                    stripePaymentIntentId = paymentIntentId,
-                    amount = amountInCents,
-                ),
-            )
-        } catch (e: Exception) {
-            throw PaymentFailedException("Payment persistence failed: ${e.message}")
-        }
+        paymentRepository.save(
+            Payment(
+                order = order,
+                status = OrderAndPaymentStatus.PENDING,
+                stripePaymentIntentId = paymentIntentId,
+                amount = amountInCents,
+            ),
+        )
 
         cartRepository.save(cart)
 
@@ -158,7 +149,7 @@ class OrderService(
         return payment.stripePaymentIntentId
     }
 
-    // This method handles the external call and final confirmation (NOT transactional)
+    // This method handles the external call and final confirmation (canNOT be a transactional)
     fun confirmPayment(
         orderId: Long,
         member: MemberResponse,
@@ -170,9 +161,17 @@ class OrderService(
             stripeClientService.confirmPaymentIntent(stripePaymentIntentId)
             self.completeSuccessfulPayment(stripePaymentIntentId)
             "Payment successful, order $orderId marked as PAID"
-        } catch (e: Exception) {
-            self.markPaymentAsFailed(stripePaymentIntentId, e.message ?: "Unknown error")
-            throw PaymentFailedException("Payment processing failed: ${e.message}")
+        } catch (e: StripePaymentFailedException) {
+            // Handle specific payment failures (e.g., card_declined, invalid_number)
+            self.markPaymentAsFailed(
+                stripePaymentIntentId,
+                "Payment failed: ${e.stripeErrorCode ?: "Unknown code"}",
+            ) // Use the actual error code!
+            throw PaymentFailedException("Payment was declined: ${e.message ?: "Unknown error"}")
+        } catch (e: StripeConnectionException) {
+            // Handle connection issues (timeouts, network problems)
+            self.markPaymentAsFailed(stripePaymentIntentId, "Network error: ${e.message}")
+            throw PaymentFailedException("Temporary payment issue. Please try again.")
         }
     }
 

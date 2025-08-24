@@ -10,6 +10,7 @@ import ecommerce.entity.Payment
 import ecommerce.entity.ProductEntity
 import ecommerce.enums.OrderAndPaymentStatus
 import ecommerce.handler.PaymentFailedException
+import ecommerce.handler.StripePaymentFailedException
 import ecommerce.repository.CartItemRepositoryJpa
 import ecommerce.repository.CartRepositoryJpa
 import ecommerce.repository.MemberRepositoryJpa
@@ -198,9 +199,9 @@ class OrderServiceTest {
         cart.cartItems.add(cartItem)
         cartRepository.save(cart)
 
-        // Simulate Stripe failure
+        // Simulate Stripe failure - use the new specific exception
         whenever(stripeClientService.createPaymentIntent(299L, "usd", "pm_card_visa"))
-            .thenThrow(RuntimeException("Stripe failed"))
+            .thenThrow(StripePaymentFailedException("Stripe API error: card_declined", "card_declined"))
 
         // Act & Assert
         val exception =
@@ -353,7 +354,7 @@ class OrderServiceTest {
         order.payment = payment
         orderRepository.save(order)
 
-        doThrow(RuntimeException("Stripe failed"))
+        doThrow(StripePaymentFailedException("Card declined", "card_declined"))
             .whenever(stripeClientService).confirmPaymentIntent("pi_123")
 
         val memberResponse =
@@ -369,6 +370,11 @@ class OrderServiceTest {
                 orderService.confirmPayment(order.id!!, memberResponse)
             }
 
-        assertTrue(exception.message!!.contains("Payment processing failed"))
+        // Update the expected message to match your new error handling
+        assertTrue(exception.message!!.contains("Payment was declined"))
+
+        // Optional: Verify the payment was marked as failed
+        val updatedPayment = paymentRepository.findByStripePaymentIntentId("pi_123")
+        assertEquals(OrderAndPaymentStatus.FAILED, updatedPayment?.status)
     }
 }
