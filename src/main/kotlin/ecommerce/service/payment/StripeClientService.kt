@@ -1,21 +1,20 @@
 package ecommerce.service.payment
 
-import ecommerce.config.StripeProperties
 import org.springframework.stereotype.Service
 
 @Service
 class StripeClientService(
-    private val stripeProperties: StripeProperties,
+    private val stripeRestClient: StripeRestClient,
 ) {
     fun createPaymentIntent(
         amount: Long,
         currency: String,
         paymentMethod: String,
     ): String {
-        return StripeRestClient(stripeProperties).createPaymentIntent(amount, currency, paymentMethod)
+        return stripeRestClient.createPaymentIntent(amount, currency, paymentMethod)
     }
 
     fun confirmPaymentIntent(paymentIntentId: String): String {
-        return StripeRestClient(stripeProperties).confirmPaymentIntent(paymentIntentId)
+        return stripeRestClient.confirmPaymentIntent(paymentIntentId)
     }
 }
