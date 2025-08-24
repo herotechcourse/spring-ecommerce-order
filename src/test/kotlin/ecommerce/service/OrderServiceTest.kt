@@ -114,7 +114,6 @@ class OrderServiceTest {
 
         val response = orderService.createOrder(member.id!!, option.id!!, 1, "pm_card_visa", "usd")
 
-        // ✅ verify persistence
         val savedOrder = orderRepository.findById(response.orderId).get()
         assertEquals(member.id, savedOrder.member!!.id)
         assertEquals(paymentIntentId, response.paymentIntentId)
@@ -159,7 +158,6 @@ class OrderServiceTest {
         productRepository.save(product)
         optionRepository.save(option)
 
-        // Cart exists but cart item not created
         val exception =
             assertThrows<NoSuchElementException> {
                 orderService.createOrder(member.id!!, option.id!!, 1, "pm_card_visa", "usd")
@@ -170,7 +168,6 @@ class OrderServiceTest {
 
     @Test
     fun `createOrder - payment fails`() {
-        // Arrange
         val member =
             memberRepository.save(
                 MemberEntity(
@@ -199,11 +196,9 @@ class OrderServiceTest {
         cart.cartItems.add(cartItem)
         cartRepository.save(cart)
 
-        // Simulate Stripe failure - use the new specific exception
         whenever(stripeClientService.createPaymentIntent(299L, "usd", "pm_card_visa"))
             .thenThrow(StripePaymentFailedException("Stripe API error: card_declined", "card_declined"))
 
-        // Act & Assert
         val exception =
             assertThrows<PaymentFailedException> {
                 orderService.createOrder(member.id!!, option.id!!, 1, "pm_card_visa", "usd")
@@ -260,7 +255,6 @@ class OrderServiceTest {
                 role = "USER",
             )
 
-        // Change from PaymentFailedException to NoSuchElementException
         val exception =
             assertThrows<NoSuchElementException> {
                 orderService.confirmPayment(999, memberResponse)
@@ -288,7 +282,6 @@ class OrderServiceTest {
                 role = "USER",
             )
 
-        // Change from PaymentFailedException to NoSuchElementException
         val exception =
             assertThrows<NoSuchElementException> {
                 orderService.confirmPayment(order.id!!, memberResponse)
@@ -370,10 +363,8 @@ class OrderServiceTest {
                 orderService.confirmPayment(order.id!!, memberResponse)
             }
 
-        // Update the expected message to match your new error handling
         assertTrue(exception.message!!.contains("Payment was declined"))
 
-        // Optional: Verify the payment was marked as failed
         val updatedPayment = paymentRepository.findByStripePaymentIntentId("pi_123")
         assertEquals(OrderAndPaymentStatus.FAILED, updatedPayment?.status)
     }

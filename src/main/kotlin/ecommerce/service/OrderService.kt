@@ -16,7 +16,6 @@ import ecommerce.repository.OrderItemRepository
 import ecommerce.repository.OrderRepository
 import ecommerce.repository.PaymentRepository
 import ecommerce.service.payment.StripeClientService
-import org.springframework.context.ApplicationContext
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -29,13 +28,8 @@ class OrderService(
     private val paymentRepository: PaymentRepository,
     private val memberRepository: MemberRepositoryJpa,
     private val stripeClientService: StripeClientService,
-    private val optionService: OptionService,
-    private val applicationContext: ApplicationContext,
+    private val orderTransactionService: OrderTransactionService,
 ) {
-    // Get proxy instance for transactional methods
-    private val self: OrderService
-        get() = applicationContext.getBean(OrderService::class.java)
-
     @Transactional
     fun createOrder(
         memberId: Long,
@@ -108,109 +102,22 @@ class OrderService(
         )
     }
 
-    @Transactional
-    fun cleanCartItemsForOrder(order: Order) {
-        val cart =
-            cartRepository.findByMemberId(order.member!!.id!!)
-                ?: throw NoSuchElementException("Cart not found")
-
-        val orderItemProductOptions = order.orderItems.mapNotNull { it.productOption?.id }.toSet()
-        cart.cartItems.removeIf { it.productOption.id in orderItemProductOptions }
-
-        cartRepository.save(cart)
-    }
-
-    @Transactional
-    fun preparePaymentProcessing(
-        orderId: Long,
-        member: MemberResponse,
-    ): String {
-        val order =
-            orderRepository.findByIdAndMemberId(orderId, member.id)
-                ?: throw NoSuchElementException("Order not found")
-
-        val payment =
-            order.payment
-                ?: throw NoSuchElementException("Payment not found")
-
-        if (payment.stripePaymentIntentId == null) {
-            throw NoSuchElementException("Stripe payment intent not found")
-        }
-
-        if (payment.status == OrderAndPaymentStatus.PAID) {
-            throw PaymentFailedException("Payment already made, status = ${payment.status}")
-        }
-
-        payment.status = OrderAndPaymentStatus.PROCESSING
-        paymentRepository.save(payment)
-        order.status = OrderAndPaymentStatus.PROCESSING
-        orderRepository.save(order)
-
-        return payment.stripePaymentIntentId
-    }
-
-    // This method handles the external call and final confirmation (canNOT be a transactional)
     fun confirmPayment(
         orderId: Long,
         member: MemberResponse,
     ): String {
-        // self call transactional methods through proxy
-        val stripePaymentIntentId = self.preparePaymentProcessing(orderId, member)
+        val stripePaymentIntentId = orderTransactionService.preparePaymentProcessing(orderId, member.id)
 
         return try {
             stripeClientService.confirmPaymentIntent(stripePaymentIntentId)
-            self.completeSuccessfulPayment(stripePaymentIntentId)
+            orderTransactionService.completeSuccessfulPayment(stripePaymentIntentId)
             "Payment successful, order $orderId marked as PAID"
         } catch (e: StripePaymentFailedException) {
-            // Handle specific payment failures (e.g., card_declined, invalid_number)
-            self.markPaymentAsFailed(
-                stripePaymentIntentId,
-                "Payment failed: ${e.stripeErrorCode ?: "Unknown code"}",
-            ) // Use the actual error code!
+            orderTransactionService.markPaymentAsFailed(stripePaymentIntentId, "Payment failed: ${e.stripeErrorCode ?: "Unknown code"}")
             throw PaymentFailedException("Payment was declined: ${e.message ?: "Unknown error"}")
         } catch (e: StripeConnectionException) {
-            // Handle connection issues (timeouts, network problems)
-            self.markPaymentAsFailed(stripePaymentIntentId, "Network error: ${e.message}")
+            orderTransactionService.markPaymentAsFailed(stripePaymentIntentId, "Network error: ${e.message}")
             throw PaymentFailedException("Temporary payment issue. Please try again.")
         }
-    }
-
-    @Transactional
-    fun completeSuccessfulPayment(stripePaymentIntentId: String) {
-        val payment =
-            paymentRepository.findByStripePaymentIntentId(stripePaymentIntentId)
-                ?: throw NoSuchElementException("Payment not found")
-
-        payment.status = OrderAndPaymentStatus.PAID
-        paymentRepository.save(payment)
-
-        val order = payment.order ?: throw IllegalStateException("Order not found for payment $stripePaymentIntentId")
-
-        order.status = OrderAndPaymentStatus.PAID
-        orderRepository.save(order)
-
-        // Update inventory - use safe calls and null checks
-        order.orderItems.forEach { orderItem ->
-            val productOption = orderItem.productOption
-            if (productOption != null && productOption.id != null) {
-                optionService.decreaseOptionQuantity(productOption.id, orderItem.quantity)
-            }
-        }
-
-        cleanCartItemsForOrder(order)
-    }
-
-    @Transactional
-    fun markPaymentAsFailed(
-        stripePaymentIntentId: String,
-        errorMessage: String,
-    ) {
-        val payment = paymentRepository.findByStripePaymentIntentId(stripePaymentIntentId)
-        payment?.status = OrderAndPaymentStatus.FAILED
-        payment?.let { paymentRepository.save(it) }
-
-        val order = payment?.order
-        order?.status = OrderAndPaymentStatus.FAILED
-        order?.let { orderRepository.save(it) }
     }
 }
