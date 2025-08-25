@@ -38,6 +38,27 @@
     - [x] Method to decrease quantity of an Option
 - [x] Implement in Service/Entity class (not API)
 
+## External API -> `Step 2-1`
+- [x] Get API key 
+- [x] Placing an order with a selected product option and quantity
+- [x] If the ordered product exists in the user's cart, it should be removed from the cart
+- [x] If the payment approval API call fails, you must handle the error safely:
+  - [x] Ensure that the user is clearly informed of the failure reason
+  - [x] In the case of a order failure due to payment rejection, display an appropriate error message
+
+## Order -> `Step 2-2`
+- [x] Order date and time
+- [x] Order status
+- [x] Purchased items
+- [x] Checkout session Id (issued by stripe)
+- [x] Payment amount
+
+## Deployment -> `Step 2-3`
+- [x] Write a deployment script to automate the deployment process
+- [x] Handle security issues when interacting with the client API
+  - [x] Resolve issues caused when the server and client have different Origin values
+- [x] HTTPS is optional, but you should discuss with your team whether to apply it
+
 # spring-ecommerce-product (Previously Merged PR)
 
 ## CRUD Operations for `Product` -> `Step 1-1`

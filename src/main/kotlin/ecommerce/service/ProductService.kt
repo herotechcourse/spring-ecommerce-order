@@ -3,7 +3,9 @@ package ecommerce.service
 import ecommerce.dto.ProductRequest
 import ecommerce.entity.OptionEntity
 import ecommerce.entity.ProductEntity
+import ecommerce.repository.OptionRepositoryJpa
 import ecommerce.repository.ProductRepositoryJpa
+import jakarta.transaction.Transactional
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Service
 @Service
 class ProductService(
     private val productRepositoryJpa: ProductRepositoryJpa,
+    private val optionRepositoryJpa: OptionRepositoryJpa,
 ) {
     fun createProduct(productRequest: ProductRequest): ProductEntity {
         if (productRepositoryJpa.existsByName(productRequest.name)) {
@@ -36,6 +39,7 @@ class ProductService(
         return productRepositoryJpa.save(product)
     }
 
+    @Transactional
     fun updateProduct(
         id: Long,
         request: ProductRequest,
@@ -49,9 +53,9 @@ class ProductService(
             throw IllegalArgumentException("Product with name '${request.name}' already exists.")
         }
 
-        product.options.clear()
+        optionRepositoryJpa.deleteByProductId(id)
         // this will execute the deletes before adding new ones
-        productRepositoryJpa.flush()
+        optionRepositoryJpa.flush()
 
         // update product fields
         product.name = request.name
@@ -90,10 +94,12 @@ class ProductService(
         return productRepositoryJpa.findAllByPrice(price, pageable)
     }
 
+    @Transactional
     fun deleteProduct(id: Long) {
         if (!productRepositoryJpa.existsById(id)) {
             throw NoSuchElementException("Product with id $id not found")
         }
+        optionRepositoryJpa.deleteByProductId(id)
         productRepositoryJpa.deleteById(id)
     }
 }

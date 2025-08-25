@@ -1,55 +1,19 @@
 package ecommerce.repository
 
-import ecommerce.dto.CartItem
 import ecommerce.dto.MemberResponse
 import ecommerce.dto.TopProductStatResponse
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.stereotype.Repository
-import java.sql.Timestamp
 
 @Repository
 class CartRepository(private val jdbcTemplate: JdbcTemplate) {
-    fun add(
+    fun removeByOptionId(
         memberId: Long,
-        productId: Long,
+        productOptionId: Long,
     ) {
-        val sql =
-            """
-            INSERT INTO CART (member_id, product_id, quantity, created_at)
-            VALUES (?, ?, 1, ?)
-            ON DUPLICATE KEY UPDATE quantity = quantity + 1
-            """.trimIndent()
-        val now = Timestamp(System.currentTimeMillis())
+        val sql = "DELETE FROM CART WHERE member_id = ? AND product_option_id = ?"
 
-        jdbcTemplate.update(sql, memberId, productId, now)
-    }
-
-    fun remove(
-        memberId: Long,
-        productId: Long,
-    ) {
-        val sql = "DELETE FROM CART WHERE member_id = ? AND product_id = ?"
-
-        jdbcTemplate.update(sql, memberId, productId)
-    }
-
-    fun getCartItems(memberId: Long): List<CartItem> {
-        val sql =
-            """
-            SELECT c.product_id, p.name, p.price, c.quantity
-            FROM CART c
-            JOIN PRODUCTS p ON c.product_id = p.id
-            WHERE c.member_id = ?
-            """.trimIndent()
-
-        return jdbcTemplate.query(sql, { rs, _ ->
-            CartItem(
-                productId = rs.getLong("product_id"),
-                name = rs.getString("name"),
-                price = rs.getDouble("price"),
-                quantity = rs.getInt("quantity"),
-            )
-        }, memberId)
+        jdbcTemplate.update(sql, memberId, productOptionId)
     }
 
     fun findTop5ProductsInLast30Days(): List<TopProductStatResponse> {

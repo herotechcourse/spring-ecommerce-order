@@ -15,13 +15,6 @@ data class ValidationErrorResponse(val errors: List<ValidationError>)
 class GlobalExceptionHandler {
     private val logger = LoggerFactory.getLogger(GlobalExceptionHandler::class.java)
 
-    @ExceptionHandler(NoSuchElementException::class)
-    fun handleNoSuchElementException(e: NoSuchElementException): ResponseEntity<Void> {
-        logger.warn("Resource not found: ${e.message}", e)
-
-        return ResponseEntity.notFound().build()
-    }
-
     @ExceptionHandler(MethodArgumentNotValidException::class)
     fun handleValidationException(ex: MethodArgumentNotValidException): ResponseEntity<ValidationErrorResponse> {
         val errors =
@@ -54,6 +47,25 @@ class GlobalExceptionHandler {
         val error = ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), ex.message ?: "Something went wrong")
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error)
+    }
+
+    @ExceptionHandler(PaymentFailedException::class)
+    fun handlePaymentFailed(ex: PaymentFailedException): ResponseEntity<Map<String, String>> {
+        val errorResponse = mapOf("error" to ex.message.orEmpty())
+        return ResponseEntity.status(HttpStatus.PAYMENT_REQUIRED).body(errorResponse)
+    }
+
+    @ExceptionHandler(OrderCreationException::class)
+    fun handleOrderCreationFailed(ex: OrderCreationException): ResponseEntity<Map<String, String>> {
+        val errorResponse = mapOf("error" to ex.message.orEmpty())
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse)
+    }
+
+    @ExceptionHandler(NoSuchElementException::class)
+    fun handleNotFound(ex: NoSuchElementException): ResponseEntity<Map<String, String>> {
+        logger.warn("Resource not found: ${ex.message}", ex)
+        val errorResponse = mapOf("error" to (ex.message ?: "Resource not found"))
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse)
     }
 
     data class ErrorResponse(
