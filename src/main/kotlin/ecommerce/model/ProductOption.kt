@@ -37,16 +37,16 @@ class ProductOption(
         this.quantity -= quantity
     }
 
-    fun updateQuantity(newQuantity: Int) {
-        quantity = newQuantity
-    }
-
     fun validateQuantity(requestedQuantity: Int) {
         if (requestedQuantity > quantity) {
             throw IllegalArgumentException(
                 "Requested quantity ($requestedQuantity) exceeds available stock ($quantity)",
             )
         }
+    }
+
+    fun calculateAmount(quantity: Int): Long {
+        return (product.price * quantity * 100).toLong()
     }
 
     companion object {

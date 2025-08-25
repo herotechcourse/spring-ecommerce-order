@@ -17,7 +17,7 @@ import java.time.LocalDateTime
 @Table(name = "carts")
 class Cart(
     @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "member_id", nullable = true)
+    @JoinColumn(name = "member_id")
     val member: Member? = null,
     @OneToMany(mappedBy = "cart", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, orphanRemoval = true)
     val cartItem: MutableList<CartItem> = mutableListOf(),

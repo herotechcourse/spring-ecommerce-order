@@ -1,6 +1,7 @@
 package ecommerce.model
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
@@ -9,7 +10,6 @@ import jakarta.persistence.FetchType
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
-import jakarta.persistence.JoinColumn
 import jakarta.persistence.OneToOne
 import jakarta.persistence.Table
 
@@ -25,8 +25,7 @@ class Member(
     @Column(name = "role", nullable = false)
     @Enumerated(EnumType.STRING)
     val role: Role = Role.USER,
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cart_id", nullable = true)
+    @OneToOne(mappedBy = "member", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
     @JsonIgnore
     var cart: Cart? = null,
     @Id
