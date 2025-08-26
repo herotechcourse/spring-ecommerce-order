@@ -12,6 +12,7 @@ import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestClientResponseException
+import java.lang.RuntimeException
 
 @Component
 class StripeClient(
@@ -50,7 +51,7 @@ class StripeClient(
             throw when {
                 statusCode.is4xxClientError -> BadRequestException("An error occurred during payment: ${stripeError.error.message}")
                 statusCode.is5xxServerError -> ExternalServiceException("Stripe down: ${stripeError.error.message}")
-                else -> IllegalArgumentException("Unexpected error: ${e.message}")
+                else -> RuntimeException("Unexpected error: ${e.message}")
             }
         }
     }
