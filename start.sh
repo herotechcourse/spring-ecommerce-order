@@ -16,4 +16,5 @@ else
 fi
 
 echo "> Starting application..."
+export $(grep -v '^#' $DEPLOY_PATH/.env | xargs)
 nohup java -jar $DEPLOY_PATH$JAR_NAME > ./application.log 2>&1 &
