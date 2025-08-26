@@ -7,7 +7,6 @@ import ecommerce.dto.ProductResponse
 import ecommerce.exception.ConflictException
 import ecommerce.exception.NotFoundException
 import ecommerce.model.Option
-import ecommerce.repository.OptionRepository
 import ecommerce.repository.ProductRepository
 import ecommerce.service.mapper.OptionMapper
 import ecommerce.service.mapper.ProductMapper
@@ -19,7 +18,7 @@ import kotlin.math.min
 
 @Transactional
 @Service
-class ProductService(private val productRepository: ProductRepository, private val optionRepository: OptionRepository) {
+class ProductService(private val productRepository: ProductRepository) {
     fun create(productRequest: ProductRequest): Long {
         require(!productRequest.options.isNullOrEmpty()) { "options must not be empty" }
 

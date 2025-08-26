@@ -7,14 +7,12 @@ import ecommerce.exception.BadRequestException
 import ecommerce.exception.ExternalServiceException
 import ecommerce.model.Order
 import ecommerce.model.OrderStatus
-import ecommerce.repository.OrderRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
 class PaymentService(
     private val stripeClient: StripeClient,
-    private val orderRepository: OrderRepository,
 ) {
     @Transactional
     fun createPaymentIntent(req: PaymentRequest): PaymentIntentResponse {
