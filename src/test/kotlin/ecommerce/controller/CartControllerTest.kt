@@ -214,6 +214,7 @@ class CartControllerTest
                     password = "very_cute_dog",
                     role = Role.USER.name,
                 )
+
             val mockProduct =
                 Product(
                     name = "Test Coffee",
