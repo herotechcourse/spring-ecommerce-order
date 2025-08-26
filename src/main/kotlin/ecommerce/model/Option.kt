@@ -30,4 +30,11 @@ class Option(
     fun subtract(quantity: Int) {
         this.quantity -= quantity
     }
+
+    fun reduceStock(requested: Int) {
+        require(quantity >= requested) {
+            "Not enough stock available"
+        }
+        quantity -= requested
+    }
 }

@@ -1,6 +1,6 @@
 package ecommerce.service
 
-import ecommerce.dto.ProductForm
+import ecommerce.dto.product.ProductForm
 import ecommerce.exception.ProductNameAlreadyExistsException
 import ecommerce.model.Product
 import ecommerce.repository.ProductRepository

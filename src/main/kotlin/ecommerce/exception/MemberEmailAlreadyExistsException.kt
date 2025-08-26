@@ -1,3 +1,3 @@
 package ecommerce.exception
 
-class MemberEmailAlreadyExistsException(message: String) : RuntimeException(message)
+class MemberEmailAlreadyExistsException(override val message: String = "Member email already exists.") : RuntimeException(message)

@@ -1,7 +1,5 @@
 package ecommerce.dto
 
-import ecommerce.model.Option
-import ecommerce.model.Product
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Pattern
 import jakarta.validation.constraints.Positive
@@ -16,14 +14,5 @@ data class ProductForm(
     var price: Double = Double.NaN,
     @field:NotBlank(message = "Product image URL is required")
     @field:Pattern(regexp = "^https?://.*", message = "Must start with 'https://'.")
-    var imageUrl: String = String(),
-) {
-    companion object {
-        fun toProduct(
-            productForm: ProductForm,
-            options: List<Option>,
-        ): Product {
-            return Product(name = productForm.name, price = productForm.price, imageUrl = productForm.imageUrl, options = options)
-        }
-    }
-}
+    var imageUrl: String = "",
+)

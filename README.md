@@ -35,3 +35,9 @@
    - DTO
      - [x] implement `ProductResponse` to organize product response with pagination
      - [x] implement `OptionResponse` to organize options response for a product
+
+6. Implement the `Place Order` feature using the Stripe Payment Create API
+    - [x] create `Order Entity` with id, relation to Cart (cart has relation to member), list of CartItems (purchased items), quantity, totalPrice (payment amount), relation to `Payment Entity`(one to one), createdAt, orderStatus, checkout session id (issued by stripe)
+    - [x] create `Payment Entity` wit id, amount, currency, createdAt
+    - [x] add a method to the cart repository if the cartItem that was ordered exists in the cart, it should be removed
+    - [x] add a method that decreases the quantity of the ordered item (in cartItem repo?) 

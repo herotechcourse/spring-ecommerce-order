@@ -2,7 +2,6 @@ package ecommerce.model
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 
 class ProductTest {
     @Test
@@ -14,25 +13,6 @@ class ProductTest {
         assertThat(product.price).isEqualTo(20.0)
         assertThat(product.imageUrl).isEqualTo("https://lotion.jpeg")
         assertThat(product.options).hasSize(2)
-    }
-
-    @Test
-    fun `should throw error when options is empty`() {
-        assertThrows<IllegalArgumentException> {
-            Product("lotion", 20.0, "https://lotion.jpeg", emptyList())
-        }
-    }
-
-    @Test
-    fun `should throw error when options names are not distinct`() {
-        assertThrows<IllegalArgumentException> {
-            Product(
-                "lotion",
-                20.0,
-                "https://lotion.jpeg",
-                listOf(Option(name = "size", quantity = 10), Option(name = "size", quantity = 5)),
-            )
-        }
     }
 
     @Test
@@ -57,12 +37,5 @@ class ProductTest {
             Product("lotion", 20.0, "https://lotion.jpeg", options = listOf(Option(name = "size", quantity = 10)))
         product.changeImageUrl("https://lotion2.jpeg")
         assertThat(product.imageUrl).isEqualTo("https://lotion2.jpeg")
-    }
-
-    @Test
-    fun `should set product reference on new options`() {
-        val options = listOf(Option(name = "size", quantity = 10))
-        val product = Product("lotion", 20.0, "https://lotion.jpeg", options)
-        assertThat(product.options[0].product).isEqualTo(product)
     }
 }

@@ -2,16 +2,14 @@ package ecommerce.controller.api
 
 import ecommerce.auth.AuthorizationExtractor
 import ecommerce.auth.BearerAuthorizationExtractor
-import ecommerce.dto.AuthResponse
-import ecommerce.dto.LoginForm
-import ecommerce.dto.MemberResponse
-import ecommerce.dto.RegisterForm
-import ecommerce.exception.MemberEmailAlreadyExistsException
+import ecommerce.dto.auth.AuthResponse
+import ecommerce.dto.member.LoginForm
+import ecommerce.dto.member.MemberResponse
+import ecommerce.dto.member.RegisterForm
 import ecommerce.service.AuthService
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -49,13 +47,5 @@ class AuthController(
         val member = authService.findMemberByToken(token)
         val response = MemberResponse(member.id, member.email)
         return ResponseEntity.ok().body(response)
-    }
-
-    @ExceptionHandler(MemberEmailAlreadyExistsException::class)
-    fun handleMemberEmailAlreadyExistsExceptionHandler(e: Exception): ResponseEntity<Map<String, Any>> {
-        val error = mapOf("email" to e.message)
-        val errorBody = mapOf("errors" to error)
-        println("MemberEmailAlreadyExistsException occurred: $errorBody")
-        return ResponseEntity.badRequest().body(errorBody)
     }
 }

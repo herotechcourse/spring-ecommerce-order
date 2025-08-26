@@ -1,3 +1,3 @@
 package ecommerce.exception
 
-class ProductNameAlreadyExistsException(message: String) : RuntimeException(message)
+class ProductNameAlreadyExistsException(override val message: String = "Product name already exists.") : RuntimeException(message)

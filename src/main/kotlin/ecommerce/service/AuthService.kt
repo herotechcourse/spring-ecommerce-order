@@ -1,9 +1,9 @@
 package ecommerce.service
 
 import ecommerce.auth.JwtTokenProvider
-import ecommerce.dto.AuthResponse
-import ecommerce.dto.LoginForm
-import ecommerce.dto.RegisterForm
+import ecommerce.dto.auth.AuthResponse
+import ecommerce.dto.member.LoginForm
+import ecommerce.dto.member.RegisterForm
 import ecommerce.exception.AuthorizationException
 import ecommerce.exception.InternalServerErrorException
 import ecommerce.exception.MemberEmailAlreadyExistsException

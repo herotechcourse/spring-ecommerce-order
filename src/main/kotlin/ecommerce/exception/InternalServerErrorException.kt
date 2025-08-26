@@ -1,3 +1,3 @@
 package ecommerce.exception
 
-class InternalServerErrorException(message: String) : RuntimeException(message)
+class InternalServerErrorException(override val message: String = "Internal Server Error.") : RuntimeException(message)

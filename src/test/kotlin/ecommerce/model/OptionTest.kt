@@ -48,11 +48,4 @@ class OptionTest {
         option.subtract(3)
         assertThat(option.quantity).isEqualTo(7)
     }
-
-    @Test
-    fun `should set product reference on option`() {
-        val product = Product("test", 10.0, "image.jpg", listOf(Option("size", 10)))
-        val option = product.options.first()
-        assertThat(option.product).isEqualTo(product)
-    }
 }

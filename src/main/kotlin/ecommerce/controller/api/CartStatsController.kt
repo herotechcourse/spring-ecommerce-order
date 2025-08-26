@@ -1,7 +1,7 @@
 package ecommerce.controller.api
 
-import ecommerce.dto.ActiveMemberInfo
-import ecommerce.dto.TopProductStats
+import ecommerce.dto.member.ActiveMemberInfo
+import ecommerce.dto.product.TopProductStats
 import ecommerce.model.Member
 import ecommerce.service.CartStatisticsService
 import ecommerce.ui.LoginMember

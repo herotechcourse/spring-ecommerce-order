@@ -1,10 +1,10 @@
 package ecommerce.controller
 
 import ecommerce.controller.api.CartController
-import ecommerce.dto.AuthResponse
-import ecommerce.dto.CartAddItemForm
-import ecommerce.dto.CartUpdateQuantityForm
-import ecommerce.dto.LoginForm
+import ecommerce.dto.auth.AuthResponse
+import ecommerce.dto.cart.CartAddItemForm
+import ecommerce.dto.cart.CartUpdateQuantityForm
+import ecommerce.dto.member.LoginForm
 import ecommerce.exception.NotFoundException
 import ecommerce.model.Member
 import ecommerce.repository.MemberRepository

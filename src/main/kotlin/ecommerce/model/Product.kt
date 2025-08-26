@@ -25,10 +25,13 @@ class Product(
     @OneToMany(mappedBy = "product", cascade = [CascadeType.PERSIST])
     val options: MutableList<Option> = options.toMutableList()
 
-    init {
-        require(options.isNotEmpty()) { "Options must not be empty" }
-        require(options.size == options.map { it.name }.distinct().size) { "Option names must be distinct" }
-        options.forEach { it.product = this }
+    fun addOption(option: Option) {
+        require(option.name.length <= 50) { "Option name must have length up to 50" }
+        require(option.quantity in 1..100_000_000) { "Option quantity must be between 1 and 100,000,000" }
+        require(option.name.matches(Regex("^[a-zA-Z0-9()\\[\\]+\\-&/_ ]+$"))) { "Option name must contain valid characters" }
+
+        option.product = this
+        this.options.add(option)
     }
 
     fun changeName(name: String) {

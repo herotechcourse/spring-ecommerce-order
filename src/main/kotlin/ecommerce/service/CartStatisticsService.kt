@@ -1,7 +1,7 @@
 package ecommerce.service
 
-import ecommerce.dto.ActiveMemberInfo
-import ecommerce.dto.TopProductStats
+import ecommerce.dto.member.ActiveMemberInfo
+import ecommerce.dto.product.TopProductStats
 import ecommerce.model.Product
 import ecommerce.repository.CartItemRepository
 import org.springframework.stereotype.Service

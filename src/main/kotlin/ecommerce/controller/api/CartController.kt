@@ -1,8 +1,9 @@
 package ecommerce.controller.api
 
-import ecommerce.dto.CartAddItemForm
-import ecommerce.dto.CartItemResponse
-import ecommerce.dto.CartUpdateQuantityForm
+import ecommerce.dto.cart.CartAddItemForm
+import ecommerce.dto.cart.CartItemResponse
+import ecommerce.dto.cart.CartUpdateQuantityForm
+import ecommerce.mappers.ProductMapper
 import ecommerce.model.Member
 import ecommerce.service.CartItemService
 import ecommerce.ui.LoginMember
@@ -35,8 +36,13 @@ class CartController(
         val pages = cartItemService.getCartItemsByMemberId(memberId, pageNumber, pageSize, sortBy)
         val alteredPages =
             pages.map { cartItem ->
-                CartItemResponse(cartItem.product, cartItem.quantity, cartItem.createdAt)
+                CartItemResponse(
+                    product = ProductMapper.toResponse(cartItem.product),
+                    quantity = cartItem.quantity,
+                    createdAt = cartItem.createdAt,
+                )
             }
+
         return ResponseEntity.ok(alteredPages)
     }
 

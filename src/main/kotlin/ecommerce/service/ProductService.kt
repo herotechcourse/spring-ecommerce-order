@@ -1,12 +1,11 @@
 package ecommerce.service
 
-import ecommerce.dto.ProductForm
+import ecommerce.dto.product.ProductForm
 import ecommerce.exception.InternalServerErrorException
 import ecommerce.exception.NotFoundException
 import ecommerce.exception.ProductNameAlreadyExistsException
 import ecommerce.model.Option
 import ecommerce.model.Product
-import ecommerce.repository.OptionRepository
 import ecommerce.repository.ProductRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
@@ -17,12 +16,14 @@ import org.springframework.stereotype.Service
 @Service
 class ProductService(
     private val productRepository: ProductRepository,
-    private val optionRepository: OptionRepository,
 ) {
     fun insert(form: ProductForm): Product {
         nameExists(form.name)
+
+        val product = Product(name = form.name, price = form.price, imageUrl = form.imageUrl)
         val option = Option(name = "none", quantity = 1)
-        val product = ProductForm.toProduct(form, listOf(option))
+        product.addOption(option)
+
         val savedProduct = productRepository.save(product)
         return productRepository.findByIdOrNull(savedProduct.id)
             ?: throw InternalServerErrorException("ProductService.insert() - Product with ID ${savedProduct.id} not found")

@@ -1,3 +1,3 @@
 package ecommerce.exception
 
-class NotFoundException(message: String) : RuntimeException(message)
+class NotFoundException(override val message: String = "Resource was not found.") : RuntimeException(message)
