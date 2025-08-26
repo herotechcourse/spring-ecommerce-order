@@ -45,7 +45,7 @@ class StatisticsE2ETest() {
 
     @Autowired
     private lateinit var optionRepository: OptionRepository
-  
+
     @LocalServerPort
     private var port: Int = 0
 
