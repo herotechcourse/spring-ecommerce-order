@@ -40,18 +40,4 @@ class PaymentService(
             order.setStatus(OrderStatus.FAILED, "Payment failed. Reason: ${e.message}")
         }
     }
-
-//    @Transactional(propagation = Propagation.REQUIRES_NEW, noRollbackFor = [Exception::class])
-//    fun processPayment(order: Order) {
-//        try {
-//            val sessionId = createPaymentIntent(PaymentRequest(order.paymentAmount, order.currency, order.paymentMethod))
-//            order.status = OrderStatus.PAID
-//            order.checkoutSessionId = sessionId
-//            orderRepository.save(order)
-//        } catch (e: Exception) {
-//            order.status = OrderStatus.FAILED
-//            orderRepository.save(order)
-//            throw e
-//        }
-//    }
 }
