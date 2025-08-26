@@ -37,7 +37,6 @@ dependencies {
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.6")
     testImplementation("org.mockito.kotlin:mockito-kotlin:5.2.1")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-    implementation("com.stripe:stripe-java:29.4.0")
     implementation("io.github.cdimascio:dotenv-kotlin:6.4.1")
 }
 
