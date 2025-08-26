@@ -36,7 +36,17 @@ class Option(
         }
     }
 
+    fun isAvailable(quantity: Int): Boolean {
+        if (quantity < 0) return false
+        if (quantity > this.quantity) return false
+        return true
+    }
+
+    fun totalPriceInCents(quantity: Int): Int {
+        return (this.product.price * quantity * 100).toInt()
+    }
+
     companion object {
-        val allowedSpecialChars = setOf('(', ')', '[', ']', '+', '-', '&', '/', '_')
+        val allowedSpecialChars = setOf('(', ')', '[', ']', '+', '-', '&', '/', '_', ' ')
     }
 }

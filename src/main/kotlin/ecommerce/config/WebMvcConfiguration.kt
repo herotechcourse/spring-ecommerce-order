@@ -5,8 +5,11 @@ import ecommerce.annotation.LoginMemberArgumentResolver
 import ecommerce.infrastructure.AuthorizationExtractor
 import ecommerce.infrastructure.JwtTokenProvider
 import ecommerce.service.AuthService
+import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.web.client.RestClient
 import org.springframework.web.method.support.HandlerMethodArgumentResolver
+import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 
@@ -27,4 +30,16 @@ class WebMvcConfiguration(
             .addPathPatterns("/api/**")
             .excludePathPatterns("/api/members/login", "/api/members/register")
     }
+
+    override fun addCorsMappings(registry: CorsRegistry) {
+        registry.addMapping("/api/**")
+            .allowedOrigins("*")
+            .allowedMethods("GET", "POST", "HEAD")
+            .allowedHeaders("*")
+            .exposedHeaders("Location")
+            .maxAge(1800)
+    }
+
+    @Bean
+    fun restClient(): RestClient = RestClient.create()
 }

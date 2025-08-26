@@ -30,7 +30,7 @@ class StatService(
         val items = cartItemRepository.findDistinctByUpdatedAtAfter(threshold)
         val result =
             items
-                .groupBy { it.product }
+                .groupBy { it.option }
                 .map { (product, list) ->
                     ProductStatsResponse(
                         productName = product.name,

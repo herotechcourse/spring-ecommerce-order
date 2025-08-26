@@ -8,7 +8,7 @@ import ecommerce.model.Cart
 import ecommerce.model.CartItem
 import ecommerce.repository.CartRepository
 import ecommerce.repository.MemberRepository
-import ecommerce.repository.ProductRepository
+import ecommerce.repository.OptionRepository
 import ecommerce.service.mapper.CartItemMapper
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
@@ -21,8 +21,8 @@ import kotlin.math.min
 @Service
 class CartService(
     private val cartRepository: CartRepository,
-    private val productRepository: ProductRepository,
     private val memberRepository: MemberRepository,
+    private val optionRepository: OptionRepository,
 ) {
     fun findCart(memberId: Long): Cart {
         return cartRepository.findCartByMemberId(memberId)
@@ -34,14 +34,14 @@ class CartService(
         request: CartItemRequest,
     ): CartItem {
         val member = memberRepository.findById(memberId).orElseThrow { NotFoundException() }
-        val product =
-            productRepository.findById(request.productId).orElseThrow { NotFoundException() }
+        val option =
+            optionRepository.findById(request.optionId).orElseThrow { NotFoundException() }
 
         val cart =
             cartRepository.findCartByMemberId(memberId)
                 ?: cartRepository.save(Cart(member))
 
-        val item = cart.addItem(product, request.quantity)
+        val item = cart.addItem(option, request.quantity)
         return item
     }
 
@@ -50,14 +50,14 @@ class CartService(
         request: CartItemRequest,
     ) {
         val member = memberRepository.findById(memberId).orElseThrow { NotFoundException() }
-        val product =
-            productRepository.findById(request.productId).orElseThrow { NotFoundException() }
+        val option =
+            optionRepository.findById(request.optionId).orElseThrow { NotFoundException() }
 
         val cart =
             cartRepository.findCartByMemberId(memberId)
                 ?: cartRepository.save(Cart(member))
 
-        cart.removeItem(product, request.quantity)
+        cart.removeItem(option, request.quantity)
     }
 
     fun getPages(

@@ -36,39 +36,34 @@ class Cart(
     val id: Long = 0L,
 ) {
     fun addItem(
-        product: Product,
+        option: Option,
         quantity: Int,
     ): CartItem {
         require(quantity > 0) { "Item quantity must be greater than zero." }
-        val existingItem = items.find { it.product.id == product.id }
-        return when (existingItem) {
-            null -> {
-                val newItem =
-                    CartItem(
-                        product = product,
-                        cart = this,
-                        quantity = quantity,
-                    )
-                items.add(newItem)
+        require(option.isAvailable(quantity)) { "Item not in stock" }
+        val existingItem = items.find { it.option.id == option.id }
 
-                newItem
-            }
+        return existingItem?.apply {
+            existingItem.quantity += quantity
+            existingItem.updatedAt = LocalDateTime.now()
+        } ?: createNewCartItem(option, quantity)
+    }
 
-            else -> {
-                existingItem.quantity += quantity
-                existingItem.updatedAt = LocalDateTime.now()
-
-                existingItem
-            }
+    private fun createNewCartItem(
+        option: Option,
+        quantity: Int,
+    ): CartItem {
+        return CartItem(option = option, cart = this, quantity = quantity).also {
+            items.add(it)
         }
     }
 
     fun removeItem(
-        product: Product,
+        option: Option,
         quantity: Int,
     ) {
         require(quantity > 0) { "Item quantity must be greater than zero." }
-        val existingItem = items.find { it.product.id == product.id } ?: throw IllegalArgumentException("Item not found.")
+        val existingItem = items.find { it.option.id == option.id } ?: throw IllegalArgumentException("Item not found.")
         var quantityToRemove = quantity
         if (existingItem.quantity < quantity) quantityToRemove = existingItem.quantity
 

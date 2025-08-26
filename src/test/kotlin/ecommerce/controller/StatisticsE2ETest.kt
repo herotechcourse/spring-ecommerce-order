@@ -1,13 +1,15 @@
 package ecommerce.controller
 
 import ecommerce.DatabaseFixture
-import ecommerce.dto.CartItemRequest
 import ecommerce.dto.TokenRequest
 import ecommerce.model.Cart
 import ecommerce.model.CartItem
+import ecommerce.model.Option
+import ecommerce.model.Product
 import ecommerce.repository.CartItemRepository
 import ecommerce.repository.CartRepository
 import ecommerce.repository.MemberRepository
+import ecommerce.repository.OptionRepository
 import ecommerce.repository.ProductRepository
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
@@ -23,10 +25,12 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.server.LocalServerPort
 import org.springframework.http.HttpStatus
+import org.springframework.test.context.ActiveProfiles
 import java.time.LocalDateTime
 
+@ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class StatisticsE2ETest {
+class StatisticsE2ETest() {
     @Autowired
     private lateinit var memberRepository: MemberRepository
 
@@ -39,6 +43,9 @@ class StatisticsE2ETest {
     @Autowired
     private lateinit var cartItemRepository: CartItemRepository
 
+    @Autowired
+    private lateinit var optionRepository: OptionRepository
+
     @LocalServerPort
     private var port: Int = 0
 
@@ -50,98 +57,64 @@ class StatisticsE2ETest {
     fun setUp() {
         val fortyDaysAgo = LocalDateTime.now().minusDays(40)
 
+        // --- Members ---
         val mina = memberRepository.save(DatabaseFixture.createMina())
         val petra = memberRepository.save(DatabaseFixture.createPetra())
         memberRepository.save(DatabaseFixture.createAdmin())
 
+        // --- Carts ---
         val minasCart = cartRepository.save(Cart(mina))
         val petrasCart = cartRepository.save(Cart(petra))
-        val brush = productRepository.save(DatabaseFixture.createBrush())
-        val palette = productRepository.save(DatabaseFixture.createPalette())
-        val canvas = productRepository.save(DatabaseFixture.createCanvas())
-        val acrylics = productRepository.save(DatabaseFixture.createAcrylics())
-        val pen = productRepository.save(DatabaseFixture.createPen())
-        val pencil = productRepository.save(DatabaseFixture.createPencil())
 
-        val cartItem1 =
-            cartItemRepository.save(
-                CartItem(
-                    product = brush,
-                    cart = minasCart,
-                    quantity = 7,
-                    createdAt = LocalDateTime.now(),
-                ),
-            )
-        val cartItem2 =
-            cartItemRepository.save(
-                CartItem(product = palette, cart = minasCart, quantity = 6, createdAt = LocalDateTime.now()),
-            )
-        val cartItem3 =
-            cartItemRepository.save(
-                CartItem(
-                    product = canvas,
-                    cart = minasCart,
-                    quantity = 5,
-                    createdAt = LocalDateTime.now(),
-                ),
-            )
-        val cartItem4 =
-            cartItemRepository.save(
-                CartItem(
-                    product = pen,
-                    cart = minasCart,
-                    quantity = 4,
-                    createdAt = fortyDaysAgo,
-                ),
-            )
-        val cartItem5 =
-            cartItemRepository.save(
-                CartItem(
-                    product = acrylics,
-                    cart = minasCart,
-                    quantity = 3,
-                    createdAt = fortyDaysAgo,
-                ),
-            )
-        val cartItem6 =
-            cartItemRepository.save(
-                CartItem(
-                    product = pencil,
-                    cart = minasCart,
-                    quantity = 2,
-                    createdAt = fortyDaysAgo,
-                ),
-            )
-        val cartItem7 =
-            cartItemRepository.save(
-                CartItem(
-                    product = pencil,
-                    cart = petrasCart,
-                    quantity = 2,
-                    createdAt = fortyDaysAgo,
-                ),
-            )
+        // --- Products & Options ---
+        fun createAndSaveOption(
+            product: Product,
+            optionName: String,
+            qty: Int,
+        ): Option {
+            val savedProduct = productRepository.save(product)
+            val option =
+                Option(name = optionName, quantity = qty).apply {
+                    this.product = savedProduct
+                }
+            return optionRepository.save(option)
+        }
 
-        cartItem1.updatedAt = LocalDateTime.now()
-        cartItem2.updatedAt = LocalDateTime.now()
-        cartItem3.updatedAt = LocalDateTime.now()
-        cartItem4.updatedAt = fortyDaysAgo
-        cartItem5.updatedAt = fortyDaysAgo
-        cartItem6.updatedAt = fortyDaysAgo
+        val brushOption = createAndSaveOption(DatabaseFixture.createBrush(), "Brush Large", 9)
+        val paletteOption = createAndSaveOption(DatabaseFixture.createPalette(), "Palette Small", 8)
+        val canvasOption = createAndSaveOption(DatabaseFixture.createCanvas(), "Canvas A4", 10)
+        val acrylicsOption = createAndSaveOption(DatabaseFixture.createAcrylics(), "Acrylics Set", 6)
+        val penOption = createAndSaveOption(DatabaseFixture.createPen(), "Pen Black", 12)
+        val pencilOption = createAndSaveOption(DatabaseFixture.createPencil(), "Pencil HB", 15)
 
-        cartItemRepository.saveAll(
+        // --- Cart Items ---
+        fun createCartItem(
+            option: Option,
+            cart: Cart,
+            qty: Int,
+            created: LocalDateTime,
+        ) = CartItem(option = option, cart = cart, quantity = qty, createdAt = created, updatedAt = created)
+
+        val recentItems =
             listOf(
-                cartItem1,
-                cartItem2,
-                cartItem3,
-                cartItem4,
-                cartItem5,
-                cartItem6,
-            ),
-        )
+                createCartItem(brushOption, minasCart, 7, now()),
+                createCartItem(paletteOption, minasCart, 6, now()),
+                createCartItem(canvasOption, minasCart, 5, now()),
+            )
 
-        mostRecentCartItems = listOf(cartItem1, cartItem2, cartItem3)
+        val oldItems =
+            listOf(
+                createCartItem(penOption, minasCart, 4, fortyDaysAgo),
+                createCartItem(acrylicsOption, minasCart, 3, fortyDaysAgo),
+                createCartItem(pencilOption, minasCart, 2, fortyDaysAgo),
+                createCartItem(pencilOption, petrasCart, 2, fortyDaysAgo),
+            )
+
+        cartItemRepository.saveAll(recentItems + oldItems)
+        mostRecentCartItems = recentItems
     }
+
+    private fun now() = LocalDateTime.now()
 
     @AfterEach
     fun tearDown() {
@@ -170,19 +143,6 @@ class StatisticsE2ETest {
         return token
     }
 
-    private fun addProductToCart(
-        cartRequest: CartItemRequest,
-        token: String,
-    ) {
-        RestAssured
-            .given()
-            .baseUri(baseUrl)
-            .header("Authorization", "Bearer $token")
-            .body(cartRequest).contentType(ContentType.JSON)
-            .`when`()
-            .post("/api/cart")
-    }
-
     private fun getStatistics(
         token: String,
         path: String,
@@ -206,7 +166,7 @@ class StatisticsE2ETest {
         val json = stats.body().jsonPath()
         val productNames = json.getList<String>("productName")
         val topProducts =
-            listOf(mostRecentCartItems[0].product.name, mostRecentCartItems[1].product.name, mostRecentCartItems[2].product.name)
+            listOf(mostRecentCartItems[0].option.name, mostRecentCartItems[1].option.name, mostRecentCartItems[2].option.name)
         Assertions.assertThat(productNames).containsExactlyInAnyOrderElementsOf(topProducts)
     }
 

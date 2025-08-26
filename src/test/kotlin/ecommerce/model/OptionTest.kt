@@ -4,8 +4,10 @@ import org.junit.jupiter.api.Assertions.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
+import org.springframework.test.context.ActiveProfiles
 import kotlin.test.Test
 
+@ActiveProfiles("test")
 class OptionTest {
     @ParameterizedTest
     @ValueSource(strings = ["()[]+-&/_", "abcd1234", "abc"])

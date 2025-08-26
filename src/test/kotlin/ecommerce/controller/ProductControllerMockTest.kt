@@ -5,8 +5,6 @@ import ecommerce.annotation.LoginMemberArgumentResolver
 import ecommerce.config.WebMvcConfiguration
 import ecommerce.dto.RegisteredMember
 import ecommerce.dto.Role
-import ecommerce.infrastructure.AuthorizationExtractor
-import ecommerce.infrastructure.JwtTokenProvider
 import ecommerce.service.ProductService
 import ecommerce.service.mapper.ProductMapper
 import org.assertj.core.api.Assertions.assertThat
@@ -22,11 +20,13 @@ import org.springframework.context.annotation.FilterType
 import org.springframework.context.annotation.Import
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
+import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
+@ActiveProfiles("test")
 @WebMvcTest(
     controllers = [ProductController::class],
     excludeFilters = [
@@ -44,12 +44,6 @@ class ProductControllerMockTest
     ) {
         @MockitoBean
         private lateinit var productService: ProductService
-
-        @MockitoBean
-        private lateinit var authorizationExtractor: AuthorizationExtractor
-
-        @MockitoBean
-        private lateinit var jwtTokenProvider: JwtTokenProvider
 
         @Autowired
         private lateinit var loginMemberArgumentResolver: LoginMemberArgumentResolver
