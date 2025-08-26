@@ -24,7 +24,7 @@ import kotlin.test.assertTrue
 @ActiveProfiles("test")
 class StripeClientTest {
     @Mock
-    private val stripeProperties = StripeProperties(secretKey = "sk_test_123")
+    private val stripeProperties = StripeProperties(secretKey = "sk_test_123", url = "https://api.stripe.com/v1/payment_intents")
 
     private val restClient: RestClient = mock(RestClient::class.java)
 

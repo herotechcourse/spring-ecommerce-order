@@ -32,7 +32,7 @@ class StripeClient(
         return try {
             val response =
                 restClient.post()
-                    .uri("https://api.stripe.com/v1/payment_intents")
+                    .uri(stripeProperties.url)
                     .header(HttpHeaders.AUTHORIZATION, "Bearer ${stripeProperties.secretKey}")
                     .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                     .body(body)
