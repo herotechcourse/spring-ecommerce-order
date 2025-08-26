@@ -172,7 +172,6 @@ It handles product stock updates, cart cleanup, payment confirmation, robust err
 ### Features
 1. Orders
 - [x] Endpoint: `GET /orders`
-- [ ] optional: add pagination
 - [x] Each order record should include:
   - [x] Order Date & Time (when payment was completed)
   - [x] Order Status (e.g., PENDING, PAID, FAILED, CANCELLED)
@@ -208,7 +207,6 @@ You must deploy your existing service and ensure it can interact with the client
   - Restart backend service.
 - [x] Handle security issues when interacting with the client API.
   - [x] For example, resolve issues caused when the server and client have different Origin values.
-- [ ] HTTPS is optional
 - [x] Cors Configuration #applyPermitDefaultValues()
   - [x] Allow all origins.
   - [x] Allow “simple” methods GET, HEAD and POST.
@@ -231,13 +229,7 @@ You must deploy your existing service and ensure it can interact with the client
 10. [x] Deploy: script (deploy.sh), run migrations, restart service, test client-server flows (CORS config).
 
 ## Considerations
-
 - [x] remove Boolean return type from all delete methods
-- [ ] change Double to BigDecimal inside the Entity (Product/price)
 - [x] decide on where and how to use Models
     - Entity == Model
 - [x] don't use Cascade.All but Persist, Merge etc.
-- [ ] move product-option mapping to the constructor
-- [ ] effective test: Create InMemory fake repos -> service uses the fake repos
-- [ ] add HTTPS
-- [ ] add webhook endpoint (/webhooks/stripe)
