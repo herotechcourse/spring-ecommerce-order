@@ -15,8 +15,6 @@ else
   sleep 5
 fi
 
-./gradlew bootJar
-
 echo "> Starting application..."
 export $(grep -v '^#' "/home/ubuntu/spring-ecommerce-order/.env" | xargs)
 nohup java -jar $DEPLOY_PATH$JAR_NAME > ./application.log 2>&1 &
