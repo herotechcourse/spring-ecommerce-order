@@ -7,4 +7,5 @@ class CartItemRequest(
     val productId: Long,
     @field:Positive(message = "Quantity must be positive")
     val quantity: Int,
+    val optionId: Long,
 )

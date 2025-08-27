@@ -1,5 +1,6 @@
 package ecommerce.exception
 
+import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.MethodArgumentNotValidException
@@ -8,6 +9,10 @@ import org.springframework.web.bind.annotation.RestControllerAdvice
 
 @RestControllerAdvice
 class GlobalExceptionHandler {
+    companion object {
+        private val log = LoggerFactory.getLogger(GlobalExceptionHandler::class.java)
+    }
+
     private fun buildErrorMessage(ex: Throwable): String {
         return buildString {
             append(ex.message ?: "Unexpected error")
@@ -16,6 +21,18 @@ class GlobalExceptionHandler {
                 append(cause.message ?: cause.toString())
             }
         }
+    }
+
+    @ExceptionHandler(StripeResponseParsingException::class)
+    fun handleStripeApiParsingException(ex: StripeResponseParsingException): ResponseEntity<ErrorMessageModel> {
+        log.error("CRITICAL: Failed to parse Stripe API response. This may indicate an API change.", ex)
+
+        val errorMessage =
+            ErrorMessageModel(
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                "An unexpected error occurred with our payment processor. Please contact support.",
+            )
+        return ResponseEntity(errorMessage, HttpStatus.INTERNAL_SERVER_ERROR)
     }
 
     @ExceptionHandler(ProductNotFoundException::class)

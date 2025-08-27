@@ -1,6 +1,7 @@
 package ecommerce.endtoend
 
 import ecommerce.dto.CartItemRequest
+import ecommerce.dto.OptionDto
 import ecommerce.dto.RegistrationRequest
 import ecommerce.repository.CartItemJpaRepository
 import io.restassured.RestAssured
@@ -46,6 +47,7 @@ class CartControllerTest {
             CartItemRequest(
                 productId = 1,
                 quantity = 2,
+                optionId = 1,
             )
 
         val addProduct =
@@ -76,5 +78,78 @@ class CartControllerTest {
         assertThat(jsonObject.get("totalElements")).isEqualTo(1)
         val productName = response.body().jsonPath().getString("content[0].productName")
         assertThat(productName).isEqualTo("Espresso")
+    }
+
+    @Test
+    fun reduceQuantityInProduct() {
+        addToCart()
+
+        val response =
+            RestAssured
+                .given().log().all()
+                .`when`()
+                .request("GET", "/api/products/1")
+                .then()
+                .extract()
+                .response()
+
+        Assertions.assertThat(response.statusCode).isEqualTo(HttpStatus.OK.value())
+        val productName = response.body().jsonPath().getString("name")
+        Assertions.assertThat(productName).isEqualTo("Espresso")
+
+        val options =
+            response.jsonPath()
+                .getList("options", OptionDto::class.java)
+
+        val option = options.first { it.name == "option1" }
+        Assertions.assertThat(option.quantity).isEqualTo(2)
+    }
+
+    @Test
+    fun deleteProductFromCart() {
+        addToCart()
+
+        val deleteResponse =
+            RestAssured.given().log().all()
+                .auth().oauth2(token)
+                .accept(ContentType.JSON)
+                .`when`().delete("/api/user/wishes/1")
+                .then().log().all().extract()
+
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value())
+
+        val getResponse =
+            RestAssured.given().log().all()
+                .auth().oauth2(token)
+                .accept(ContentType.JSON)
+                .`when`().get("/api/user/wishes")
+                .then().log().all().extract()
+
+        val jsonObject = JSONObject(getResponse.asString())
+        assertThat(jsonObject.get("totalElements")).isEqualTo(0)
+    }
+
+    @Test
+    fun deleteAllProductsFromCart() {
+        addToCart()
+
+        val deleteAllResponse =
+            RestAssured.given().log().all()
+                .auth().oauth2(token)
+                .accept(ContentType.JSON)
+                .`when`().delete("/api/user/wishes")
+                .then().log().all().extract()
+
+        assertThat(deleteAllResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value())
+
+        val getResponse =
+            RestAssured.given().log().all()
+                .auth().oauth2(token)
+                .accept(ContentType.JSON)
+                .`when`().get("/api/user/wishes")
+                .then().log().all().extract()
+
+        val jsonObject = JSONObject(getResponse.asString())
+        assertThat(jsonObject.get("totalElements")).isEqualTo(0)
     }
 }

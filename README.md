@@ -104,4 +104,40 @@ Content-Type: application/json
    - This logic should be implemented in the Service class or Entity class for future reuse.
 
 
+## Step 1.4 - Place Order (Stripe Payment Integration)
 
+### Features
+1. **Cart products**
+- [x] Users can choose a product with a selected option and quantity.
+- [x] The system decreases the stock of the selected product option accordingly.
+- [x] Products in cart can be removed after order completion.
+
+2. **Stripe Payment Integration**
+- [x] Integrated with the Stripe Payment Create API using the test sandbox API key.
+- [x] Payments are processed using the Stripe test environment during development.
+
+3. **Error Handling for Payment Failures**
+- [x] If the payment API call fails, the system handles the error safely.
+- [x] Displays message indicating the reason for failure.
+
+## Step 2-2 — Order
+
+### Features
+
+- [x] Create and place orders with selected cart items.
+- [x] Persist payment data linked to the order.
+- [x] Design database relationships for orders and payments to support Stripe payment integration and status tracking.
+- [x] Member API endpoint to view order history and details.
+- [x] The following information must be visible in the Orders API response:
+  - Order date and time
+  - Order status
+  - Purchased items
+  - Checkout session ID (issued by Stripe)
+  - Payment amount
+
+## Step 2-3 - Deployment
+
+### Features
+
+- [x] Write a deployment script to automate the deployment process.
+- [x] Handle security issues when interacting with the client API.

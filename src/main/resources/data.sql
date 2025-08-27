@@ -30,17 +30,6 @@ VALUES (1),
        (3),
        (4);
 
-INSERT INTO CART_ITEM (CART_ID, PRODUCT_ID, QUANTITY, CREATED_AT)
-VALUES (2, 7, 3, NOW()),
-       (2, 8, 2, NOW()),
-       (3, 8, 2, NOW()),
-       (3, 2, 1, NOW());
-
-INSERT INTO CART_HISTORY (CART_PRODUCT_ID, STATUS, CREATED_AT)
-VALUES (1, 'ADDED', NOW()),
-       (2, 'ADDED', NOW()),
-       (3, 'ADDED', NOW()),
-       (4, 'ADDED', NOW());
 
 INSERT INTO OPTION (NAME, QUANTITY, PRODUCT_ID)
 VALUES ('option1', 4, 1),
@@ -53,3 +42,16 @@ VALUES ('option1', 4, 1),
        ('option8', 4, 8),
        ('option9', 4, 9),
        ('option10', 4, 10);
+
+
+INSERT INTO CART_ITEM (CART_ID, PRODUCT_ID, OPTION_ID, QUANTITY, CREATED_AT)
+VALUES (2, 7, 1, 3, NOW()),
+       (2, 8, 2, 2, NOW()),
+       (3, 8, 3, 2, NOW()),
+       (3, 2, 4, 1, NOW());
+
+INSERT INTO CART_HISTORY (CART_PRODUCT_ID, STATUS, CREATED_AT)
+VALUES (1, 'ADDED', NOW()),
+       (2, 'ADDED', NOW()),
+       (3, 'ADDED', NOW()),
+       (4, 'ADDED', NOW());

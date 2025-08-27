@@ -30,4 +30,10 @@ data class Cart(
     fun deleteCartProduct(productId: Long): Boolean {
         return cartProducts.removeIf { it.product.id == productId }
     }
+
+    fun clearCartProducts(): Boolean {
+        val isNotEmpty = cartProducts.isNotEmpty()
+        cartProducts.clear()
+        return isNotEmpty
+    }
 }
