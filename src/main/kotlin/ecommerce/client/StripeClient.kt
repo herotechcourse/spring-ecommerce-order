@@ -3,6 +3,7 @@ package ecommerce.client
 import com.fasterxml.jackson.databind.ObjectMapper
 import ecommerce.config.StripeProperties
 import ecommerce.dto.payment.StripeErrorResponse
+import ecommerce.dto.payment.StripePaymentIntentRequest
 import ecommerce.dto.payment.StripePaymentResponse
 import ecommerce.exception.PaymentClientException
 import ecommerce.exception.PaymentServerException
@@ -16,7 +17,6 @@ import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.HttpServerErrorException
 import org.springframework.web.client.ResourceAccessException
 import org.springframework.web.client.RestClient
-import java.time.Duration
 
 private val logger = KotlinLogging.logger {}
 
@@ -24,36 +24,38 @@ private val logger = KotlinLogging.logger {}
 class StripeClient(
     private val stripeProperties: StripeProperties,
     private val objectMapper: ObjectMapper,
-    private val restClient: RestClient = defaultRestClient(),
+    restClient: RestClient? = null,
+    private val baseUrl: String = "https://api.stripe.com",
 ) {
-    companion object {
-        private fun defaultRestClient(): RestClient =
-            RestClient.builder()
-                .requestFactory(
-                    SimpleClientHttpRequestFactory().apply {
-                        setConnectTimeout(Duration.ofSeconds(3).toMillis().toInt())
-                        setReadTimeout(Duration.ofSeconds(10).toMillis().toInt())
-                    },
-                )
-                .build()
-    }
+    private val restClient: RestClient = restClient ?: buildDefaultRestClient(stripeProperties)
+
+    private fun buildDefaultRestClient(props: StripeProperties): RestClient =
+        RestClient.builder()
+            .requestFactory(
+                SimpleClientHttpRequestFactory().apply {
+                    // Assume props expose millisecond values; adjust if they’re Durations
+                    setConnectTimeout(props.connectTimeoutMs.toInt())
+                    setReadTimeout(props.readTimeoutMs.toInt())
+                },
+            )
+            .build()
 
     fun createPaymentIntent(
         amount: Long,
         currency: String = "usd",
     ): StripePaymentResponse {
-        // Stripe expects application/x-www-form-urlencoded
         val form =
-            LinkedMultiValueMap<String, String>().apply {
-                add("amount", amount.toString()) // smallest currency unit
-                add("currency", currency)
-                // Optionally enable automatic payment methods:
-                // add("automatic_payment_methods[enabled]", "true")
-            }
+            StripePaymentIntentRequest(
+                amount = amount,
+                currency = currency,
+                confirm = true,
+                automaticPaymentMethodsEnabled = true,
+                automaticPaymentMethodsAllowRedirects = "never",
+            ).toForm()
 
         return try {
             restClient.post()
-                .uri("https://api.stripe.com/v1/payment_intents")
+                .uri("$baseUrl/v1/payment_intents")
                 .header(HttpHeaders.AUTHORIZATION, "Bearer ${stripeProperties.secretKey}")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .body(form)
@@ -61,11 +63,15 @@ class StripeClient(
                 .body(StripePaymentResponse::class.java)!!
         } catch (e: HttpClientErrorException) {
             // 4xx from Stripe
-            val msg = parseStripeMessage(e.responseBodyAsString) ?: "Invalid request to Stripe."
+            val raw = e.responseBodyAsString
+            val msg = parseStripeMessage(raw) ?: "Invalid request to Stripe."
+            logger.warn { "Stripe 4xx: status=${e.statusCode.value()}, message=$msg, body=$raw" }
             throw PaymentClientException("Stripe Client Error: $msg")
         } catch (e: HttpServerErrorException) {
             // 5xx from Stripe
-            val msg = parseStripeMessage(e.responseBodyAsString) ?: "Stripe service unavailable."
+            val raw = e.responseBodyAsString
+            val msg = parseStripeMessage(raw) ?: "Stripe service unavailable."
+            logger.error(e) { "Stripe 5xx: status=${e.statusCode.value()}, body=$raw" }
             throw PaymentServerException("Stripe Server Error: $msg")
         } catch (e: ResourceAccessException) {
             // timeouts / I/O issues
@@ -73,6 +79,15 @@ class StripeClient(
             throw PaymentServerException("Could not connect to payment service.")
         }
     }
+
+    private fun StripePaymentIntentRequest.toForm(): LinkedMultiValueMap<String, String> =
+        LinkedMultiValueMap<String, String>().apply {
+            add("amount", amount.toString())
+            add("currency", currency)
+            add("confirm", confirm.toString())
+            add("automatic_payment_methods[enabled]", automaticPaymentMethodsEnabled.toString())
+            add("automatic_payment_methods[allow_redirects]", automaticPaymentMethodsAllowRedirects)
+        }
 
     private fun parseStripeMessage(body: String?): String? =
         try {
