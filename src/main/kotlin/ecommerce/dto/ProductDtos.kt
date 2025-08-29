@@ -7,7 +7,7 @@ import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Pattern
 import jakarta.validation.constraints.Size
 
-data class CreateProductRequest(
+class CreateProductRequest(
     @field:NotNull(message = "Name must not be blank")
     @field:Size(max = 15, message = "Name must be at most 15 characters")
     @field:Pattern(
@@ -35,7 +35,7 @@ data class CreateProductRequest(
     val imageUrl: String,
 )
 
-data class UpdateProductRequest(
+class UpdateProductRequest(
     @field:NotNull(message = "Name must not be blank")
     @field:Size(max = 15, message = "Name must be at most 15 characters")
     @field:Pattern(
@@ -60,7 +60,7 @@ data class UpdateProductRequest(
     val imageUrl: String,
 )
 
-data class ProductOptionRequest(
+class ProductOptionRequest(
     @field:NotNull(message = "Option Name must not be blank")
     @field:Size(max = 50, message = "Name must be at most 50 characters")
     @field:Pattern(
@@ -74,11 +74,13 @@ data class ProductOptionRequest(
     @field:Min(1, message = "quantity must be greater than 0")
     @field:Max(99999999, message = "quantity must be lesser than 100,000,000")
     val quantity: Int,
+    @field:NotNull(message = "Price must not be empty")
+    var price: Double,
     @field:NotNull(message = "Product must not be blank")
     var productId: Long,
 )
 
-data class ProductPatchRequest(
+class ProductPatchRequest(
     @field:Size(max = 15, message = "Name must be at most 15 characters")
     @field:Pattern(
         regexp = "^[a-zA-Z0-9 ()\\[\\]+\\-&/_]{1,100}$",

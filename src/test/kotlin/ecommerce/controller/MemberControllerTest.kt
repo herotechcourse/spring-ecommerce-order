@@ -33,7 +33,7 @@ class MemberControllerTest {
 
     @BeforeEach
     fun setUpAdmin() {
-        val adminMember = Member("admin@email.com", "adminpass", "Admin User", Role.ADMIN, 2L)
+        val adminMember = Member("admin@email.com", "adminpass", "Admin User", Role.ADMIN, id = 2L)
         adminToken = tokenService.generateToken(adminMember)
     }
 

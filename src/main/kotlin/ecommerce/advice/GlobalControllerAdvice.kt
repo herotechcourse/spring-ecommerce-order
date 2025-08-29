@@ -4,11 +4,12 @@ import ecommerce.exception.AuthenticationException
 import ecommerce.exception.AuthorizationException
 import ecommerce.exception.DuplicateNameException
 import ecommerce.exception.ErrorResponse
+import ecommerce.exception.FailedPaymentException
 import ecommerce.exception.InsufficientProductOptionsException
 import ecommerce.exception.NotFoundException
-import ecommerce.exception.ProductValidationException
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
+import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestControllerAdvice
@@ -17,9 +18,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice
 class GlobalControllerAdvice {
     private val log = LoggerFactory.getLogger(GlobalControllerAdvice::class.java)
 
-    @ExceptionHandler(RuntimeException::class)
+    @ExceptionHandler(Exception::class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    fun handleGenericException(e: RuntimeException): ErrorResponse {
+    fun handleGenericException(e: Exception): ErrorResponse {
         log.error("Unhandled exception occurred", e)
 
         return ErrorResponse(
@@ -34,16 +35,6 @@ class GlobalControllerAdvice {
         return ErrorResponse(
             error = "NOT_FOUND",
             message = e.message ?: "Resource not found",
-        )
-    }
-
-    @ExceptionHandler(ProductValidationException::class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    fun handleProductValidationException(e: ProductValidationException): ErrorResponse {
-        return ErrorResponse(
-            error = "VALIDATION_ERROR",
-            message = e.message ?: "Validation failed",
-            fieldErrors = null,
         )
     }
 
@@ -71,6 +62,35 @@ class GlobalControllerAdvice {
         return ErrorResponse(
             error = "CONFLICT",
             message = e.message ?: "Duplicate name conflict",
+        )
+    }
+
+    @ExceptionHandler(FailedPaymentException::class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    fun handleFailedPaymentException(e: FailedPaymentException): ErrorResponse {
+        return ErrorResponse(
+            error = "PAYMENT_FAILED",
+            message = e.message ?: "Payment processing failed",
+        )
+    }
+
+    @ExceptionHandler(IllegalStateException::class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    fun handleIllegalStateException(e: IllegalStateException): ErrorResponse {
+        return ErrorResponse(
+            error = "CONFLICT",
+            message = e.message ?: "Invalid operation",
+        )
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException::class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    fun handleValidationException(e: MethodArgumentNotValidException): ErrorResponse {
+        val fieldErrors = e.bindingResult.fieldErrors.associate { it.field to (it.defaultMessage ?: "Invalid value") }
+        return ErrorResponse(
+            error = "VALIDATION_FAILED",
+            message = "Request validation failed",
+            fieldErrors = fieldErrors,
         )
     }
 

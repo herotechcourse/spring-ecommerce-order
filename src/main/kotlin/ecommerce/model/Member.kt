@@ -7,16 +7,13 @@ import jakarta.persistence.Enumerated
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
-import jakarta.persistence.Index
 import jakarta.persistence.Table
+import org.hibernate.annotations.CreationTimestamp
+import org.hibernate.annotations.UpdateTimestamp
+import java.time.LocalDateTime
 
 @Entity
-@Table(
-    name = "members",
-    indexes = [
-        Index(name = "idx_member_email", columnList = "email"),
-    ],
-)
+@Table(name = "members")
 class Member(
     @Column(name = "email", nullable = false, unique = true)
     var email: String,
@@ -27,19 +24,16 @@ class Member(
     @Column(name = "role", nullable = false)
     @Enumerated(EnumType.STRING)
     val role: Role = Role.USER,
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    var createdAt: LocalDateTime? = null,
+    @UpdateTimestamp
+    @Column(name = "updated_at", nullable = false)
+    var updatedAt: LocalDateTime? = null,
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 ) {
-    constructor(
-        email: String,
-        name: String,
-    ) : this(
-        email = email,
-        password = "",
-        name = name,
-    )
-
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is Member) return false
@@ -52,7 +46,7 @@ class Member(
     }
 
     override fun hashCode(): Int {
-        return email.hashCode()
+        return id?.hashCode() ?: email.hashCode()
     }
 
     fun updateProfile(

@@ -99,7 +99,7 @@ class MemberControllerIntegrationTest {
 
     @Test
     fun `should return 200 - valid token of ADMIN member`() {
-        val testMember = Member("jin@gmail.com", "pw1234", "jin", Role.ADMIN, 1L)
+        val testMember = Member("jin@gmail.com", "pw1234", "jin", Role.ADMIN, id = 1L)
         val validToken = tokenService.generateToken(testMember)
         mockMvc.get("/api/admin/products") {
             header("Authorization", "Bearer $validToken")
@@ -110,7 +110,7 @@ class MemberControllerIntegrationTest {
 
     @Test
     fun `should return 200 - USER can access cart`() {
-        val testMember = Member("jin@gmail.com", "pw1234", "jin", Role.USER, 1L)
+        val testMember = Member("jin@gmail.com", "pw1234", "jin", Role.USER, id = 1L)
         val validToken = tokenService.generateToken(testMember)
         mockMvc.get("/api/carts/1/items") {
             header("Authorization", "Bearer $validToken")
@@ -137,7 +137,7 @@ class MemberControllerIntegrationTest {
 
     @Test
     fun `should return 403 - USER role cannot access admin endpoint`() {
-        val testMember = Member("user@gmail.com", "pw1234", "user", Role.USER, 3L)
+        val testMember = Member("user@gmail.com", "pw1234", "user", Role.USER, id = 3L)
         val validToken = tokenService.generateToken(testMember)
         mockMvc.get("/api/admin/products") {
             header("Authorization", "Bearer $validToken")

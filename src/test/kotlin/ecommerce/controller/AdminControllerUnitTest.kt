@@ -1,6 +1,8 @@
 package ecommerce.controller
 
+import ecommerce.dto.auth.AuthenticatedUser
 import ecommerce.model.Product
+import ecommerce.model.Role
 import ecommerce.service.ProductOptionService
 import ecommerce.service.ProductService
 import org.assertj.core.api.Assertions.assertThat
@@ -37,7 +39,8 @@ class AdminControllerUnitTest {
 
         `when`(productService.findProductById(productId)).thenReturn(expectedProduct)
 
-        val result = adminController.getProductById(productId)
+        val adminUser = AuthenticatedUser(1L, Role.ADMIN, "admin@test.com", "Admin User")
+        val result = adminController.getProductById(productId, adminUser)
 
         assertThat(result).isEqualTo(expectedProduct)
         verify(productService, times(1)).findProductById(productId)
@@ -48,8 +51,9 @@ class AdminControllerUnitTest {
         val productId = 999L
         `when`(productService.findProductById(productId)).thenThrow(RuntimeException("Product not found"))
 
+        val adminUser = AuthenticatedUser(1L, Role.ADMIN, "admin@test.com", "Admin User")
         assertThrows(RuntimeException::class.java) {
-            adminController.getProductById(productId)
+            adminController.getProductById(productId, adminUser)
         }
         verify(productService, times(1)).findProductById(productId)
     }
@@ -65,7 +69,8 @@ class AdminControllerUnitTest {
 
         `when`(productService.findAllProducts(0, 10, "name")).thenReturn(page)
 
-        val result = adminController.getAllProducts(0, 10, "name")
+        val adminUser = AuthenticatedUser(1L, Role.ADMIN, "admin@test.com", "Admin User")
+        val result = adminController.getAllProducts(0, 10, "name", adminUser)
 
         assertThat(result).isEqualTo(page)
         assertThat(result.content.size).isEqualTo(2)

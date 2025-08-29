@@ -1,4 +1,4 @@
-package ecommerce.resolver
+package ecommerce.auth
 
 import ecommerce.dto.auth.AuthenticatedUser
 import ecommerce.interceptor.AuthInterceptor

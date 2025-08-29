@@ -58,6 +58,6 @@ class Product(
     }
 
     override fun toString(): String {
-        return "Product(id=$id, name=$name, price=$price quantity=$quantity)"
+        return "Product(id=$id, name=$name, price=$price, quantity=$quantity)"
     }
 }

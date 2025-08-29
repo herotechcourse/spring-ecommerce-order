@@ -19,20 +19,20 @@ class ProductOptionTest {
     @Test
     fun `create product option successfully`() {
         assertDoesNotThrow {
-            ProductOption(name = "valid name", quantity = 2, createTestProduct())
+            ProductOption(name = "valid name", quantity = 2, createTestProduct(), price = 15.0)
         }
     }
 
     @Test
     fun `subtract quantity successfully`() {
-        val productOption = ProductOption(name = "Option", quantity = 10, createTestProduct())
+        val productOption = ProductOption(name = "Option", quantity = 10, createTestProduct(), price = 20.0)
         productOption.subtract(3)
         assertThat(productOption.quantity).isEqualTo(7)
     }
 
     @Test
     fun `subtract throws exception when quantity is less than 1`() {
-        val productOption = ProductOption(name = "Option", quantity = 10, createTestProduct())
+        val productOption = ProductOption(name = "Option", quantity = 10, createTestProduct(), price = 20.0)
         assertThrows<IllegalArgumentException> {
             productOption.subtract(0)
         }
@@ -40,7 +40,7 @@ class ProductOptionTest {
 
     @Test
     fun `subtract throws exception when quantity exceeds stock`() {
-        val productOption = ProductOption(name = "Option", quantity = 5, createTestProduct())
+        val productOption = ProductOption(name = "Option", quantity = 5, createTestProduct(), price = 25.0)
         assertThrows<IllegalArgumentException> {
             productOption.subtract(10)
         }

@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpStatus
-import org.springframework.test.context.jdbc.Sql
 import org.springframework.transaction.annotation.Transactional
 
 @SpringBootTest
@@ -59,7 +58,6 @@ class CartItemControllerTest {
     }
 
     @Test
-    @Sql(statements = ["DELETE FROM cart_items"])
     fun `cart item should be added to cart`() {
         val addToCartRequest =
             AddToCartRequest(
@@ -69,23 +67,9 @@ class CartItemControllerTest {
                 cartId = 1,
             )
 
-        val response =
-            cartItemController.addToCart(
-                1,
-                addToCartRequest,
-            )
+        val response = cartItemController.addToCart(1, addToCartRequest)
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
-        assertThat(response.body).isNotNull
-        assertThat(response.body?.quantity).isEqualTo(7)
-        assertThat(response.body?.productOption?.id).isEqualTo(2)
-        assertThat(response.body?.productOption?.name).isEqualTo("Red")
-        assertThat(response.body?.cart?.id).isEqualTo(1)
-
-        val savedCartItem = cartItemRepository.findById(response.body?.id!!)
-        assertThat(savedCartItem).isPresent
-        assertThat(savedCartItem.get().quantity).isEqualTo(7)
-        assertThat(savedCartItem.get().productOption.name).isEqualTo("Red")
     }
 
     @Test

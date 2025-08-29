@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
+@Transactional
 class CartService(
     private val cartRepository: CartRepository,
     private val cartItemRepository: CartItemRepository,
@@ -29,7 +30,6 @@ class CartService(
         return cartItemRepository.findByCartId(cartId)
     }
 
-    @Transactional
     fun clearCart(userId: Long) {
         cartRepository.deleteByMemberId(userId)
     }

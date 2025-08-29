@@ -22,7 +22,7 @@ class CartItemController(
         @PathVariable cartId: Long,
         @RequestBody request: AddToCartRequest,
     ): ResponseEntity<CartItem> {
-        val cartItem = cartItemService.saveCartItem(request, cartId)
+        val cartItem = cartItemService.addCartItem(request, cartId)
         return ResponseEntity.ok(cartItem)
     }
 
@@ -32,7 +32,7 @@ class CartItemController(
         @PathVariable cartId: Long,
         @RequestBody request: AddToCartRequest,
     ): ResponseEntity<CartItem> {
-        val updatedItem = cartItemService.saveCartItem(request, itemId, cartId)
+        val updatedItem = cartItemService.addCartItem(request, cartId)
         return ResponseEntity.ok(updatedItem)
     }
 

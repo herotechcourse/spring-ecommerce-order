@@ -62,3 +62,77 @@
 - [x] **Pagination** - Add `Pageable` support to controllers
 - [x] **Inventory Management** - Stock tracking and validation
 - [ ] **Performance** - Query optimization and caching
+
+---
+
+## External API Integration - Step 2 (Feature-list)
+
+### Step 2-1: Stripe Payment Integration
+- [x] Create Order related entities (Order, OrderItem, OrderStatus, PaymentStatus)
+- [x] Create Payment related entities (Payment, PaymentMethod)
+- [x] Basic order creation workflow (CheckoutController, OrderService)
+- [x] Cart-based order placement (CreateOrderRequest with cartItemIds)
+- [x] Order validation (cart ownership, stock availability)
+- [x] Stock management methods (updateProductStock, clearCartItems)
+- [x] Implement Stripe Payment API integration (/config)
+    - [x] StripeProperties configuration class
+    - [x] StripeClient for API calls
+    - [x] Enable configuration properties in Application
+- [x] Connect payment flow to order creation
+    - [x] Create payment intent before order creation
+    - [x] Handle payment confirmation/failure
+    - [x] Integrate stock decrease on successful payment
+    - [x] Integrate cart cleanup on successful payment
+
+### Step 2-2: Orders Management
+- [x] Implement Orders API endpoints
+- [x] Display order information:
+    - [x] (mandatory) Order date and time, Order status, Purchased items, Checkout session Id (issued by stripe), Payment amount
+    - [] (optional) other payment-related fields
+- [x] Design database schema for orders and payments
+
+### Step 2-3: Deployment
+- [x] Create automated deployment script (start.sh)
+    - [x] Build JAR file with gradle
+    - [x] Stop existing application process
+    - [x] Copy new JAR to deployment location
+    - [x] Start application with nohup
+- [x] Configure CORS for client-server interaction
+    - [x] Add CORS configuration to WebMvcConfig
+    - [x] Allow cross-origin requests from frontend
+    - [x] Test CORS with OPTIONS requests
+- [x] Handle security considerations for production deployment
+    - [x] Set up proper logging for production
+    - [x] Ensure JWT secret is environment-based (via .env file)
+    - [x] Configure proper CORS origins (not wildcard in production)
+- [ ] (optional) Implement HTTPS
+- [x] Test deployment on AWS instance
+- [x] Verify application runs correctly in production environment
+
+--- 
+## Development-plan
+
+### Product Structure
+```
+src/main/kotlin/ecommerce/
+├── controller/                 # REST API endpoints (e.g., Products, Cart)
+├── service/                    # Business logic (e.g., ProductService, CartService)
+├── repository/                 # Spring Data JPA repositories
+├── domain/                     # JPA entities (the core business objects)
+├── web/dto/                    # Data Transfer Objects (Request/Response)
+└── config/                     # Spring configurations (e.g., WebMvcConfig)
+```
+
+### Domain Models
+* **`Member`**:
+    * Represents a user account with an email, password, and role.
+* **`Product`**:
+    * A product in the catalog with basic information like name and brand.
+    * It contains a list of `ProductOption`s.
+* **`ProductOption`**:
+    * A specific variant of a product (e.g., size, color) with its own price and stock quantity.
+    * This is the purchasable unit.
+* **`Cart`**:
+    * A shopping cart linked to a `Member`.
+* **`CartItem`**:
+    * An item within a `Cart`, linked to a specific `ProductOption` and tracking the quantity.

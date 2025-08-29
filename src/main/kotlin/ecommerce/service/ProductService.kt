@@ -52,7 +52,7 @@ class ProductService(
         val productOptions =
             request.productOptions.map { option ->
                 option.productId = savedProduct.id!!
-                ProductOption(option.name, option.quantity, savedProduct)
+                ProductOption(option.name, option.quantity, savedProduct, request.price)
             }
 
         try {

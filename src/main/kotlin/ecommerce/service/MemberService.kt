@@ -1,7 +1,7 @@
 package ecommerce.service
 
+import ecommerce.dto.member.MemberUpdateRequest
 import ecommerce.dto.member.RegisterRequest
-import ecommerce.dto.member.UpdateRequest
 import ecommerce.exception.AuthenticationException
 import ecommerce.exception.NotFoundException
 import ecommerce.model.Cart
@@ -59,18 +59,18 @@ class MemberService(
     @Transactional
     fun updateMemberById(
         id: Long,
-        updateRequest: UpdateRequest,
+        memberUpdateRequest: MemberUpdateRequest,
     ) {
         val existingMember =
             memberRepository.findByIdOrNull(id)
                 ?: throw NotFoundException("Member with id $id not found")
 
-        if (updateRequest.email != existingMember.email &&
-            memberRepository.existsByEmail(updateRequest.email)
+        if (memberUpdateRequest.email != existingMember.email &&
+            memberRepository.existsByEmail(memberUpdateRequest.email)
         ) {
             throw IllegalArgumentException("Email already exists")
         }
-        existingMember.updateProfile(updateRequest.email, updateRequest.name)
+        existingMember.updateProfile(memberUpdateRequest.email, memberUpdateRequest.name)
     }
 
     fun deleteMemberById(id: Long) {

@@ -1,6 +1,6 @@
 package ecommerce.controller
 
-import ecommerce.dto.member.UpdateRequest
+import ecommerce.dto.member.MemberUpdateRequest
 import ecommerce.model.Member
 import ecommerce.service.MemberService
 import jakarta.validation.Valid
@@ -34,10 +34,10 @@ class MemberController(private val memberService: MemberService) {
 
     @PutMapping("/{id}")
     fun updateMember(
-        @Valid @RequestBody updateRequest: UpdateRequest,
+        @Valid @RequestBody memberUpdateRequest: MemberUpdateRequest,
         @PathVariable id: Long,
     ): ResponseEntity<Unit> {
-        memberService.updateMemberById(id, updateRequest)
+        memberService.updateMemberById(id, memberUpdateRequest)
         return ResponseEntity.ok().build()
     }
 

@@ -39,6 +39,7 @@ class ProductOptionService(
                     name = request.name,
                     quantity = request.quantity,
                     product = product,
+                    price = request.price,
                 )
             return productOptionRepository.save(newOption)
         }
