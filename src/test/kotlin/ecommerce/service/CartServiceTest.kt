@@ -1,12 +1,12 @@
 package ecommerce.service
 
-import ecommerce.TestFixture.BRUSH
-import ecommerce.TestFixture.PAINTING_SAD_HUMAN
-import ecommerce.TestFixture.createAdmin
-import ecommerce.TestFixture.createMina
-import ecommerce.TestFixture.createPaintingHappyHuman
-import ecommerce.TestFixture.createPaintingSadHuman
-import ecommerce.TestFixture.createPetra
+import ecommerce.BasicTestFixture
+import ecommerce.BasicTestFixture.PAINTING_SAD_HUMAN
+import ecommerce.BasicTestFixture.createAdmin
+import ecommerce.BasicTestFixture.createMina
+import ecommerce.BasicTestFixture.createPaintingHappyHuman
+import ecommerce.BasicTestFixture.createPaintingSadHuman
+import ecommerce.BasicTestFixture.createPetra
 import ecommerce.dto.CartItemRequest
 import ecommerce.repository.MemberRepository
 import ecommerce.repository.ProductRepository
@@ -16,9 +16,11 @@ import org.junit.jupiter.api.assertDoesNotThrow
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.context.annotation.Import
+import org.springframework.test.context.jdbc.Sql
 
 @DataJpaTest
 @Import(CartService::class)
+@Sql(scripts = ["classpath:cleanup.sql"], executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 class CartServiceTest {
     @Autowired
     private lateinit var cartService: CartService
@@ -33,35 +35,43 @@ class CartServiceTest {
     fun `adding item does not throw exception`() {
         assertDoesNotThrow {
             val member = memberRepository.save(createPetra())
-            val product = productRepository.save(BRUSH)
-            val request = CartItemRequest(product.id!!, 1)
+            val fixture = BasicTestFixture.createBrushWithOptions()
+            val product = productRepository.save(fixture)
+            val firstOption = product.options.first()
+            val request = CartItemRequest(firstOption.id, 1)
 
-            val cartItem = cartService.addItem(member.id!!, request)
-            cartItem.cart!!
+            val cartItem = cartService.addItem(member.id, request)
+            cartItem.cart
         }
     }
 
     @Test
     fun `adding item returns the correct cart item`() {
         val member = memberRepository.save(createMina())
-        val product = productRepository.save(createPaintingSadHuman())
-        val request = CartItemRequest(product.id!!, 1)
+        val fixture = BasicTestFixture.createProductWithOptions(createPaintingSadHuman())
+        val product = productRepository.save(fixture)
 
-        val cartItem = cartService.addItem(member.id!!, request)
+        val firstOption = product.options.first()
+        val request = CartItemRequest(firstOption.id, 1)
+
+        val cartItem = cartService.addItem(member.id, request)
         assertThat(cartItem.product.name).isEqualTo(PAINTING_SAD_HUMAN.name)
     }
 
     @Test
     fun `delete item does not throw an exception`() {
         val member = memberRepository.save(createAdmin())
-        val product = productRepository.save(createPaintingHappyHuman())
-        val addRequest = CartItemRequest(product.id!!, 1)
-        val cartItem = cartService.addItem(member.id!!, addRequest)
+        val fixture = BasicTestFixture.createProductWithOptions(createPaintingHappyHuman())
+        val savedProduct = productRepository.save(fixture)
 
-        val deleteRequest = CartItemRequest(cartItem.product.id!!, 1)
+        val firstOption = savedProduct.options.first()
+        val addRequest = CartItemRequest(firstOption.id, 1)
+
+        val cartItem = cartService.addItem(member.id, addRequest)
+        val deleteRequest = CartItemRequest(firstOption.id, 1)
 
         assertDoesNotThrow {
-            cartService.deleteItem(member.id!!, deleteRequest)
+            cartService.deleteItem(member.id, deleteRequest)
         }
     }
 }

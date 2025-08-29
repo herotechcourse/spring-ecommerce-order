@@ -24,7 +24,12 @@ class Product(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0L,
 ) {
-    @OneToMany(mappedBy = "product", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
+    @OneToMany(
+        mappedBy = "product",
+        cascade = [CascadeType.ALL],
+        orphanRemoval = true,
+        fetch = FetchType.LAZY,
+    )
     val options: MutableList<Option> = mutableListOf()
 
     fun addOptions(newOptions: List<Option>): Product {
@@ -32,7 +37,7 @@ class Product(
         return this
     }
 
-    fun addOption(newOption: Option): Product {
+    private fun addOption(newOption: Option): Product {
         require(options.none { it.name == newOption.name }) {
             throw DuplicateOptionNameException("Duplicate option name: ${newOption.name}")
         }

@@ -17,8 +17,7 @@ class DefaultProductFactory : ProductFactory {
         require(request.options.distinct().size == request.options.size) {
             throw DuplicateOptionNameException("Duplicate option found in new options")
         }
-
-        val optionEntities = request.options.map { Option(name = it.name, quantity = it.quantity) }
+        val optionEntities = request.options.map { Option(name = it.name, availableStock = it.quantity) }
         val product =
             Product(
                 name = request.name,
