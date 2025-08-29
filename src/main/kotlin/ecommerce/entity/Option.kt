@@ -9,12 +9,14 @@ import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
+import jakarta.persistence.Version
 
 @Entity
 @Table(name = "product_option")
 class Option(
     name: String,
     @Column(nullable = false)
+    @Version
     var quantity: Int,
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,11 +33,5 @@ class Option(
         require(quantity in 1 until 100_000_000) {
             "Quantity must be between 1 and 99,999,999."
         }
-    }
-
-    fun subtract(amount: Int) {
-        if (amount <= 0) throw IllegalArgumentException("Amount must be positive.")
-        if (quantity - amount < 0) throw IllegalStateException("Not enough quantity.")
-        quantity -= amount
     }
 }

@@ -4,40 +4,67 @@ import ecommerce.dto.CartRequest
 import ecommerce.dto.MemberStatsResponse
 import ecommerce.dto.ProductStatResponse
 import ecommerce.entity.Cart
+import ecommerce.entity.CartItem
 import ecommerce.entity.Member
 import ecommerce.repository.CartJpaRepository
 import ecommerce.repository.CartStaticsRepository
-import ecommerce.repository.ProductJpaRepository
-import org.springframework.data.repository.findByIdOrNull
+import ecommerce.repository.OptionJpaRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
 class CartService(
     private val cartRepository: CartJpaRepository,
-    private val productRepository: ProductJpaRepository,
     private val cartStaticsRepository: CartStaticsRepository,
+    private val optionRepository: OptionJpaRepository,
 ) {
     @Transactional
-    fun addToCart(
+    fun addOptionToCart(
         member: Member,
         request: CartRequest,
     ) {
-        val product = productRepository.findByIdOrNull(request.productId) ?: throw NoSuchElementException()
-        cartRepository.save(Cart(member, product))
+        val option =
+            optionRepository.findByProductIdAndId(
+                request.productId,
+                request.optionId,
+            ) ?: throw NoSuchElementException()
+
+        val cart =
+            cartRepository.findByMemberId(
+                member.id,
+            ) ?: Cart(member)
+
+        cart.add(option, request.quantity)
+        cartRepository.save(cart)
     }
 
     @Transactional(readOnly = true)
-    fun getCartItems(memberId: Long): List<Cart> {
+    fun getCartItems(memberId: Long): List<CartItem> {
         return cartRepository.findByMemberId(memberId)
+            ?.items
+            ?.toList()
+            ?: throw NoSuchElementException("Cart for member $memberId not found")
+    }
+
+    @Transactional(readOnly = true)
+    fun findCartByIdAndMemberId(
+        cartId: Long,
+        memberId: Long,
+    ): Cart? {
+        return cartRepository.findByMemberId(memberId) ?: throw NoSuchElementException()
     }
 
     @Transactional
-    fun removeFromCart(
-        memberId: Long,
-        productId: Long,
+    fun removeOptionFromCart(
+        member: Member,
+        request: CartRequest,
     ) {
-        cartRepository.deleteByMemberIdAndProductId(memberId, productId)
+        val cart =
+            cartRepository.findByMemberId(
+                member.id,
+            ) ?: throw NoSuchElementException()
+
+        cart.remove(request.optionId, request.quantity)
     }
 
     @Transactional(readOnly = true)
@@ -48,5 +75,14 @@ class CartService(
     @Transactional(readOnly = true)
     fun getRecentlyActiveMembers(): List<MemberStatsResponse> {
         return cartStaticsRepository.getRecentlyActiveMembers()
+    }
+
+    @Transactional
+    fun clearCart(memberId: Long) {
+        val cart =
+            cartRepository.findByMemberId(memberId)
+                ?: throw NoSuchElementException("Cart for member $memberId not found")
+
+        cart.clear()
     }
 }

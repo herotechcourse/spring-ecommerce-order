@@ -1,6 +1,6 @@
 package ecommerce.auth
 
-import ecommerce.entity.Role
+import ecommerce.entity.enumerated.Role
 import ecommerce.service.MemberService
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse

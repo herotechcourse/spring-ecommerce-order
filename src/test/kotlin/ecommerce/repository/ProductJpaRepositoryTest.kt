@@ -26,7 +26,7 @@ class ProductJpaRepositoryTest {
         val product =
             Product(
                 name = "TestProduct",
-                price = 19.99,
+                price = 19,
                 imageUrl = "http://test.com/image.png",
                 options = listOf(option),
             )

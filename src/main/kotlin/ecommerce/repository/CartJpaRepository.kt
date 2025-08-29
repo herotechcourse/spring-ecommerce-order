@@ -6,15 +6,10 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
 
 interface CartJpaRepository : JpaRepository<Cart, Long> {
-    fun findByMemberId(memberId: Long): List<Cart>
+    fun findByMemberId(memberId: Long): Cart?
 
     fun findByMemberId(
         memberId: Long,
         pageable: Pageable,
     ): Page<Cart>
-
-    fun deleteByMemberIdAndProductId(
-        memberId: Long,
-        productId: Long,
-    )
 }

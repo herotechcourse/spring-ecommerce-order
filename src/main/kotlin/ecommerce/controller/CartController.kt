@@ -2,7 +2,7 @@ package ecommerce.controller
 
 import ecommerce.auth.annotation.LoginMember
 import ecommerce.dto.CartRequest
-import ecommerce.entity.Cart
+import ecommerce.entity.CartItem
 import ecommerce.entity.Member
 import ecommerce.service.CartService
 import org.springframework.http.ResponseEntity
@@ -23,14 +23,14 @@ class CartController(
         @RequestBody request: CartRequest,
         @LoginMember member: Member,
     ): ResponseEntity<Unit> {
-        cartService.addToCart(member, request)
+        cartService.addOptionToCart(member, request)
         return ResponseEntity.ok().build()
     }
 
     @GetMapping
     fun getCart(
         @LoginMember member: Member,
-    ): ResponseEntity<List<Cart>> {
+    ): ResponseEntity<List<CartItem>> {
         val cartItems = cartService.getCartItems(member.id)
         return ResponseEntity.ok(cartItems)
     }
@@ -40,7 +40,7 @@ class CartController(
         @RequestBody request: CartRequest,
         @LoginMember member: Member,
     ): ResponseEntity<Unit> {
-        cartService.removeFromCart(member.id, request.productId)
+        cartService.removeOptionFromCart(member, request)
         return ResponseEntity.noContent().build()
     }
 }

@@ -29,6 +29,11 @@ class ProductService(
     }
 
     @Transactional(readOnly = true)
+    fun findById(id: Long): Product {
+        return productRepository.findById(id).orElseThrow()
+    }
+
+    @Transactional(readOnly = true)
     fun getAllPaginated(pageable: Pageable): Page<ProductResponse> {
         return productRepository.findAll(pageable).map { it.toResponse() }
     }

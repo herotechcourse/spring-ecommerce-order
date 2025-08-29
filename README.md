@@ -1,6 +1,5 @@
 # spring-ecommerce-order Step 1
 
-
 ## Step 1.1 - Entity Mapping
 
 ### Features to Implement step 1.1
@@ -26,3 +25,16 @@
 - [x] Option quantity must be at least 1 and less than 100,000,000.
 - [x] Duplicate option names are not allowed within the same product to prevent confusion during purchase.
 - [x] Implement a method to decrease the quantity of a product option by a specified amount.
+
+## Step 2.1 - External API
+
+### Features to implement step 2.1
+
+- [x] Load payment sandbox key and expose a configured payment client.
+- [x] Order domain model:
+  - [x] Order (PENDING/PAID/FAILED).
+  - [x] OrderItem.
+- [x] Place order endpoint.
+- [x] Transaction flow: PENDING order → call payment → on success mark PAID and keep stock; on failure mark FAILED and restore stock.
+- [x] Cart cleanup on success.
+- [x] User-facing error messages.

@@ -1,4 +1,4 @@
-package ecommerce.entity
+package ecommerce.entity.enumerated
 
 enum class Role {
     USER,

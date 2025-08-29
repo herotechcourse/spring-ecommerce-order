@@ -1,4 +1,4 @@
-package ecommerce.dto.stripe
+package ecommerce.dto
 
 class PaymentResponse(
     val id: String,

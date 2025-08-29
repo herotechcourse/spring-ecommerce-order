@@ -7,7 +7,7 @@ class ProductTest {
     private val dummyProduct =
         Product(
             name = "Test Product",
-            price = 1.0,
+            price = 1,
             imageUrl = "http://test.com",
             options =
                 listOf(
@@ -27,7 +27,7 @@ class ProductTest {
         assertThrows<IllegalArgumentException> {
             Product(
                 "a",
-                0.0,
+                0,
                 "http://example.jpg",
                 listOf(
                     Option("salami", 2),
@@ -41,7 +41,7 @@ class ProductTest {
         assertThrows<IllegalArgumentException> {
             Product(
                 "a",
-                3.0,
+                3,
                 "example.jpg",
                 listOf(
                     Option("salami", 2),
