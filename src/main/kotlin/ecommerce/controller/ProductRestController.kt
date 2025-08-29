@@ -7,7 +7,6 @@ import ecommerce.service.ProductService
 import jakarta.validation.Valid
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
-import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -27,17 +26,17 @@ class ProductRestController(
 ) {
     @GetMapping
     fun getAll(
-
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "10") size: Int,
         @RequestParam(defaultValue = "id") sortBy: String,
         @RequestParam(defaultValue = "asc") direction: String,
     ): ResponseEntity<Page<ProductResponse>> {
-        val sort = if (direction.equals("desc", ignoreCase = true)) {
-            Sort.by(sortBy).descending()
-        } else {
-            Sort.by(sortBy).ascending()
-        }
+        val sort =
+            if (direction.equals("desc", ignoreCase = true)) {
+                Sort.by(sortBy).descending()
+            } else {
+                Sort.by(sortBy).ascending()
+            }
 
         val pageable = PageRequest.of(page, size, sort)
         val result = productService.getAllPaginated(pageable)

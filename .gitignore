@@ -38,3 +38,12 @@ out/
 
 ### Mac OS ###
 .DS_Store
+
+# --- Env & secrets ---
+.env
+*.key
+*.pem
+*.crt
+*.jks
+*.keystore
+
